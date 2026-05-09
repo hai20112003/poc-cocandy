@@ -71,10 +71,8 @@ const COLUMNS: ColumnDef<SupplierSource, unknown>[] = [
 ]
 
 export function SourcesPage() {
-  const { sources: f, setFilter } = useFiltersStore((s) => ({
-    sources: s.sources,
-    setFilter: s.setFilter,
-  }))
+  const f = useFiltersStore((s) => s.sources)
+  const setFilter = useFiltersStore((s) => s.setFilter)
   const debouncedSearch = useDebounce(f.search, 300)
   const { sources, isLoading } = useSources()
 

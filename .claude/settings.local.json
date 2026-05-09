@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk ls *)",
+      "Bash(rtk find *)",
+      "Bash(bash *)",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v20.20.1/bin:$PATH\")",
+      "Bash(rtk git *)",
+      "Bash(export PATH=\"/Users/hainv03/.nvm/versions/node/v20.20.1/bin:$PATH\")",
+      "Bash(npm create *)",
+      "Bash(npx create-vite@latest *)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(rtk npx *)",
+      "Bash(./node_modules/.bin/tailwindcss init *)",
+      "Bash(rtk read *)",
+      "Bash(rtk npm *)",
+      "Bash(git init *)",
+      "Bash(/usr/bin/npm run *)",
+      "Bash(git rm *)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npx shadcn@latest add sheet input select separator skeleton dropdown-menu badge)",
+      "Bash(rtk grep *)",
+      "Bash(rtk tsc *)"
+    ]
+  }
+}

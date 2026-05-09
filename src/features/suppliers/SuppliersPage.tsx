@@ -30,10 +30,8 @@ const COLUMNS: ColumnDef<Supplier, unknown>[] = [
 ]
 
 export function SuppliersPage() {
-  const { suppliers: f, setFilter } = useFiltersStore((s) => ({
-    suppliers: s.suppliers,
-    setFilter: s.setFilter,
-  }))
+  const f = useFiltersStore((s) => s.suppliers)
+  const setFilter = useFiltersStore((s) => s.setFilter)
   const debouncedSearch = useDebounce(f.search, 300)
   const { suppliers, isLoading } = useSuppliers()
 

@@ -20,10 +20,8 @@ const STATUS_TABS = [
 ]
 
 export function OrdersPage() {
-  const { orders: f, setFilter } = useFiltersStore((s) => ({
-    orders: s.orders,
-    setFilter: s.setFilter,
-  }))
+  const f = useFiltersStore((s) => s.orders)
+  const setFilter = useFiltersStore((s) => s.setFilter)
   const debouncedSearch = useDebounce(f.search, 300)
   const { orders, isLoading, total } = useOrders({ search: debouncedSearch, status: f.status })
 

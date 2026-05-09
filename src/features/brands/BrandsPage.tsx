@@ -30,10 +30,8 @@ const COLUMNS: ColumnDef<Brand, unknown>[] = [
 ]
 
 export function BrandsPage() {
-  const { brands: f, setFilter } = useFiltersStore((s) => ({
-    brands: s.brands,
-    setFilter: s.setFilter,
-  }))
+  const f = useFiltersStore((s) => s.brands)
+  const setFilter = useFiltersStore((s) => s.setFilter)
   const debouncedSearch = useDebounce(f.search, 300)
   const { brands, isLoading } = useBrands()
 
