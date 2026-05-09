@@ -1,8 +1,10 @@
 export interface Supplier {
   id: string
+  name: string
   mccCode: string
-  brandId: string
-  supplierSourceId: string
-  productType: string
+  brandIds: string[]
+  supplierSourceIds: string[]
+  productCategories: string[]   // 'NPL' | 'Thành phẩm'
   qrImageUrl?: string
+  nccInfo?: string
 }
