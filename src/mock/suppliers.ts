@@ -1,6 +1,6 @@
-import type { Supplier } from '@/features/suppliers/types'
+interface LegacySupplier { id: string; code: string; name: string }
 
-export const mockSuppliers: Supplier[] = [
+export const mockSuppliers: LegacySupplier[] = [
   { id: 's1', code: 'SUP-001', name: 'Acme Corporation' },
   { id: 's2', code: 'SUP-002', name: 'Sunrise Trading Ltd' },
   { id: 's3', code: 'SUP-003', name: 'Global Trade Co.' },

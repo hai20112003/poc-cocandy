@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { mockSuppliers } from '@/mock/suppliers'
+import { mockMccSuppliers } from '@/mock/mcc-suppliers'
 import type { Supplier } from '@/features/suppliers/types'
 
 interface SuppliersState {
@@ -9,10 +9,10 @@ interface SuppliersState {
 }
 
 export const useSuppliersStore = create<SuppliersState>((set) => ({
-  suppliers: mockSuppliers,
+  suppliers: mockMccSuppliers,
   add: (data) =>
     set((s) => ({
-      suppliers: [...s.suppliers, { ...data, id: `s${Date.now()}` }],
+      suppliers: [...s.suppliers, { ...data, id: `mcc${Date.now()}` }],
     })),
   update: (id, data) =>
     set((s) => ({

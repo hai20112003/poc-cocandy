@@ -1,61 +1,44 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Pencil, Users } from 'lucide-react'
+import { Plus, Search, Pencil, Network } from 'lucide-react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { PageLayout } from '@/layouts/PageLayout'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable } from '@/components/shared/DataTable'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { SupplierModal } from './components/SupplierModal'
-import { useSuppliers } from './hooks/useSuppliers'
-import { useSuppliersStore } from '@/store/suppliersStore'
-import { useBrandsStore } from '@/store/brandsStore'
+import { SupplierSourceModal } from './components/SupplierSourceModal'
+import { useSupplierSources } from './hooks/useSupplierSources'
 import { useSupplierSourcesStore } from '@/store/supplierSourcesStore'
 import { useDebounce } from '@/hooks/useDebounce'
-import type { Supplier } from './types'
+import type { SupplierSource } from './types'
 
-export function SuppliersPage() {
-  const { suppliers, isLoading } = useSuppliers()
-  const { add, update } = useSuppliersStore()
-  const brands = useBrandsStore((s) => s.brands)
-  const supplierSources = useSupplierSourcesStore((s) => s.supplierSources)
-
-  const brandMap = useMemo(
-    () => Object.fromEntries(brands.map((b) => [b.id, b.name])),
-    [brands]
-  )
-  const sourceMap = useMemo(
-    () => Object.fromEntries(supplierSources.map((ss) => [ss.id, ss.name])),
-    [supplierSources]
-  )
+export function SupplierSourcesPage() {
+  const { supplierSources, isLoading } = useSupplierSources()
+  const { add, update } = useSupplierSourcesStore()
 
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
-  const [selected, setSelected] = useState<Supplier | null>(null)
+  const [selected, setSelected] = useState<SupplierSource | null>(null)
   const debouncedSearch = useDebounce(search, 300)
 
   const filtered = useMemo(() => {
-    if (!debouncedSearch) return suppliers
+    if (!debouncedSearch) return supplierSources
     const q = debouncedSearch.toLowerCase()
-    return suppliers.filter(
-      (s) =>
-        s.mccCode.toLowerCase().includes(q) ||
-        (brandMap[s.brandId] ?? '').toLowerCase().includes(q) ||
-        (sourceMap[s.supplierSourceId] ?? '').toLowerCase().includes(q) ||
-        s.productType.toLowerCase().includes(q)
+    return supplierSources.filter(
+      (ss) => ss.code.toLowerCase().includes(q) || ss.name.toLowerCase().includes(q)
     )
-  }, [suppliers, debouncedSearch, brandMap, sourceMap])
+  }, [supplierSources, debouncedSearch])
 
   function openAdd() {
     setSelected(null)
     setModalOpen(true)
   }
 
-  function openEdit(supplier: Supplier) {
-    setSelected(supplier)
+  function openEdit(ss: SupplierSource) {
+    setSelected(ss)
     setModalOpen(true)
   }
 
-  function handleSave(data: Omit<Supplier, 'id'>) {
+  function handleSave(data: Omit<SupplierSource, 'id'>) {
     if (selected) {
       update(selected.id, data)
     } else {
@@ -63,10 +46,10 @@ export function SuppliersPage() {
     }
   }
 
-  const columns: ColumnDef<Supplier, unknown>[] = [
+  const columns: ColumnDef<SupplierSource, unknown>[] = [
     {
-      accessorKey: 'mccCode',
-      header: 'Mã MCC',
+      accessorKey: 'code',
+      header: 'Mã code',
       cell: ({ getValue }) => (
         <span className="font-mono text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
           {getValue<string>()}
@@ -74,41 +57,11 @@ export function SuppliersPage() {
       ),
     },
     {
-      accessorKey: 'brandId',
-      header: 'Branch',
+      accessorKey: 'name',
+      header: 'Tên Supplier-source',
       cell: ({ getValue }) => (
-        <span className="text-slate-700 dark:text-slate-300">
-          {brandMap[getValue<string>()] ?? getValue<string>()}
-        </span>
+        <span className="font-medium text-slate-800 dark:text-slate-200">{getValue<string>()}</span>
       ),
-    },
-    {
-      accessorKey: 'supplierSourceId',
-      header: 'Suppliers-source',
-      cell: ({ getValue }) => (
-        <span className="text-slate-600 dark:text-slate-400">
-          {sourceMap[getValue<string>()] ?? getValue<string>()}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'productType',
-      header: 'Loại sản phẩm',
-      cell: ({ getValue }) => (
-        <span className="text-slate-700 dark:text-slate-300">{getValue<string>()}</span>
-      ),
-    },
-    {
-      accessorKey: 'qrImageUrl',
-      header: 'QR nhóm trao đổi',
-      cell: ({ getValue }) => {
-        const url = getValue<string | undefined>()
-        return url ? (
-          <img src={url} alt="QR" className="w-8 h-8 object-contain rounded border border-slate-200 dark:border-slate-700" />
-        ) : (
-          <span className="text-slate-300 dark:text-slate-600 text-[10px]">—</span>
-        )
-      },
     },
     {
       id: 'actions',
@@ -129,8 +82,8 @@ export function SuppliersPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="Suppliers"
-        subtitle={isLoading ? 'Đang tải...' : `${filtered.length} suppliers`}
+        title="Suppliers-sources"
+        subtitle={isLoading ? 'Đang tải...' : `${filtered.length} sources`}
         actions={
           <button
             onClick={openAdd}
@@ -146,7 +99,7 @@ export function SuppliersPage() {
         <Search className="w-3 h-3 text-slate-400 flex-shrink-0" />
         <input
           type="text"
-          placeholder="Tìm theo MCC, branch, loại sản phẩm..."
+          placeholder="Tìm kiếm supplier-source..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 text-[11px] bg-transparent text-slate-700 dark:text-slate-300 placeholder-slate-400 outline-none"
@@ -156,15 +109,15 @@ export function SuppliersPage() {
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
         {!isLoading && filtered.length === 0 ? (
           <EmptyState
-            icon={Users}
-            title="Không tìm thấy supplier"
-            description="Thử từ khóa khác hoặc thêm supplier mới"
+            icon={Network}
+            title="Không tìm thấy supplier-source"
+            description="Thử từ khóa khác hoặc thêm mới"
             action={
               <button
                 onClick={openAdd}
                 className="px-3 py-1.5 text-[11px] font-semibold bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
               >
-                Thêm supplier mới
+                Thêm supplier-source mới
               </button>
             }
           />
@@ -178,10 +131,10 @@ export function SuppliersPage() {
         )}
       </div>
 
-      <SupplierModal
+      <SupplierSourceModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        supplier={selected}
+        supplierSource={selected}
         onSave={handleSave}
       />
     </PageLayout>

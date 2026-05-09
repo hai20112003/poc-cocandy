@@ -1,5 +1,8 @@
 export interface Supplier {
   id: string
-  code: string
-  name: string
+  mccCode: string
+  brandId: string
+  supplierSourceId: string
+  productType: string
+  qrImageUrl?: string
 }
