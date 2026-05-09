@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react'
-import { mockSuppliers } from '@/mock/suppliers'
-import type { Supplier } from '../types'
+import { useSuppliersStore } from '@/store/suppliersStore'
 
 export function useSuppliers() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([])
+  const suppliers = useSuppliersStore((s) => s.suppliers)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSuppliers(mockSuppliers)
-      setIsLoading(false)
-    }, 400)
+    const timer = setTimeout(() => setIsLoading(false), 400)
     return () => clearTimeout(timer)
   }, [])
 

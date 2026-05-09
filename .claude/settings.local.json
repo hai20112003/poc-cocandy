@@ -21,7 +21,10 @@
       "Bash(npx shadcn@latest init --defaults)",
       "Bash(npx shadcn@latest add sheet input select separator skeleton dropdown-menu badge)",
       "Bash(rtk grep *)",
-      "Bash(rtk tsc *)"
+      "Bash(rtk tsc *)",
+      "Bash(./node_modules/.bin/tsc *)",
+      "Bash(/opt/homebrew/bin/node *)",
+      "Bash(PATH=\"/Users/hainv03/.nvm/versions/node/v20.20.1/bin:$PATH\" node *)"
     ]
   }
 }

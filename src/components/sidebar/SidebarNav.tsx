@@ -1,19 +1,13 @@
-import { ClipboardList, Building2, Tag, Globe } from 'lucide-react'
+import { ClipboardList, Building2, Tag } from 'lucide-react'
 import { SidebarNavItem } from './SidebarNavItem'
 
 const NAV_GROUPS = [
   {
-    label: 'Procurement',
+    label: 'Nhà Cung Cấp',
     items: [
-      { to: '/orders', icon: ClipboardList, label: 'Orders', badge: '12' },
+      { to: '/brands', icon: Tag, label: 'Brand' },
       { to: '/suppliers', icon: Building2, label: 'Suppliers' },
-      { to: '/brands', icon: Tag, label: 'Brands' },
-    ],
-  },
-  {
-    label: 'Sourcing',
-    items: [
-      { to: '/sources', icon: Globe, label: 'Sources' },
+      { to: '/orders', icon: ClipboardList, label: 'Order' },
     ],
   },
 ]

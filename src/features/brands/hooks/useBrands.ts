@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react'
-import { mockBrands } from '@/mock/brands'
-import type { Brand } from '../types'
+import { useBrandsStore } from '@/store/brandsStore'
 
 export function useBrands() {
-  const [brands, setBrands] = useState<Brand[]>([])
+  const brands = useBrandsStore((s) => s.brands)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setBrands(mockBrands)
-      setIsLoading(false)
-    }, 400)
+    const timer = setTimeout(() => setIsLoading(false), 400)
     return () => clearTimeout(timer)
   }, [])
 
