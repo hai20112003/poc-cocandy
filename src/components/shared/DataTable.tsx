@@ -5,8 +5,10 @@ import {
   getPaginationRowModel,
   flexRender,
   type ColumnDef,
+  type PaginationState,
 } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/utils/cn'
 import { LoadingSkeleton } from './LoadingSkeleton'
 import { EmptyState } from './EmptyState'
@@ -28,6 +30,15 @@ export function DataTable<T>({
   globalFilter,
   pageSize = 20,
 }: DataTableProps<T>) {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize,
+  })
+
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+  }, [globalFilter])
+
   const table = useReactTable({
     data,
     columns,
@@ -36,10 +47,10 @@ export function DataTable<T>({
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       globalFilter: globalFilter ?? '',
-      pagination: { pageIndex: 0, pageSize },
+      pagination,
     },
     onGlobalFilterChange: () => {},
-    onPaginationChange: () => {},
+    onPaginationChange: setPagination,
   })
 
   if (isLoading) {
@@ -47,6 +58,7 @@ export function DataTable<T>({
   }
 
   const rows = table.getRowModel().rows
+  const totalRows = table.getFilteredRowModel().rows.length
 
   return (
     <div>
@@ -102,7 +114,9 @@ export function DataTable<T>({
 
       <div className="flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-700">
         <span className="text-[10px] text-slate-500">
-          {rows.length} of {data.length} rows
+          {totalRows === 0
+            ? 'No rows'
+            : `${pagination.pageIndex * pageSize + 1}–${Math.min((pagination.pageIndex + 1) * pageSize, totalRows)} of ${totalRows}`}
         </span>
         <div className="flex gap-1">
           <button
