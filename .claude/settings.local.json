@@ -24,7 +24,9 @@
       "Bash(rtk tsc *)",
       "Bash(./node_modules/.bin/tsc *)",
       "Bash(/opt/homebrew/bin/node *)",
-      "Bash(PATH=\"/Users/hainv03/.nvm/versions/node/v20.20.1/bin:$PATH\" node *)"
+      "Bash(PATH=\"/Users/hainv03/.nvm/versions/node/v20.20.1/bin:$PATH\" node *)",
+      "Bash(/Users/hainv03/.nvm/versions/node/v20.20.1/bin/node node_modules/.bin/tsc --noEmit)",
+      "Bash(/Users/hainv03/.nvm/versions/node/v20.20.1/bin/node node_modules/.bin/vite build)"
     ]
   }
 }

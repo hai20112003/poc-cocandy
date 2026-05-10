@@ -1,50 +1,173 @@
-import type { Order, OrderStatus } from '@/features/orders/types'
+import type { Order } from '@/features/orders/types'
 
-const STATUSES: OrderStatus[] = ['draft', 'pending', 'confirmed', 'in_transit', 'delivered', 'overdue']
-const SUPPLIER_IDS = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15']
-const BRAND_IDS = ['b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13','b14','b15']
-const CURRENCIES = ['USD', 'USD', 'USD', 'EUR', 'USD']
-const PRODUCTS = [
-  'Running Shoes', 'Sports Jersey', 'Training Shorts', 'Hoodie', 'Track Pants',
-  'Sports Socks', 'Cap', 'Backpack', 'Water Bottle', 'Gym Gloves',
-  'Yoga Mat', 'Resistance Bands', 'Foam Roller', 'Jump Rope', 'Dumbbell Set',
-]
-
-function addDays(base: Date, days: number): string {
-  return new Date(base.getTime() + days * 86_400_000).toISOString()
-}
-
-function generateOrder(i: number): Order {
-  const base = new Date('2026-01-15')
-  const createdAt = addDays(base, i * 3)
-  const amount = Math.round((1200 + (i * 1337 % 48000)) / 100) * 100
-
-  return {
-    id: `PO-${2400 + i}`,
-    supplierId: SUPPLIER_IDS[i % SUPPLIER_IDS.length],
-    brandId: BRAND_IDS[i % BRAND_IDS.length],
-    amount,
-    currency: CURRENCIES[i % CURRENCIES.length],
-    status: STATUSES[i % STATUSES.length],
-    createdAt,
-    expectedDate: addDays(new Date(createdAt), 30 + (i % 15)),
+export const mockOrders: Order[] = [
+  {
+    id: 'ORD-001',
+    supplierId: 'mcc1',
+    status: 'Đã về khớp',
+    createdAt: '2026-04-10',
     items: [
       {
-        id: `PO-${2400 + i}-1`,
-        productName: PRODUCTS[i % PRODUCTS.length],
-        quantity: (i % 10) + 1,
-        unitPrice: Math.round(amount * 0.7 / ((i % 10) + 1) / 10) * 10,
+        id: 'i-001-1',
+        productName: 'Giày Nike Air Max 270',
+        productCategory: 'Thành phẩm',
+        productCode: 'NK-AM270-42',
+        orderDate: '2026-04-10',
+        quantity: 200,
+        unit: 'đôi',
+        unitPrice: 225000,
+        totalAmount: 45000000,
+        currency: 'VND',
+        notes: 'Size 42, màu trắng đen',
       },
-      ...(i % 3 === 0
-        ? [{
-            id: `PO-${2400 + i}-2`,
-            productName: PRODUCTS[(i + 5) % PRODUCTS.length],
-            quantity: (i % 4) + 1,
-            unitPrice: Math.round(amount * 0.3 / ((i % 4) + 1) / 10) * 10,
-          }]
-        : []),
     ],
-  }
-}
-
-export const mockOrders: Order[] = Array.from({ length: 50 }, (_, i) => generateOrder(i + 1))
+  },
+  {
+    id: 'ORD-002',
+    supplierId: 'mcc2',
+    status: 'Đang giao',
+    createdAt: '2026-04-15',
+    items: [
+      {
+        id: 'i-002-1',
+        productName: 'Áo Adidas Tiro 24',
+        productCategory: 'Thành phẩm',
+        productCode: 'AD-T24-XL',
+        orderDate: '2026-04-15',
+        quantity: 300,
+        unit: 'cái',
+        unitPrice: 45000,
+        totalAmount: 13500000,
+        currency: 'VND',
+      },
+      {
+        id: 'i-002-2',
+        productName: 'Quần Adidas Tiro 24',
+        productCategory: 'Thành phẩm',
+        productCode: 'AD-T24Q-XL',
+        orderDate: '2026-04-18',
+        quantity: 200,
+        unit: 'cái',
+        unitPrice: 75000,
+        totalAmount: 15000000,
+        currency: 'VND',
+      },
+    ],
+  },
+  {
+    id: 'ORD-003',
+    supplierId: 'mcc3',
+    status: 'Đã đặt',
+    createdAt: '2026-04-20',
+    items: [
+      {
+        id: 'i-003-1',
+        productName: 'Vải cotton 100% khổ 1.6m',
+        productCategory: 'Nguyên phụ liệu',
+        productCode: 'NPL-CT160-W',
+        orderDate: '2026-04-20',
+        quantity: 2000,
+        unit: 'm',
+        unitPrice: 31000,
+        totalAmount: 62000000,
+        currency: 'VND',
+        notes: 'Màu trắng 60%, màu đen 40%',
+      },
+      {
+        id: 'i-003-2',
+        productName: 'Khóa kéo YKK 5cm',
+        productCategory: 'Nguyên phụ liệu',
+        productCode: 'NPL-YKK5-BK',
+        orderDate: '2026-04-20',
+        quantity: 5000,
+        unit: 'cái',
+        unitPrice: 1120,
+        totalAmount: 5600000,
+        currency: 'VND',
+      },
+    ],
+  },
+  {
+    id: 'ORD-004',
+    supplierId: 'mcc1',
+    status: 'Về lệch bill',
+    createdAt: '2026-04-22',
+    items: [
+      {
+        id: 'i-004-1',
+        productName: 'Đế giày TPU cao su',
+        productCategory: 'Nguyên phụ liệu',
+        productCode: 'NPL-TPU-44',
+        orderDate: '2026-04-22',
+        quantity: 2000,
+        unit: 'cái',
+        unitPrice: 9900,
+        totalAmount: 19800000,
+        currency: 'VND',
+        notes: 'Bill ghi 2000 nhưng thực nhận 1850',
+      },
+    ],
+  },
+  {
+    id: 'ORD-005',
+    supplierId: 'mcc4',
+    status: 'Về một phần',
+    createdAt: '2026-04-25',
+    items: [
+      {
+        id: 'i-005-1',
+        productName: 'Quần Under Armour HeatGear',
+        productCategory: 'Thành phẩm',
+        productCode: 'UA-HG-M',
+        orderDate: '2026-04-25',
+        quantity: 300,
+        unit: 'cái',
+        unitPrice: 112,
+        totalAmount: 33600,
+        currency: 'USD',
+      },
+    ],
+  },
+  {
+    id: 'ORD-006',
+    supplierId: 'mcc5',
+    status: 'Đã đặt',
+    createdAt: '2026-04-28',
+    items: [
+      {
+        id: 'i-006-1',
+        productName: 'Giày New Balance 574',
+        productCategory: 'Thành phẩm',
+        productCode: 'NB-574-41',
+        orderDate: '2026-04-28',
+        quantity: 150,
+        unit: 'đôi',
+        unitPrice: 340000,
+        totalAmount: 51000000,
+        currency: 'VND',
+        notes: '50% trắng, 50% đen',
+      },
+    ],
+  },
+  {
+    id: 'ORD-007',
+    supplierId: 'mcc6',
+    status: 'Đang giao',
+    createdAt: '2026-05-01',
+    items: [
+      {
+        id: 'i-007-1',
+        productName: 'Chỉ may polyester 40/2',
+        productCategory: 'Nguyên phụ liệu',
+        productCode: 'NPL-CH40-BL',
+        orderDate: '2026-05-01',
+        quantity: 50,
+        unit: 'cuộn',
+        unitPrice: 164000,
+        totalAmount: 8200000,
+        currency: 'VND',
+        notes: 'Màu đen, cuộn 5000m/cuộn',
+      },
+    ],
+  },
+]
