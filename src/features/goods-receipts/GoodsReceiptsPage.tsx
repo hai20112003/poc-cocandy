@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Eye, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Search, Eye, CheckCircle2, AlertCircle } from 'lucide-react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { PageLayout } from '@/layouts/PageLayout'
 import { PageHeader } from '@/components/shared/PageHeader'
@@ -10,7 +10,6 @@ import { GoodsReceiptDetailModal } from './components/GoodsReceiptDetailModal'
 import { InvoiceDetailModal } from './components/InvoiceDetailModal'
 import { useDebounce } from '@/hooks/useDebounce'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
 import type { GoodsReceipt, Invoice } from './types'
 
@@ -219,7 +218,7 @@ export function GoodsReceiptsPage() {
     <PageLayout>
       <PageHeader
         title="GRN & Hóa đơn"
-        description="Quản lý phiếu nhập kho và hóa đơn nhà cung cấp"
+        subtitle="Quản lý phiếu nhập kho và hóa đơn nhà cung cấp"
       />
 
       {/* Tabs */}
