@@ -3,12 +3,14 @@ import { useState, useMemo } from 'react'
 import { ChevronLeft, Edit, Check, X, Send, Package } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { usePRWorkflow } from '@/hooks/useWorkflow'
+import { RatingModal, RatingFormData } from '../components/RatingModal'
 
 export function PRDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [showRejectForm, setShowRejectForm] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
+  const [showRatingModal, setShowRatingModal] = useState(false)
   const purchaseRequest = useProcurementStore((state) => state.getPurchaseRequest(id || ''))
   const allGoodsReceipts = useProcurementStore((state) => state.goodsReceipts)
   const goodsReceipts = useMemo(() => allGoodsReceipts.filter((grn) => grn.prId === id), [allGoodsReceipts, id])
@@ -62,6 +64,23 @@ export function PRDetail() {
   }
 
   const totalEstimated = purchaseRequest.items.reduce((sum, item) => sum + (item.estimatedPrice ?? 0) * item.quantity, 0)
+
+  const handleSubmitRating = (data: RatingFormData) => {
+    if (id) {
+      useProcurementStore.setState((state) => ({
+        purchaseRequests: state.purchaseRequests.map((pr) =>
+          pr.id === id
+            ? {
+                ...pr,
+                overallRating: data.overallRating,
+                ratingComment: data.ratingComment,
+              }
+            : pr
+        ),
+      }))
+      setShowRatingModal(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -440,6 +459,58 @@ export function PRDetail() {
               </div>
             </div>
 
+            {/* Supplier Rating Section */}
+            {['Converted', 'Completed'].includes(purchaseRequest.status) && (
+              <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  ⭐ Đánh giá nhà cung cấp
+                </h3>
+
+                {purchaseRequest.overallRating ? (
+                  // Already rated - show readonly display
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span
+                          key={star}
+                          className={`text-lg ${
+                            star <= purchaseRequest.overallRating!
+                              ? 'text-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                        >
+                          ★
+                        </span>
+                      ))}
+                      <span className="text-sm font-semibold text-gray-900 ml-2">
+                        {purchaseRequest.overallRating}/5
+                      </span>
+                    </div>
+
+                    {purchaseRequest.ratingComment && (
+                      <div className="bg-gray-50 rounded p-3 text-sm text-gray-700 border border-gray-200">
+                        {purchaseRequest.ratingComment}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => setShowRatingModal(true)}
+                      className="w-full mt-4 px-3 py-2 text-sm border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium"
+                    >
+                      ✏️ Chỉnh sửa đánh giá
+                    </button>
+                  </div>
+                ) : (
+                  // Not rated yet - show button
+                  <button
+                    onClick={() => setShowRatingModal(true)}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                  >
+                    ⭐ Đánh giá
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Summary Card */}
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
@@ -465,6 +536,15 @@ export function PRDetail() {
             </div>
           </div>
         </div>
+
+        {/* Rating Modal */}
+        <RatingModal
+          isOpen={showRatingModal}
+          onClose={() => setShowRatingModal(false)}
+          onSubmit={handleSubmitRating}
+          currentRating={purchaseRequest.overallRating}
+          currentComment={purchaseRequest.ratingComment}
+        />
 
         {/* Rejection Modal */}
         {showRejectForm && (
