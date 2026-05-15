@@ -3,7 +3,7 @@ import { useProcurementStore } from '@/store/procurementStore'
 export function usePRWorkflow() {
   const { getPurchaseRequest, updatePurchaseRequest } = useProcurementStore()
 
-  const submitPR = (prId: string, approverLevel: 'manager' | 'director' | 'cfo') => {
+  const submitPR = (prId: string) => {
     const pr = getPurchaseRequest(prId)
     if (!pr) return
 
@@ -22,7 +22,7 @@ export function usePRWorkflow() {
       ...pr,
       status: 'Approved' as const,
       approvedBy,
-      approvedAt: new Date().toISOString(),
+      approvedAt: new Date(),
     }
     updatePurchaseRequest(prId, updatedPR)
   }
@@ -57,14 +57,14 @@ export function usePRWorkflow() {
 export function usePOWorkflow() {
   const { getPurchaseOrder, updatePurchaseOrder } = useProcurementStore()
 
-  const sendPO = (poId: string, supplierEmail: string) => {
+  const sendPO = (poId: string) => {
     const po = getPurchaseOrder(poId)
     if (!po) return
 
     const updatedPO = {
       ...po,
       status: 'Sent' as const,
-      sentAt: new Date().toISOString(),
+      sentAt: new Date(),
     }
     updatePurchaseOrder(poId, updatedPO)
   }
@@ -76,7 +76,7 @@ export function usePOWorkflow() {
     const updatedPO = {
       ...po,
       status: 'Confirmed' as const,
-      confirmedAt: new Date().toISOString(),
+      confirmedAt: new Date(),
       confirmedBy,
     }
     updatePurchaseOrder(poId, updatedPO)
@@ -100,7 +100,7 @@ export function usePOWorkflow() {
     const updatedPO = {
       ...po,
       status: 'Completed' as const,
-      completedAt: new Date().toISOString(),
+      completedAt: new Date(),
     }
     updatePurchaseOrder(poId, updatedPO)
   }
