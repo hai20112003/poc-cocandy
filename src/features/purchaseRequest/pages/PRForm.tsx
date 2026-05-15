@@ -514,7 +514,7 @@ export function PRForm() {
                 <span className={items.every(i => i.quantity > 0) ? 'text-green-600' : 'text-gray-400'}>
                   {items.every(i => i.quantity > 0) ? '✓' : '○'}
                 </span>
-                <span className={items.every(i => i.quantity > 0) ? 'text-gray-900 font-medium' : 'text-gray-500'}>Tất cả dòng hàng có SL > 0</span>
+                <span className={items.every(i => i.quantity > 0) ? 'text-gray-900 font-medium' : 'text-gray-500'}>Tất cả dòng hàng có SL &gt; 0</span>
               </div>
             </div>
           </div>

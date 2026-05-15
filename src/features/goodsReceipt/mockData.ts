@@ -1,4 +1,3 @@
-cat > /Users/hainv03/Documents/project/poc-cocandy-v2/src/features/goodsReceipt/mockData.ts << 'GRNEOF'
 import { IGRN, IReturn } from './types'
 
 const baseDate = new Date('2026-05-15')

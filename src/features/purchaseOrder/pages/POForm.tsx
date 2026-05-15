@@ -10,13 +10,16 @@ export function POForm() {
   const purchaseOrder = id ? useProcurementStore((state) => state.getPurchaseOrder(id)) : null
   const { addPurchaseOrder, updatePurchaseOrder, suppliers } = useProcurementStore()
 
+  const currentUser = 'Trọng Nguyễn'
+  const today = new Date().toISOString().split('T')[0]
+
   const [formData, setFormData] = useState<Partial<IPurchaseOrder>>({
-    code: '',
+    code: `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
     supplierId: '',
     status: 'Draft',
     items: [],
     createdAt: new Date().toISOString(),
-    createdBy: 'Current User',
+    createdBy: currentUser,
   })
 
   const [items, setItems] = useState<IPurchaseOrderItem[]>([])
@@ -25,7 +28,6 @@ export function POForm() {
     quantity: 0,
     unitPrice: 0,
   })
-  const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (purchaseOrder) {
@@ -34,13 +36,11 @@ export function POForm() {
     }
   }, [purchaseOrder])
 
+  const calculateTotal = () => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
+  const total = calculateTotal()
+
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-    if (!formData.code) newErrors.code = 'PO code is required'
-    if (!formData.supplierId) newErrors.supplierId = 'Supplier is required'
-    if (items.length === 0) newErrors.items = 'At least one item is required'
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return formData.supplierId && items.length > 0 && items.every((item) => item.quantity > 0 && item.unitPrice > 0)
   }
 
   const handleAddItem = () => {
@@ -53,20 +53,12 @@ export function POForm() {
         quantityReceived: 0,
       }
       setItems([...items, item])
-      setNewItem({
-        productName: '',
-        quantity: 0,
-        unitPrice: 0,
-      })
+      setNewItem({ productName: '', quantity: 0, unitPrice: 0 })
     }
   }
 
   const handleRemoveItem = (index: number) => {
     setItems(items.filter((_, i) => i !== index))
-  }
-
-  const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,194 +77,282 @@ export function POForm() {
       addPurchaseOrder(dataToSave)
     }
 
-    navigate(id ? `/orders/${id}` : '/orders')
+    navigate('/orders')
   }
+
+  const selectedSupplier = formData.supplierId
+    ? suppliers.find((s) => s.id === formData.supplierId)
+    : null
+  const isFormValid = validateForm()
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
-        >
-          <ChevronLeft size={20} />
-          Back
-        </button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{id ? 'Edit Purchase Order' : 'Create Purchase Order'}</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+          >
+            <ChevronLeft size={20} />
+            Danh sách PO
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 inline-flex items-center gap-2">
+              Tạo Đơn Đặt Hàng
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">● Draft</span>
+            </h1>
+            <p className="text-gray-600 text-sm mt-1">{formData.code} · {currentUser} · {new Date().toLocaleDateString('vi-VN')}</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+            💾 Lưu nháp
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={!isFormValid}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+              isFormValid ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            Tạo PO
+          </button>
         </div>
       </div>
 
-      {/* Form */}
-      <div className="bg-white rounded-lg shadow-sm p-8 max-w-3xl">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT - Form */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Section 1: Thông tin đơn hàng */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-blue-600"></span>
+              Thông tin đơn hàng
+            </h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">PO Code *</label>
-                <input
-                  type="text"
-                  value={formData.code || ''}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  disabled={!!id}
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.code ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="PO-001"
-                />
-                {errors.code && <p className="text-red-600 text-sm mt-1">{errors.code}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Supplier *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nhà cung cấp <span className="text-red-600">*</span>
+                </label>
                 <select
                   value={formData.supplierId || ''}
                   onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.supplierId ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Select a supplier</option>
+                  <option value="">-- Chọn nhà cung cấp --</option>
                   {suppliers.map((supplier) => (
                     <option key={supplier.id} value={supplier.id}>
-                      {supplier.name}
+                      {supplier.name} ({supplier.code})
                     </option>
                   ))}
                 </select>
-                {errors.supplierId && <p className="text-red-600 text-sm mt-1">{errors.supplierId}</p>}
               </div>
+
+              {selectedSupplier && (
+                <div className="grid grid-cols-2 gap-4 p-3 bg-blue-50 rounded-lg">
+                  <div>
+                    <div className="text-xs text-gray-600">Điều khoản thanh toán</div>
+                    <div className="font-medium text-gray-900">{selectedSupplier.paymentTerms}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-600">Lead time</div>
+                    <div className="font-medium text-gray-900">{selectedSupplier.leadTime} ngày</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Items */}
-          <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Items *</h2>
-            {errors.items && <p className="text-red-600 text-sm mb-4">{errors.items}</p>}
-
-            <div className="space-y-3 mb-6 overflow-x-auto">
-              {items.length > 0 && (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 font-medium text-gray-700">Product</th>
-                      <th className="text-right py-2 font-medium text-gray-700">Quantity</th>
-                      <th className="text-right py-2 font-medium text-gray-700">Unit Price</th>
-                      <th className="text-right py-2 font-medium text-gray-700">Amount</th>
-                      <th className="text-center py-2 font-medium text-gray-700">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((item, idx) => (
-                      <tr key={idx} className="border-b border-gray-100">
-                        <td className="py-2">{item.productName}</td>
-                        <td className="py-2 text-right">{item.quantity}</td>
-                        <td className="py-2 text-right">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.unitPrice)}
-                        </td>
-                        <td className="py-2 text-right">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                            item.quantity * item.unitPrice
-                          )}
-                        </td>
-                        <td className="py-2 text-center">
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveItem(idx)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <X size={18} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+          {/* Section 2: Chi tiết mặt hàng */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-green-600"></span>
+                Chi tiết mặt hàng
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">{items.length} dòng</span>
+              </h2>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                <input
-                  type="text"
-                  value={newItem.productName || ''}
-                  onChange={(e) => setNewItem({ ...newItem, productName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Product name"
-                />
-              </div>
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-8">#</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Tên hàng *</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-24">SL *</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-32">Đơn giá *</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-32">Thành tiền</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 w-8"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {items.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-600">{idx + 1}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.productName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{item.quantity}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.unitPrice)}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                          item.quantity * item.unitPrice
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button type="button" onClick={() => handleRemoveItem(idx)} className="text-red-600 hover:text-red-700 font-bold">
+                          ×
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-              <div className="grid grid-cols-3 gap-4">
+            {/* Add Item */}
+            <div className="p-6 bg-gray-50 border-t border-gray-200 space-y-3">
+              <div className="grid grid-cols-5 gap-2">
+                <div className="col-span-2">
+                  <input
+                    type="text"
+                    value={newItem.productName || ''}
+                    onChange={(e) => setNewItem({ ...newItem, productName: e.target.value })}
+                    placeholder="Tên sản phẩm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                   <input
                     type="number"
                     min="0"
                     value={newItem.quantity || 0}
                     onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="SL"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
                   <input
                     type="number"
                     min="0"
                     value={newItem.unitPrice || 0}
                     onChange={(e) => setNewItem({ ...newItem, unitPrice: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Đơn giá"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                  <div className="px-4 py-2 bg-gray-100 rounded-lg text-gray-700">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                      (newItem.quantity || 0) * (newItem.unitPrice || 0)
-                    )}
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  >
+                    <Plus size={18} className="mx-auto" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="p-6 bg-white border-t border-gray-200 flex items-center justify-between">
+              <div>
+                <div className="text-sm text-gray-600">Tạm tính</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-gray-600">Số dòng hàng</div>
+                <div className="text-3xl font-bold text-blue-600">{items.length}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT - Summary */}
+        <div className="space-y-6">
+          {/* Supplier Info */}
+          {selectedSupplier && (
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold text-gray-900 mb-4">Thông tin NCC</h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <div className="text-gray-600">Tên NCC</div>
+                  <div className="font-medium text-gray-900">{selectedSupplier.name}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600">Rating</div>
+                  <div className="font-medium text-gray-900">{selectedSupplier.rating.toFixed(1)} ★</div>
+                </div>
+                <div>
+                  <div className="text-gray-600">Trạng thái</div>
+                  <div className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                    selectedSupplier.status === 'Active' ? 'bg-green-100 text-green-700' :
+                    selectedSupplier.status === 'Suspended' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {selectedSupplier.status}
                   </div>
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={handleAddItem}
-                className="w-full px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition flex items-center justify-center gap-2"
-              >
-                <Plus size={18} />
-                Add Item
-              </button>
             </div>
+          )}
 
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Total Amount</div>
-              <div className="text-2xl font-bold text-blue-600">
-                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(calculateTotal())}
+          {/* Summary */}
+          <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+            <h3 className="font-semibold text-blue-900 mb-3">Tổng cộng</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-blue-700">Tạm tính</span>
+                <span className="font-semibold text-blue-900">
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700">VAT (10%)</span>
+                <span className="font-semibold text-blue-900">
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total * 0.1)}
+                </span>
+              </div>
+              <div className="border-t-2 border-blue-200 pt-2 mt-2 flex justify-between">
+                <span className="font-semibold text-blue-900">Tổng cộng</span>
+                <span className="text-xl font-bold text-blue-900">
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total * 1.1)}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="border-t border-gray-200 pt-6 flex gap-3">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-            >
-              {id ? 'Update Order' : 'Create Order'}
-            </button>
+          {/* Validation */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h3 className="font-semibold text-gray-900 mb-4">Yêu cầu trước khi tạo</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2">
+                <span className={formData.supplierId ? 'text-green-600' : 'text-gray-400'}>
+                  {formData.supplierId ? '✓' : '○'}
+                </span>
+                <span className={formData.supplierId ? 'text-gray-900 font-medium' : 'text-gray-500'}>Chọn nhà cung cấp</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={items.length > 0 ? 'text-green-600' : 'text-gray-400'}>
+                  {items.length > 0 ? '✓' : '○'}
+                </span>
+                <span className={items.length > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}>Thêm ít nhất 1 mặt hàng</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={items.every((i) => i.quantity > 0 && i.unitPrice > 0) ? 'text-green-600' : 'text-gray-400'}>
+                  {items.every((i) => i.quantity > 0 && i.unitPrice > 0) ? '✓' : '○'}
+                </span>
+                <span className={items.every((i) => i.quantity > 0 && i.unitPrice > 0) ? 'text-gray-900 font-medium' : 'text-gray-500'}>Tất cả mặt hàng có SL & giá</span>
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )
