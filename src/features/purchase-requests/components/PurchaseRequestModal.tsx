@@ -18,18 +18,21 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
     department: data?.department ?? '',
     neededDate: data?.neededDate ?? '',
     priority: data?.priority ?? 'medium',
-    items: data?.items ?? [
+    items: (data?.items ?? [
       {
         id: '1',
-        productName: '',
         productCategory: '',
+        productName: '',
         specification: '',
         quantity: 0,
         unit: 'mét',
         estimatedPrice: 0,
         suggestedSupplier: '',
       },
-    ],
+    ]).map((item) => ({
+      ...item,
+      productCategory: item.productCategory || '',
+    })),
     notes: data?.notes ?? '',
   })
 
