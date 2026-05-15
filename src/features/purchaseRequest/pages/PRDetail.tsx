@@ -352,33 +352,44 @@ export function PRDetail() {
                 </div>
 
                 {/* Receiving (GRN #2 chờ) */}
-                {['Approved', 'Converted'].includes(purchaseRequest.status) && (
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="w-7 h-7 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center">
-                        <Package size={14} />
-                      </div>
-                      {purchaseRequest.status === 'Converted' && <div className="w-0.5 h-5 bg-green-200" />}
+                <div className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                      purchaseRequest.status === 'Converted'
+                        ? 'bg-green-100 text-green-700'
+                        : ['Approved', 'Converted'].includes(purchaseRequest.status)
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {purchaseRequest.status === 'Converted' ? '✓' : purchaseRequest.status === 'Approved' ? <Package size={14} /> : '○'}
                     </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">Nhập kho</div>
-                      <div className="text-yellow-600 font-medium">GRN #2 chờ</div>
-                    </div>
+                    {purchaseRequest.status === 'Converted' && <div className="w-0.5 h-5 bg-green-200" />}
                   </div>
-                )}
+                  <div>
+                    <div className="font-semibold text-gray-900">Nhập kho</div>
+                    {purchaseRequest.status === 'Approved' && <div className="text-yellow-600 font-medium">GRN #2 chờ</div>}
+                    {purchaseRequest.status === 'Converted' && <div className="text-gray-600">Đã nhập kho</div>}
+                    {!['Approved', 'Converted'].includes(purchaseRequest.status) && <div className="text-gray-400">Chưa bắt đầu</div>}
+                  </div>
+                </div>
 
                 {/* Completed */}
-                {purchaseRequest.status === 'Converted' && (
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="w-7 h-7 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold">✓</div>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">Hoàn thành</div>
-                      <div className="text-gray-600">Đã hoàn thành nhập kho</div>
+                <div className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold ${
+                      purchaseRequest.status === 'Converted'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {purchaseRequest.status === 'Converted' ? '✓' : '○'}
                     </div>
                   </div>
-                )}
+                  <div>
+                    <div className="font-semibold text-gray-900">Hoàn thành</div>
+                    {purchaseRequest.status === 'Converted' && <div className="text-gray-600">Đã hoàn thành nhập kho</div>}
+                    {purchaseRequest.status !== 'Converted' && <div className="text-gray-400">Chưa bắt đầu</div>}
+                  </div>
+                </div>
               </div>
             </div>
 
