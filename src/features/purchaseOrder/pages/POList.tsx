@@ -53,9 +53,9 @@ export function POList() {
       {/* Stats */}
       <div className="px-8 py-6 grid grid-cols-3 gap-4">
         {[
-          { label: 'Active', value: stats.active, icon: '⚡' },
-          { label: 'Awaiting Confirmation', value: stats.awaiting, icon: '⏳' },
-          { label: 'Completed', value: stats.completed, icon: '✓' },
+          { label: 'Đang hoạt động', value: stats.active, icon: '⚡' },
+          { label: 'Chờ xác nhận', value: stats.awaiting, icon: '⏳' },
+          { label: 'Hoàn thành', value: stats.completed, icon: '✓' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white p-4 rounded-lg border border-gray-200">
             <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
@@ -79,13 +79,13 @@ export function POList() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
-            <option>All</option>
-            <option>Draft</option>
-            <option>Sent</option>
-            <option>Confirmed</option>
-            <option>Receiving</option>
-            <option>Completed</option>
-            <option>Cancelled</option>
+            <option value="All">Tất cả</option>
+            <option value="Draft">Nháp</option>
+            <option value="Sent">Đã gửi</option>
+            <option value="Confirmed">Đã xác nhận</option>
+            <option value="Receiving">Đang nhập</option>
+            <option value="Completed">Hoàn thành</option>
+            <option value="Cancelled">Đã huỷ</option>
           </select>
         </div>
       </div>
@@ -116,7 +116,12 @@ export function POList() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadge(po.status)}`}>
-                      {po.status}
+                      {po.status === 'Draft' && 'Nháp'}
+                      {po.status === 'Sent' && 'Đã gửi'}
+                      {po.status === 'Confirmed' && 'Đã xác nhận'}
+                      {po.status === 'Receiving' && 'Đang nhập'}
+                      {po.status === 'Completed' && 'Hoàn thành'}
+                      {po.status === 'Cancelled' && 'Đã huỷ'}
                     </span>
                   </td>
                 </tr>

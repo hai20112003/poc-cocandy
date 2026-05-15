@@ -105,7 +105,7 @@ export function POForm() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 inline-flex items-center gap-2">
               Tạo Đơn Đặt Hàng
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">● Draft</span>
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">● Nháp</span>
             </h1>
             <p className="text-gray-600 text-sm mt-1">{formData.code} · {currentUser} · {new Date().toLocaleDateString('vi-VN')}</p>
           </div>

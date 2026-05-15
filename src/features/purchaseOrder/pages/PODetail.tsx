@@ -19,7 +19,7 @@ export function PODetail() {
           <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
             <ChevronLeft size={20} />
           </button>
-          <h1 className="text-2xl font-bold">Purchase Order Not Found</h1>
+          <h1 className="text-2xl font-bold">Không Tìm Thấy Đơn Đặt Hàng</h1>
         </div>
       </div>
     )
@@ -58,11 +58,11 @@ export function PODetail() {
             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
           >
             <ChevronLeft size={20} />
-            Back
+            Quay lại
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{purchaseOrder.code}</h1>
-            <p className="text-gray-600">Purchase Order</p>
+            <p className="text-gray-600">Đơn Đặt Hàng</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -73,14 +73,14 @@ export function PODetail() {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 <Edit size={18} />
-                Edit
+                Sửa
               </button>
               <button
                 onClick={() => sendPO(id || '')}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 <Send size={18} />
-                Send to Supplier
+                Gửi cho NCC
               </button>
             </>
           )}
@@ -90,7 +90,7 @@ export function PODetail() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               <Check size={18} />
-              Confirm
+              Xác nhận
             </button>
           )}
           {purchaseOrder.status === 'Confirmed' && (
@@ -99,7 +99,7 @@ export function PODetail() {
               className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
             >
               <Truck size={18} />
-              Start Receiving
+              Bắt đầu nhập
             </button>
           )}
           {purchaseOrder.status === 'Receiving' && (
@@ -108,7 +108,7 @@ export function PODetail() {
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
               <Check size={18} />
-              Complete
+              Hoàn thành
             </button>
           )}
         </div>
@@ -117,23 +117,28 @@ export function PODetail() {
       {/* Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="text-sm text-gray-600 mb-2">Status</div>
+          <div className="text-sm text-gray-600 mb-2">Trạng thái</div>
           <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(purchaseOrder.status)}`}>
-            {purchaseOrder.status}
+            {purchaseOrder.status === 'Draft' && 'Nháp'}
+            {purchaseOrder.status === 'Sent' && 'Đã gửi'}
+            {purchaseOrder.status === 'Confirmed' && 'Đã xác nhận'}
+            {purchaseOrder.status === 'Receiving' && 'Đang nhập'}
+            {purchaseOrder.status === 'Completed' && 'Hoàn thành'}
+            {purchaseOrder.status === 'Cancelled' && 'Đã huỷ'}
           </div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="text-sm text-gray-600 mb-2">Supplier</div>
-          <div className="text-lg font-semibold text-gray-900">{supplier?.name || 'Unknown'}</div>
+          <div className="text-sm text-gray-600 mb-2">NCC</div>
+          <div className="text-lg font-semibold text-gray-900">{supplier?.name || 'Chưa xác định'}</div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="text-sm text-gray-600 mb-2">Total Amount</div>
+          <div className="text-sm text-gray-600 mb-2">Tổng tiền</div>
           <div className="text-lg font-semibold text-gray-900">
             {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalItems)}
           </div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="text-sm text-gray-600 mb-2">Received Amount</div>
+          <div className="text-sm text-gray-600 mb-2">Tiền nhập</div>
           <div className="text-lg font-semibold text-gray-900">
             {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalReceived)}
           </div>
@@ -143,23 +148,23 @@ export function PODetail() {
       {/* Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Information</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin đơn hàng</h3>
           <div className="space-y-3">
             <div>
-              <div className="text-sm text-gray-600">Supplier</div>
+              <div className="text-sm text-gray-600">NCC</div>
               <div className="text-gray-900">{supplier?.name}</div>
             </div>
             <div>
-              <div className="text-sm text-gray-600">Created Date</div>
+              <div className="text-sm text-gray-600">Ngày tạo</div>
               <div className="text-gray-900">{new Date(purchaseOrder.createdAt).toLocaleDateString('vi-VN')}</div>
             </div>
             <div>
-              <div className="text-sm text-gray-600">Created By</div>
+              <div className="text-sm text-gray-600">Tạo bởi</div>
               <div className="text-gray-900">{purchaseOrder.createdBy}</div>
             </div>
             {purchaseOrder.relatedPRIds && purchaseOrder.relatedPRIds.length > 0 && (
               <div>
-                <div className="text-sm text-gray-600">Related PRs</div>
+                <div className="text-sm text-gray-600">PR liên kết</div>
                 <div className="space-y-1">
                   {purchaseOrder.relatedPRIds.map((prId) => (
                     <button
@@ -167,7 +172,7 @@ export function PODetail() {
                       onClick={() => navigate(`/purchase-requests/${prId}`)}
                       className="text-blue-600 hover:underline block"
                     >
-                      View PR
+                      Xem PR
                     </button>
                   ))}
                 </div>
@@ -177,23 +182,23 @@ export function PODetail() {
         </div>
 
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Timeline</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Tiến độ trạng thái</h3>
           <div className="space-y-3 text-sm">
             {purchaseOrder.sentAt && (
               <div>
-                <div className="text-gray-600">Sent Date</div>
+                <div className="text-gray-600">Ngày gửi</div>
                 <div className="text-gray-900">{new Date(purchaseOrder.sentAt).toLocaleDateString('vi-VN')}</div>
               </div>
             )}
             {purchaseOrder.confirmedAt && (
               <div>
-                <div className="text-gray-600">Confirmed Date</div>
+                <div className="text-gray-600">Ngày xác nhận</div>
                 <div className="text-gray-900">{new Date(purchaseOrder.confirmedAt).toLocaleDateString('vi-VN')}</div>
               </div>
             )}
             {purchaseOrder.completedAt && (
               <div>
-                <div className="text-gray-600">Completed Date</div>
+                <div className="text-gray-600">Ngày hoàn thành</div>
                 <div className="text-gray-900">{new Date(purchaseOrder.completedAt).toLocaleDateString('vi-VN')}</div>
               </div>
             )}
@@ -214,7 +219,7 @@ export function PODetail() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tab === 'items' ? 'Items' : 'Timeline'}
+              {tab === 'items' ? 'Mặt hàng' : 'Tiến độ'}
             </button>
           ))}
         </div>
@@ -226,12 +231,12 @@ export function PODetail() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Product</th>
-                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Qty Ordered</th>
-                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Qty Received</th>
-                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Outstanding</th>
-                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Unit Price</th>
-                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Amount</th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Sản phẩm</th>
+                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">SL Đặt</th>
+                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">SL Nhập</th>
+                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Còn lại</th>
+                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Giá đơn vị</th>
+                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Thành tiền</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -266,7 +271,7 @@ export function PODetail() {
                   <div className="w-1 flex-grow bg-gray-200 mt-2" style={{ height: '40px' }}></div>
                 </div>
                 <div className="pb-8">
-                  <div className="font-semibold text-gray-900">Created</div>
+                  <div className="font-semibold text-gray-900">Đã tạo</div>
                   <div className="text-sm text-gray-600">{new Date(purchaseOrder.createdAt).toLocaleDateString('vi-VN')}</div>
                 </div>
               </div>
@@ -288,9 +293,9 @@ export function PODetail() {
                     }`} style={{ height: '40px' }}></div>
                   </div>
                   <div className="pb-8">
-                    <div className="font-semibold text-gray-900">Sent to Supplier</div>
+                    <div className="font-semibold text-gray-900">Đã gửi cho NCC</div>
                     <div className="text-sm text-gray-600">
-                      {purchaseOrder.sentAt ? new Date(purchaseOrder.sentAt).toLocaleDateString('vi-VN') : 'Date TBD'}
+                      {purchaseOrder.sentAt ? new Date(purchaseOrder.sentAt).toLocaleDateString('vi-VN') : 'Chưa xác định'}
                     </div>
                   </div>
                 </div>
@@ -313,9 +318,9 @@ export function PODetail() {
                     }`} style={{ height: '40px' }}></div>
                   </div>
                   <div className="pb-8">
-                    <div className="font-semibold text-gray-900">Order Confirmed</div>
+                    <div className="font-semibold text-gray-900">Đơn hàng đã xác nhận</div>
                     <div className="text-sm text-gray-600">
-                      {purchaseOrder.confirmedAt ? new Date(purchaseOrder.confirmedAt).toLocaleDateString('vi-VN') : 'Date TBD'}
+                      {purchaseOrder.confirmedAt ? new Date(purchaseOrder.confirmedAt).toLocaleDateString('vi-VN') : 'Chưa xác định'}
                     </div>
                   </div>
                 </div>
@@ -333,8 +338,8 @@ export function PODetail() {
                     </div>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Goods Receiving</div>
-                    <div className="text-sm text-gray-600">In progress or completed</div>
+                    <div className="font-semibold text-gray-900">Nhập hàng</div>
+                    <div className="text-sm text-gray-600">Đang tiến hành hoặc hoàn thành</div>
                   </div>
                 </div>
               )}
