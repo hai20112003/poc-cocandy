@@ -50,7 +50,7 @@ export function PRList() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Yêu Cầu Mua Hàng</h1>
-            <p className="text-sm text-gray-500 mt-1">Purchase Request · {purchaseRequests.length} yêu cầu tổng cộng</p>
+            <p className="text-sm text-gray-500 mt-1">Yêu Cầu Mua Hàng · {purchaseRequests.length} yêu cầu tổng cộng</p>
           </div>
           <button onClick={() => navigate('/purchase-requests/add')} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
             + Tạo PR Mới
@@ -88,11 +88,11 @@ export function PRList() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
-            <option>All</option>
-            <option>Submitted</option>
-            <option>Approved</option>
-            <option>Rejected</option>
-            <option>Converted</option>
+            <option value="All">Tất cả</option>
+            <option value="Submitted">Đã gửi</option>
+            <option value="Approved">Đã duyệt</option>
+            <option value="Rejected">Đã từ chối</option>
+            <option value="Converted">Đã chuyển</option>
           </select>
         </div>
       </div>
@@ -123,7 +123,10 @@ export function PRList() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(pr.priority)}`}>
-                      {pr.priority}
+                      {pr.priority === 'Urgent' && 'Khẩn cấp'}
+                      {pr.priority === 'High' && 'Cao'}
+                      {pr.priority === 'Medium' && 'Trung bình'}
+                      {pr.priority === 'Low' && 'Thấp'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
@@ -131,11 +134,11 @@ export function PRList() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadge(pr.status)}`}>
-                      {pr.status === 'Submitted' ? '⏳ Pending' :
-                       pr.status === 'Approved' ? '✓ Approved' :
-                       pr.status === 'Rejected' ? '✕ Rejected' :
-                       pr.status === 'Converted' ? '→ Converted' :
-                       '◌ Draft'}
+                      {pr.status === 'Submitted' ? '⏳ Đã gửi' :
+                       pr.status === 'Approved' ? '✓ Đã duyệt' :
+                       pr.status === 'Rejected' ? '✕ Đã từ chối' :
+                       pr.status === 'Converted' ? '→ Đã chuyển' :
+                       '◌ Nháp'}
                     </span>
                   </td>
                 </tr>

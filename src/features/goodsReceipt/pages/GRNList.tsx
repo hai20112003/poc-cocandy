@@ -67,13 +67,13 @@ export function GRNList() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
-            <option>All</option>
-            <option>Draft</option>
-            <option>Submitted</option>
-            <option>Received</option>
-            <option>QC In Progress</option>
-            <option>Completed</option>
-            <option>Rejected</option>
+            <option value="All">Tất cả</option>
+            <option value="Draft">Nháp</option>
+            <option value="Submitted">Đã gửi</option>
+            <option value="Received">Đã nhập</option>
+            <option value="QC In Progress">QC đang xử lý</option>
+            <option value="Completed">Hoàn thành</option>
+            <option value="Rejected">Từ chối</option>
           </select>
         </div>
       </div>
@@ -103,11 +103,16 @@ export function GRNList() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(grn.status)}`}>
-                      {grn.status}
+                      {grn.status === 'Draft' && 'Nháp'}
+                      {grn.status === 'Submitted' && 'Đã gửi'}
+                      {grn.status === 'Received' && 'Đã nhập'}
+                      {grn.status === 'QC In Progress' && 'QC đang xử lý'}
+                      {grn.status === 'Completed' && 'Hoàn thành'}
+                      {grn.status === 'Rejected' && 'Từ chối'}
                     </span>
                   </td>
                   <td className={`px-4 py-3 text-sm font-medium ${getQCColor(grn.items[0]?.qcStatus || 'Pending')}`}>
-                    {grn.items[0]?.qcStatus || 'Pending'}
+                    {grn.items[0]?.qcStatus === 'Pass' && 'Đạt' || grn.items[0]?.qcStatus === 'Fail' && 'Không đạt' || 'Chờ'}
                   </td>
                 </tr>
               ))}
