@@ -29,8 +29,6 @@ export function RatingModal({
   const [comment, setComment] = useState<string>(currentComment || '')
   const [hoveredRating, setHoveredRating] = useState<number>(0)
 
-  if (!isOpen) return null
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (rating === 0) return
@@ -55,6 +53,8 @@ export function RatingModal({
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isOpen, handleClose])
+
+  if (!isOpen) return null
 
   const displayRating = hoveredRating || rating
   const isValid = rating > 0
