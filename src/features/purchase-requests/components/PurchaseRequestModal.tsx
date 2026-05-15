@@ -185,7 +185,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
             {formData.items.map((item, idx) => (
               <div key={item.id} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
                 <div className="text-xs font-semibold text-slate-600">Dòng {idx + 1}</div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="text-xs">Loại sản phẩm</label>
                     <Select value={item.productCategory || ''} onValueChange={(val) => handleCategoryChange(item.id, val || '')}>
@@ -196,14 +196,20 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                   </div>
                   <div>
                     <label className="text-xs">Sản phẩm</label>
-                    <Select value={item.productName || ''} onValueChange={(val) => handleProductChange(item.id, val || '')}>
-                      <option value="">-- Chọn --</option>
-                      {item.productCategory && PRODUCTS_BY_CATEGORY[item.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm']?.map((p) => (
-                        <option key={p.name} value={p.name}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </Select>
+                    {!item.productCategory ? (
+                      <div className="w-full px-3 py-2 border rounded text-sm bg-slate-100 text-slate-500">
+                        -- Chọn loại sản phẩm trước --
+                      </div>
+                    ) : (
+                      <Select value={item.productName || ''} onValueChange={(val) => handleProductChange(item.id, val || '')}>
+                        <option value="">-- Chọn --</option>
+                        {PRODUCTS_BY_CATEGORY[item.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm'].map((p) => (
+                          <option key={p.name} value={p.name}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
                   </div>
                   <div>
                     <label className="text-xs">Đặc tả</label>
@@ -213,6 +219,8 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                       onChange={(e) => handleItemChange(item.id, 'specification', e.target.value)}
                     />
                   </div>
+                </div>
+                <div className="grid grid-cols-1 gap-2 mt-2">
                   <div>
                     <label className="text-xs">Số lượng</label>
                     <Input
@@ -223,7 +231,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 gap-2 mt-2">
                   <div>
                     <label className="text-xs">Đơn vị</label>
                     <Input value={item.unit} readOnly className="bg-slate-100" />
@@ -248,7 +256,6 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                       ))}
                     </Select>
                   </div>
-                  <div></div>
                 </div>
               </div>
             ))}
