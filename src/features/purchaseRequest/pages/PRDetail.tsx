@@ -21,7 +21,7 @@ export function PRDetail() {
           <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
             <ChevronLeft size={20} />
           </button>
-          <h1 className="text-2xl font-bold">Purchase Request Not Found</h1>
+          <h1 className="text-2xl font-bold">Không Tìm Thấy Yêu Cầu Mua Hàng</h1>
         </div>
       </div>
     )
@@ -80,11 +80,11 @@ export function PRDetail() {
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 {purchaseRequest.code}
                 <span className={`inline-block px-3 py-1 rounded text-sm font-medium ${getStatusColor(purchaseRequest.status)}`}>
-                  {purchaseRequest.status === 'Draft' && '◌ Draft'}
-                  {purchaseRequest.status === 'Submitted' && '⏳ Submitted'}
-                  {purchaseRequest.status === 'Approved' && '✓ Approved'}
-                  {purchaseRequest.status === 'Rejected' && '✕ Rejected'}
-                  {purchaseRequest.status === 'Converted' && '→ Converted'}
+                  {purchaseRequest.status === 'Draft' && '◌ Nháp'}
+                  {purchaseRequest.status === 'Submitted' && '⏳ Đã gửi'}
+                  {purchaseRequest.status === 'Approved' && '✓ Đã duyệt'}
+                  {purchaseRequest.status === 'Rejected' && '✕ Đã từ chối'}
+                  {purchaseRequest.status === 'Converted' && '→ Đã chuyển'}
                 </span>
               </h1>
               <p className="text-gray-600 text-sm mt-2">
@@ -233,29 +233,29 @@ export function PRDetail() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700">Mặt hàng</th>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700">Thông số</th>
-                      <th className="px-4 py-3 text-right font-semibold text-gray-700">SL</th>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700">ĐVT</th>
-                      <th className="px-4 py-3 text-right font-semibold text-gray-700">Giá ước tính</th>
-                      <th className="px-4 py-3 text-right font-semibold text-gray-700">Thành tiền</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700 w-8">#</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700">Loại</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700">Sản phẩm</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700">Đặc tả</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700 w-20">SL</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700 w-20">Đơn vị</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">Giá ước tính</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700">NCC gợi ý</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {purchaseRequest.items.map((item) => (
+                    {purchaseRequest.items.map((item, idx) => (
                       <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-900">{item.productName}</td>
-                        <td className="px-4 py-3 text-gray-600">{item.specification}</td>
-                        <td className="px-4 py-3 text-right text-gray-900">{item.quantity}</td>
-                        <td className="px-4 py-3 text-gray-600">{item.unit}</td>
-                        <td className="px-4 py-3 text-right text-gray-900">
+                        <td className="px-4 py-3 text-sm text-gray-600">{idx + 1}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{item.productCategory || '—'}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.productName}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{item.specification}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{item.quantity}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{item.unit}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
                           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice ?? 0)}
                         </td>
-                        <td className="px-4 py-3 text-right font-medium text-gray-900">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                            (item.estimatedPrice ?? 0) * item.quantity
-                          )}
-                        </td>
+                        <td className="px-4 py-3 text-sm text-blue-600">{item.suggestedSupplier || '—'}</td>
                       </tr>
                     ))}
                   </tbody>

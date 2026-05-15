@@ -150,7 +150,7 @@ export function PRForm() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 inline-flex items-center gap-2">
               Tạo Yêu Cầu Mua Hàng
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">◌ Draft</span>
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">◌ Nháp</span>
             </h1>
             <p className="text-gray-600 text-sm mt-1">{formData.code} · Tự động sinh · {currentUser} · {new Date().toLocaleDateString('vi-VN')}</p>
           </div>
@@ -269,10 +269,10 @@ export function PRForm() {
                 </label>
                 <div className="flex gap-2">
                   {[
-                    { value: 'low', label: '● Low' },
-                    { value: 'medium', label: '● Medium' },
-                    { value: 'high', label: '● High' },
-                    { value: 'urgent', label: '🔴 Urgent' },
+                    { value: 'low', label: '● Thấp' },
+                    { value: 'medium', label: '● Trung bình' },
+                    { value: 'high', label: '● Cao' },
+                    { value: 'urgent', label: '🔴 Khẩn cấp' },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -288,7 +288,7 @@ export function PRForm() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Urgent — cần duyệt trong ngày. High — trong 24h.</p>
+                <p className="text-xs text-gray-500 mt-1">Khẩn cấp — cần duyệt trong ngày. Cao — trong 24h.</p>
               </div>
 
               {/* Notes */}
@@ -362,13 +362,12 @@ export function PRForm() {
 
             {/* Add Item Form */}
             <div className="p-6 bg-white border-t border-gray-200">
-              <p className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <Plus size={16} className="text-blue-600" />
-                Thêm dòng hàng mới
-              </p>
-              <div className="flex gap-2 items-end">
+              <div className="grid gap-2 items-end" style={{ gridTemplateColumns: '0 1fr 1fr 1fr 5rem 5rem 8rem 1fr 2rem' }}>   
+                {/* Empty for # column */}
+                <div></div>
+
                 {/* Loại Sản Phẩm */}
-                <div className="flex-1">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Loại</label>
                   <select
                     value={newItem.productCategory || ''}
@@ -382,7 +381,7 @@ export function PRForm() {
                 </div>
 
                 {/* Sản Phẩm */}
-                <div className="flex-1">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Sản phẩm</label>
                   {!newItem.productCategory ? (
                     <div className="w-full px-3 py-2 border border-dashed border-orange-300 rounded-lg text-sm bg-orange-50 text-orange-600 flex items-center gap-1">
@@ -409,7 +408,7 @@ export function PRForm() {
                 </div>
 
                 {/* Đặc Tả */}
-                <div className="flex-1">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Đặc tả</label>
                   <input
                     type="text"
@@ -421,7 +420,7 @@ export function PRForm() {
                 </div>
 
                 {/* Số Lượng */}
-                <div className="w-20">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">SL</label>
                   <input
                     type="number"
@@ -434,7 +433,7 @@ export function PRForm() {
                 </div>
 
                 {/* Đơn Vị */}
-                <div className="w-20">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Đơn vị</label>
                   <input
                     type="text"
@@ -446,7 +445,7 @@ export function PRForm() {
                 </div>
 
                 {/* Giá */}
-                <div className="w-32">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Giá</label>
                   <input
                     type="number"
@@ -459,7 +458,7 @@ export function PRForm() {
                 </div>
 
                 {/* NCC */}
-                <div className="flex-1">
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">NCC</label>
                   <select
                     value={newItem.suggestedSupplier || ''}
@@ -474,6 +473,9 @@ export function PRForm() {
                     ))}
                   </select>
                 </div>
+
+                {/* Empty for delete column */}
+                <div></div>
               </div>
               <button
                 type="button"
