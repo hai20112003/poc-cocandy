@@ -34,6 +34,8 @@ export interface IPR {
   convertedToPOId?: string
   requester?: string
   notes?: string
+  overallRating?: number      // 1-5 star rating
+  ratingComment?: string      // Optional comment, max 500 chars
 }
 
 // Type aliases for backward compatibility
