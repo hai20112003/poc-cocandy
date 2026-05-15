@@ -1,5 +1,6 @@
 export interface PurchaseRequestItem {
   id: string
+  productCategory: 'Nguyên phụ liệu' | 'Thành phẩm'
   productName: string
   specification: string
   quantity: number
