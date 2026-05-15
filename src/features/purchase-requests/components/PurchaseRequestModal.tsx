@@ -103,6 +103,17 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
     }
   }
 
+  function handleCategoryChange(itemId: string, category: string) {
+    setFormData((prev) => ({
+      ...prev,
+      items: prev.items.map((item) =>
+        item.id === itemId
+          ? { ...item, productCategory: category, productName: '' }
+          : item
+      ),
+    }))
+  }
+
   const totalEstimated = formData.items.reduce((sum, item) => sum + item.quantity * item.estimatedPrice, 0)
 
   function handleSubmit() {
@@ -177,7 +188,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                 <div className="grid grid-cols-4 gap-2">
                   <div>
                     <label className="text-xs">Loại sản phẩm</label>
-                    <Select value={item.productCategory || ''} onValueChange={(val) => handleItemChange(item.id, 'productCategory', val)}>
+                    <Select value={item.productCategory || ''} onValueChange={(val) => handleCategoryChange(item.id, val || '')}>
                       <option value="">-- Chọn --</option>
                       <option value="Nguyên phụ liệu">Nguyên phụ liệu</option>
                       <option value="Thành phẩm">Thành phẩm</option>
