@@ -16,6 +16,8 @@ export function GRNForm() {
   const [itemStorageLocation, setItemStorageLocation] = useState<Record<string, string>>({})
   const [itemNotes, setItemNotes] = useState<Record<string, string>>({})
   const [receivedQty, setReceivedQty] = useState<Record<string, number>>({})
+  const [acceptedQty, setAcceptedQty] = useState<Record<string, number>>({})
+  const [rejectedQty, setRejectedQty] = useState<Record<string, number>>({})
 
   const goodsReceipt = useProcurementStore((state) => state.getGoodsReceipt(id || ''))
   const { purchaseOrders, getSupplier, addGoodsReceipt, updateGoodsReceipt } = useProcurementStore()
@@ -42,19 +44,26 @@ export function GRNForm() {
   const handleSave = () => {
     if (!isValid || !selectedPO) return
 
-    const grnItems = formItems.map((item) => ({
-      id: item.id,
-      productId: item.productId,
-      productName: item.productName,
-      expectedQty: item.quantity,
-      receivedQty: receivedQty[item.id] || 0,
-      unit: item.unit,
-      qcStatus: (itemQCStatus[item.id] || 'Pending') as 'Pass' | 'Fail' | 'Pending',
-      batchNo: itemBatchNo[item.id],
-      expiryDate: itemExpiryDate[item.id] ? new Date(itemExpiryDate[item.id]) : undefined,
-      storageLocation: itemStorageLocation[item.id],
-      notes: itemNotes[item.id],
-    }))
+    const grnItems = formItems.map((item) => {
+      const received = receivedQty[item.id] || 0
+      const accepted = acceptedQty[item.id] || received
+      const rejected = rejectedQty[item.id] || 0
+      return {
+        id: item.id,
+        productId: item.productId,
+        productName: item.productName,
+        expectedQty: item.quantity,
+        receivedQty: received,
+        acceptedQty: accepted,
+        rejectedQty: rejected,
+        unit: item.unit,
+        qcStatus: (itemQCStatus[item.id] || 'Pending') as 'Pass' | 'Fail' | 'Pending',
+        batchNo: itemBatchNo[item.id],
+        expiryDate: itemExpiryDate[item.id] ? new Date(itemExpiryDate[item.id]) : undefined,
+        storageLocation: itemStorageLocation[item.id],
+        notes: itemNotes[item.id],
+      }
+    })
 
     const grnData = {
       id: selectedGRN?.id || `GRN-${Date.now()}`,
@@ -225,28 +234,30 @@ export function GRNForm() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Mặt Hàng</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Dự Kiến</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Nhập</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Còn Lại</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">QC</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Lô Hàng</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Hạn Sử Dụng</th>
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="px-6 py-3 text-left font-semibold text-gray-700">Tên hàng</th>
+                        <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '65px'}}>SL đặt PO</th>
+                        <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '80px'}}>Thực nhận</th>
+                        <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '80px'}}>Chấp nhận</th>
+                        <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '70px'}}>Từ chối</th>
+                        <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '70px'}}>Còn lại</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700" style={{width: '90px'}}>Số lô</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700" style={{width: '80px'}}>Vị trí kho</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Ghi chú</th>
                       </tr>
                     </thead>
                     <tbody>
                       {formItems.map((item) => {
                         const received = receivedQty[item.id] || 0
-                        const outstanding = item.quantity - received
+                        const accepted = acceptedQty[item.id] || received
+                        const rejected = rejectedQty[item.id] || 0
+                        const remaining = item.quantity - accepted - rejected
                         return (
                           <tr key={item.id} className="border-b border-gray-100">
-                            <td className="px-4 py-3 font-medium text-gray-900">{item.productName}</td>
-                            <td className="px-4 py-3 text-right text-gray-600">
-                              {item.quantity} {item.unit}
-                            </td>
-                            <td className="px-4 py-3">
+                            <td className="px-6 py-4 font-medium text-gray-900">{item.productName}</td>
+                            <td className="px-4 py-4 text-center text-gray-900">{item.quantity}{item.unit}</td>
+                            <td className="px-4 py-4 text-center">
                               <input
                                 type="number"
                                 min="0"
@@ -258,33 +269,78 @@ export function GRNForm() {
                                     [item.id]: parseInt(e.target.value) || 0,
                                   }))
                                 }
-                                className="w-20 px-2 py-1 border border-gray-300 rounded text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-16 px-2 py-1 border border-gray-300 rounded text-right text-sm"
+                                style={{
+                                  width: '60px',
+                                  padding: '4px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  textAlign: 'right',
+                                  background: '#f8fafc',
+                                  color: '#0f1729'
+                                }}
                               />
                             </td>
-                            <td className="px-4 py-3 text-right text-orange-600 font-medium">
-                              {outstanding} {item.unit}
-                            </td>
-                            <td className="px-4 py-3">
-                              <select
-                                value={itemQCStatus[item.id] || ''}
+                            <td className="px-4 py-4 text-center">
+                              <input
+                                type="number"
+                                min="0"
+                                max={item.quantity}
+                                value={accepted}
                                 onChange={(e) =>
-                                  setItemQCStatus((prev) => ({
+                                  setAcceptedQty((prev) => ({
                                     ...prev,
-                                    [item.id]: e.target.value as 'Pass' | 'Fail' | 'Pending',
+                                    [item.id]: parseInt(e.target.value) || 0,
                                   }))
                                 }
-                                className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="">--</option>
-                                <option value="Pass">Pass</option>
-                                <option value="Fail">Fail</option>
-                                <option value="Pending">Pending</option>
-                              </select>
+                                className="w-16 px-2 py-1 border border-gray-300 rounded text-right text-sm"
+                                style={{
+                                  width: '60px',
+                                  padding: '4px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  textAlign: 'right',
+                                  background: '#f8fafc',
+                                  color: '#0f1729'
+                                }}
+                              />
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-4 text-center">
+                              <input
+                                type="number"
+                                min="0"
+                                max={item.quantity}
+                                value={rejected}
+                                onChange={(e) =>
+                                  setRejectedQty((prev) => ({
+                                    ...prev,
+                                    [item.id]: parseInt(e.target.value) || 0,
+                                  }))
+                                }
+                                className="w-16 px-2 py-1 border rounded text-right text-sm"
+                                style={{
+                                  width: '60px',
+                                  padding: '4px 8px',
+                                  border: rejected > 0 ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  textAlign: 'right',
+                                  background: rejected > 0 ? '#fff1f1' : '#f8fafc',
+                                  color: rejected > 0 ? '#dc2626' : '#0f1729'
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-4 text-center" style={{
+                              color: remaining === 0 ? '#059669' : '#dc2626',
+                              fontWeight: '600',
+                              fontSize: '12px'
+                            }}>
+                              {remaining}{item.unit} {remaining === 0 ? '✓' : ''}
+                            </td>
+                            <td className="px-4 py-4">
                               <input
                                 type="text"
-                                placeholder="Lô hàng"
+                                placeholder="LOT"
                                 value={itemBatchNo[item.id] || ''}
                                 onChange={(e) =>
                                   setItemBatchNo((prev) => ({
@@ -292,20 +348,35 @@ export function GRNForm() {
                                     [item.id]: e.target.value,
                                   }))
                                 }
-                                className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-4">
                               <input
-                                type="date"
-                                value={itemExpiryDate[item.id] || ''}
+                                type="text"
+                                placeholder="A2-04"
+                                value={itemStorageLocation[item.id] || ''}
                                 onChange={(e) =>
-                                  setItemExpiryDate((prev) => ({
+                                  setItemStorageLocation((prev) => ({
                                     ...prev,
                                     [item.id]: e.target.value,
                                   }))
                                 }
-                                className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            </td>
+                            <td className="px-4 py-4">
+                              <input
+                                type="text"
+                                placeholder="Ghi chú"
+                                value={itemNotes[item.id] || ''}
+                                onChange={(e) =>
+                                  setItemNotes((prev) => ({
+                                    ...prev,
+                                    [item.id]: e.target.value,
+                                  }))
+                                }
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
                             </td>
                           </tr>
@@ -313,28 +384,6 @@ export function GRNForm() {
                       })}
                     </tbody>
                   </table>
-                </div>
-
-                {/* Item Notes */}
-                <div className="mt-6 space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">Ghi Chú Cho Mặt Hàng</label>
-                  {formItems.map((item) => (
-                    <div key={item.id}>
-                      <label className="block text-xs text-gray-600 mb-1">{item.productName}</label>
-                      <textarea
-                        placeholder="Ghi chú cho mặt hàng này"
-                        value={itemNotes[item.id] || ''}
-                        onChange={(e) =>
-                          setItemNotes((prev) => ({
-                            ...prev,
-                            [item.id]: e.target.value,
-                          }))
-                        }
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  ))}
                 </div>
               </div>
             )}
