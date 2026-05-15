@@ -4,6 +4,8 @@ export interface IGRNItem {
   productName: string
   expectedQty: number
   receivedQty: number
+  acceptedQty: number
+  rejectedQty: number
   unit: string
   qcStatus: 'Pass' | 'Fail' | 'Pending'
   batchNo?: string

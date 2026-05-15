@@ -297,31 +297,67 @@ export function GRNDetail() {
         <div className="p-6">
           {activeTab === 'items' && (
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Product</th>
-                    <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">Qty Received</th>
-                    <th className="px-6 py-3 text-center text-sm font-medium text-gray-700">QC Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Notes</th>
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Tên hàng</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">SL đặt PO</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Thực nhận</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Chấp nhận</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Từ chối</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Còn lại</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700 w-24">Số lô</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700 w-24">Vị trí kho</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">QC Note</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {goodsReceipt.items.map((item) => (
-                    <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 text-gray-900 font-medium">{item.productName}</td>
-                      <td className="px-6 py-4 text-right text-gray-900">{item.quantityReceived}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          {getQCStatusIcon(item.qcStatus)}
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${getQCStatusColor(item.qcStatus)}`}>
-                            {item.qcStatus}
+                  {goodsReceipt.items.map((item) => {
+                    const remaining = item.expectedQty - item.acceptedQty - item.rejectedQty
+                    return (
+                      <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                        <td className="px-4 py-3 font-medium text-gray-900">{item.productName}</td>
+                        <td className="px-4 py-3 text-center text-gray-900">{item.expectedQty}{item.unit}</td>
+                        <td className="px-4 py-3 text-center text-gray-900">{item.receivedQty}{item.unit}</td>
+                        <td className="px-4 py-3 text-center">
+                          <input
+                            type="number"
+                            value={item.acceptedQty}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                            readOnly
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <input
+                            type="number"
+                            value={item.rejectedQty}
+                            className={`w-full px-2 py-1 border rounded text-center text-sm ${
+                              item.rejectedQty > 0 ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                            }`}
+                            readOnly
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`font-semibold text-sm ${
+                            remaining === 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {remaining}{item.unit} {remaining === 0 ? '✓' : ''}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">{item.notes || '-'}</td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-4 py-3 text-gray-500 text-xs">{item.batchNo || '—'}</td>
+                        <td className="px-4 py-3 text-gray-500 text-xs">{item.storageLocation || '—'}</td>
+                        <td className="px-4 py-3 text-xs">
+                          {item.qcStatus === 'Pass' ? (
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded inline-block">✓ {item.notes}</span>
+                          ) : item.qcStatus === 'Pending' ? (
+                            <span className="text-yellow-600">⏳ {item.notes}</span>
+                          ) : (
+                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded inline-block">✕ {item.notes}</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
