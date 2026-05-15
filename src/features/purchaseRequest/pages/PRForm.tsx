@@ -322,6 +322,7 @@ export function PRForm() {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-8">#</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Loại *</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Sản phẩm *</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Đặc tả</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-20">SL *</th>
@@ -335,6 +336,7 @@ export function PRForm() {
                   {items.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm text-gray-600">{idx + 1}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{item.productCategory || '—'}</td>
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.productName}</td>
                       <td className="px-4 py-3 text-sm text-gray-600">{item.specification}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{item.quantity}</td>
