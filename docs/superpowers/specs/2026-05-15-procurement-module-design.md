@@ -9,10 +9,20 @@
 
 ## Overview
 
-Complete implementation of Cocandy ERP's Procurement Module with 11 screens, built from design file `erp-full-v4_1.html`. 
+Complete implementation of Cocandy ERP's Procurement Module with full business logic support, built from:
+- Design file `erp-full-v4_1.html` (11 screens, UI/UX)
+- Detailed requirements document (business workflows, entities, rules)
 
-**Phase 1 (MVP):** Suppliers management → Purchase Request → Purchase Order → Goods Receipt (with partial receipt support)  
-**Phase 2:** Supplier ratings, contract management, quality metrics, evaluation system
+**Phase 1 (MVP - Core Workflow):** 
+- Suppliers (CRUD + multi-contacts + product catalog)
+- Purchase Request (creation + approval workflow + multi-level authorization)
+- Purchase Order (from PR + status tracking + PO amendments)
+- Goods Receipt (full/partial receipt + QC + returns handling)
+
+**Phase 2 (Enhanced Features):** 
+- Supplier ratings & quarterly evaluations (4 criteria + weighted scoring)
+- Supplier contracts (framework agreements + price history + renewals)
+- Invoice & Payment tracking (công nợ NCC + reconciliation)
 
 ---
 
@@ -147,27 +157,17 @@ src/features/
 - Add/Edit product: Modal with product, unit, unit price, MOQ, lead time, notes
 - Bulk status change: Select multiple → change status
 
+**Business Rules:**
+- Each supplier can have multiple contacts (primary, accounting, logistics)
+- Primary contact auto-selected for communication
+- Multiple products/categories per supplier (danh mục hàng)
+- Lead time can differ per product (override from supplier average)
+- Status transitions: Active ↔ Suspended, Active → Blacklisted (one-way)
+- Blacklist reason must be recorded (hàng giả, giao trễ liên tục, etc.)
+- Rating auto-calculated from quarterly evaluations (Phase 2)
+
 **Data types:**
 ```typescript
-interface ISupplier {
-  id: string
-  code: string
-  name: string
-  taxId: string
-  type: 'Manufacturer' | 'Trader' | 'Individual'
-  address: string
-  phone: string
-  email: string
-  leadTime: number // days
-  paymentTerms: string
-  currency: string
-  status: 'Active' | 'Suspended' | 'Blacklisted'
-  contacts: IContact[]
-  products: IProduct[]
-  createdAt: Date
-  updatedAt: Date
-}
-
 interface IContact {
   id: string
   name: string
@@ -186,6 +186,27 @@ interface IProduct {
   moq: number
   leadTime: number
   notes: string
+}
+
+interface ISupplier {
+  id: string
+  code: string
+  name: string
+  taxId: string
+  type: 'Manufacturer' | 'Trader' | 'Individual'
+  address: string
+  phone: string
+  email: string
+  leadTime: number // days (average)
+  paymentTerms: 'NET 15' | 'NET 30' | 'NET 60' | 'COD' | 'Prepaid'
+  currency: string
+  status: 'Active' | 'Suspended' | 'Blacklisted'
+  blacklistReason?: string
+  rating: number // 0-5 (from evaluations, Phase 2)
+  contacts: IContact[]
+  products: IProduct[]
+  createdAt: Date
+  updatedAt: Date
 }
 ```
 
@@ -230,6 +251,20 @@ Draft ──Submit──> Submitted ──Approve──> Approved ──Convert�
                        ↑
                     Reject (→ Draft + reason)
 ```
+
+**Approval Authorization Levels (based on total PR value):**
+| PR Value | Approver |
+|----------|----------|
+| < 5M | Department Manager |
+| 5M – 50M | Department Head |
+| > 50M | Director |
+
+**Business Rules:**
+- `needed_by_date` is critical for PO deadline calculation (PO must be sent before this date)
+- PR can be converted to multiple POs (split across suppliers)
+- Multiple PRs can be combined into one PO (consolidate for volume discount)
+- If rejected, reason must explain issues (budget, timing, specs) for requester to adjust
+- Rejection can suggest alternative suppliers or timing
 
 **Data types:**
 ```typescript
