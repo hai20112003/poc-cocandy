@@ -39,7 +39,10 @@
       "Bash(pkill -f \"vite\")",
       "Bash(pkill -f \"npm run dev\")",
       "Bash(rtk ps *)",
-      "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")"
+      "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")",
+      "Bash(rtk lint *)",
+      "Bash(timeout 15 npm run dev)",
+      "Bash(curl -s http://localhost:5174)"
     ]
   }
 }
