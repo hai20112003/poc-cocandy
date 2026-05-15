@@ -33,15 +33,15 @@ export function PRForm() {
     code: `PR-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
     department: '',
     createdBy: currentUser,
-    neededDate: today,
+    neededDate: new Date(today),
     priority: 'Low' as const,
     status: 'Draft',
     items: [],
     subtotal: 0,
     tax: 0,
     total: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
     approver: '',
   })
 
@@ -109,7 +109,7 @@ export function PRForm() {
       subtotal: totalAmount,
       tax: 0,
       total: totalAmount,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
     } as IPurchaseRequest
 
     if (id && purchaseRequest) {
@@ -234,7 +234,7 @@ export function PRForm() {
                   <input
                     type="date"
                     value={typeof formData.neededDate === 'string' ? formData.neededDate : (formData.neededDate ? new Date(formData.neededDate).toISOString().split('T')[0] : today)}
-                    onChange={(e) => setFormData({ ...formData, neededDate: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, neededDate: new Date(e.target.value) })}
                     min={today}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />

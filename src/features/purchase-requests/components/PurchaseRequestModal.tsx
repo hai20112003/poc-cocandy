@@ -113,8 +113,8 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
           <div>
             <label className="block text-sm font-medium mb-1">Bộ phận yêu cầu *</label>
             <Select
-              value={formData.department}
-              onValueChange={(value) => setFormData((prev) => ({ ...prev, department: value }))}
+              value={formData.department || ''}
+              onValueChange={(value) => setFormData((prev) => ({ ...prev, department: value as string }))}
             >
               <option value="">-- Chọn bộ phận --</option>
               <option value="Sản xuất">Sản xuất</option>
@@ -160,7 +160,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="text-xs">Sản phẩm</label>
-                    <Select value={item.productName} onValueChange={(val) => handleProductChange(item.id, val)}>
+                    <Select value={item.productName || ''} onValueChange={(val) => handleProductChange(item.id, val)}>
                       <option value="">-- Chọn --</option>
                       {PRODUCTS.map((p) => (
                         <option key={p.name} value={p.name}>

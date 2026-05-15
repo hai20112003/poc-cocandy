@@ -11,7 +11,7 @@ export function PRList() {
   const filtered = useMemo(() => {
     return purchaseRequests.filter((pr) => {
       const matchSearch = pr.code.toLowerCase().includes(search.toLowerCase()) ||
-        pr.requester.toLowerCase().includes(search.toLowerCase())
+        (pr.requester ?? '').toLowerCase().includes(search.toLowerCase())
       const matchStatus = statusFilter === 'All' || pr.status === statusFilter
       return matchSearch && matchStatus
     })

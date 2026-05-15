@@ -17,7 +17,7 @@ export function POForm() {
     supplierId: '',
     status: 'Draft',
     items: [],
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
     createdBy: currentUser,
   })
 
