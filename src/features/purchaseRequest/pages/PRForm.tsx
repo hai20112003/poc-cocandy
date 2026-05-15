@@ -361,23 +361,33 @@ export function PRForm() {
             </div>
 
             {/* Add Item Form */}
-            <div className="p-6 bg-gray-50 border-t border-gray-200 space-y-3">
-              <div className="grid grid-cols-8 gap-2">
+            <div className="p-6 bg-white border-t border-gray-200">
+              <p className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <Plus size={16} className="text-blue-600" />
+                Thêm dòng hàng mới
+              </p>
+              <div className="grid grid-cols-8 gap-3">
+                {/* Loại Sản Phẩm */}
                 <div className="col-span-1.5">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Loại</label>
                   <select
                     value={newItem.productCategory || ''}
                     onChange={(e) => setNewItem({ ...newItem, productCategory: e.target.value, productName: '', unit: '' })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                   >
-                    <option value="">-- Loại --</option>
+                    <option value="">-- Chọn --</option>
                     <option value="Nguyên phụ liệu">Nguyên phụ liệu</option>
                     <option value="Thành phẩm">Thành phẩm</option>
                   </select>
                 </div>
+
+                {/* Sản Phẩm */}
                 <div className="col-span-1.5">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Sản phẩm</label>
                   {!newItem.productCategory ? (
-                    <div className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-100 text-gray-500">
-                      Chọn loại trước
+                    <div className="w-full px-3 py-2 border border-dashed border-orange-300 rounded-lg text-sm bg-orange-50 text-orange-600 flex items-center gap-1">
+                      <AlertCircle size={14} />
+                      <span>Chọn loại trước</span>
                     </div>
                   ) : (
                     <select
@@ -386,7 +396,7 @@ export function PRForm() {
                         const product = PRODUCTS_BY_CATEGORY[newItem.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm'].find(p => p.name === e.target.value)
                         setNewItem({ ...newItem, productName: e.target.value, unit: product?.unit || '' })
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                     >
                       <option value="">-- Chọn sản phẩm --</option>
                       {(newItem.productCategory ? PRODUCTS_BY_CATEGORY[newItem.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm'] : []).map((p) => (
@@ -397,49 +407,64 @@ export function PRForm() {
                     </select>
                   )}
                 </div>
+
+                {/* Đặc Tả */}
                 <div className="col-span-1.5">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Đặc tả</label>
                   <input
                     type="text"
                     value={newItem.specification || ''}
                     onChange={(e) => setNewItem({ ...newItem, specification: e.target.value })}
                     placeholder="Màu, khổ..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                   />
                 </div>
+
+                {/* Số Lượng */}
                 <div className="col-span-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">SL</label>
                   <input
                     type="number"
                     min="0"
                     value={newItem.quantity || 0}
                     onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
                     placeholder="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                   />
                 </div>
+
+                {/* Đơn Vị */}
                 <div className="col-span-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Đơn vị</label>
                   <input
                     type="text"
                     value={newItem.unit || ''}
                     onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
                     placeholder="mét"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                   />
                 </div>
+
+                {/* Giá */}
                 <div className="col-span-1.5">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Giá</label>
                   <input
                     type="number"
                     min="0"
                     value={newItem.estimatedPrice || 0}
                     onChange={(e) => setNewItem({ ...newItem, estimatedPrice: parseInt(e.target.value) })}
                     placeholder="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                   />
                 </div>
+
+                {/* NCC */}
                 <div className="col-span-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">NCC</label>
                   <select
                     value={newItem.suggestedSupplier || ''}
                     onChange={(e) => setNewItem({ ...newItem, suggestedSupplier: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition"
                   >
                     <option value="">-- Không --</option>
                     {SUPPLIERS.map((s) => (
@@ -453,7 +478,7 @@ export function PRForm() {
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="w-full py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition flex items-center justify-center gap-2"
+                className="w-full mt-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center gap-2 shadow-sm"
               >
                 <Plus size={18} />
                 Thêm dòng hàng
