@@ -261,6 +261,27 @@ export function PRDetail() {
                 </table>
               </div>
             </div>
+
+            {/* GRN History Card */}
+            {['Approved', 'Converted'].includes(purchaseRequest.status) && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">📦 Lịch sử nhập kho (GRN)</h3>
+                    <p className="text-sm text-gray-600 mt-1">Các phiếu nhập kho liên kết với yêu cầu này</p>
+                  </div>
+                  <button
+                    onClick={() => navigate('/goods-receipts/add')}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                  >
+                    + Tạo GRN
+                  </button>
+                </div>
+                <div className="p-6 text-center text-gray-600">
+                  <p className="text-sm">Chưa có GRN nào. Hãy tạo GRN mới để bắt đầu nhập kho.</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column */}
@@ -347,16 +368,6 @@ export function PRDetail() {
               </div>
             </div>
 
-            {/* Create GRN Button */}
-            {['Approved', 'Converted'].includes(purchaseRequest.status) && (
-              <button
-                onClick={() => navigate('/goods-receipts/add')}
-                className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-medium flex items-center justify-center gap-2"
-              >
-                <Package size={18} />
-                Tạo GRN
-              </button>
-            )}
 
             {/* Summary Card */}
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
