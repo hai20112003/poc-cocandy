@@ -221,7 +221,6 @@ export function SupplierDetail() {
                   </div>
                 </div>
                 </div>
-                </div>
 
                 {/* Right sidebar */}
                 <div className="space-y-6">
