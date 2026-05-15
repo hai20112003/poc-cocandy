@@ -34,6 +34,8 @@ export const mockPurchaseRequests: IPR[] = [
     approver: 'Nguyễn Minh B',
     createdAt: new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-002',
@@ -79,6 +81,8 @@ export const mockPurchaseRequests: IPR[] = [
     approver: 'Phạm Văn D',
     createdAt: new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   // APPROVED
   {
@@ -113,6 +117,8 @@ export const mockPurchaseRequests: IPR[] = [
     approvedAt: new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000),
     createdAt: new Date(baseDate.getTime() - 3 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-004',
@@ -146,6 +152,8 @@ export const mockPurchaseRequests: IPR[] = [
     approvedAt: new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000),
     createdAt: new Date(baseDate.getTime() - 4 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   // DRAFT
   {
@@ -178,6 +186,8 @@ export const mockPurchaseRequests: IPR[] = [
     approver: '',
     createdAt: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   // REJECTED
   {
@@ -211,6 +221,8 @@ export const mockPurchaseRequests: IPR[] = [
     rejectionReason: 'Vượt quá budget quý này. Thử tháng sau được không?',
     createdAt: new Date(baseDate.getTime() - 6 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   // CONVERTED
   {
@@ -246,6 +258,8 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-001',
     createdAt: new Date(baseDate.getTime() - 10 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 8 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-008',
@@ -280,6 +294,8 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-002',
     createdAt: new Date(baseDate.getTime() - 15 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 12 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   // CONVERTED - Additional completed examples
   {
@@ -315,6 +331,8 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-003',
     createdAt: new Date(baseDate.getTime() - 20 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 7 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-010',
@@ -349,6 +367,8 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-004',
     createdAt: new Date(baseDate.getTime() - 22 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-011',
@@ -383,6 +403,8 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-005',
     createdAt: new Date(baseDate.getTime() - 25 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 3 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-012',
@@ -417,6 +439,8 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-006',
     createdAt: new Date(baseDate.getTime() - 30 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 10 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
   {
     id: 'pr-013',
@@ -451,5 +475,7 @@ export const mockPurchaseRequests: IPR[] = [
     convertedToPOId: 'po-007',
     createdAt: new Date(baseDate.getTime() - 32 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(baseDate.getTime() - 14 * 24 * 60 * 60 * 1000),
+    overallRating: undefined,
+    ratingComment: undefined,
   },
 ]
