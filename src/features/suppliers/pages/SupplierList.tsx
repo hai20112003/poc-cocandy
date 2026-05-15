@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useProcurementStore } from '../../../store/procurementStore'
 import { ISupplier } from '../types'
 
 export function SupplierList() {
+  const navigate = useNavigate()
   const { suppliers } = useProcurementStore()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -110,7 +112,7 @@ export function SupplierList() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filtered.map((supplier) => (
-                <tr key={supplier.id} className="hover:bg-gray-50">
+                <tr key={supplier.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/suppliers/${supplier.id}`)}>
                   <td className="px-4 py-3 text-sm text-blue-600 font-medium">{supplier.code}</td>
                   <td className="px-4 py-3 text-sm">
                     <div className="font-medium text-gray-900">{supplier.name}</div>

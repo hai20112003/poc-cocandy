@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useProcurementStore } from '../../../store/procurementStore'
 
 export function GRNList() {
+  const navigate = useNavigate()
   const { goodsReceipts } = useProcurementStore()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -92,7 +94,7 @@ export function GRNList() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filtered.map((grn) => (
-                <tr key={grn.id} className="hover:bg-gray-50 cursor-pointer">
+                <tr key={grn.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/goods-receipts/${grn.id}`)}>
                   <td className="px-4 py-3 text-sm text-blue-600 font-medium">{grn.code}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{grn.poId}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{grn.supplierName}</td>

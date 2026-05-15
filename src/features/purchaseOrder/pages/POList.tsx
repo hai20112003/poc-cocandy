@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useProcurementStore } from '../../../store/procurementStore'
 
 export function POList() {
+  const navigate = useNavigate()
   const { purchaseOrders } = useProcurementStore()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -103,7 +105,7 @@ export function POList() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filtered.map((po) => (
-                <tr key={po.id} className="hover:bg-gray-50 cursor-pointer">
+                <tr key={po.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/orders/${po.id}`)}>
                   <td className="px-4 py-3 text-sm text-blue-600 font-medium">{po.code}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{po.supplierName}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">

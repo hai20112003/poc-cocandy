@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useProcurementStore } from '../../../store/procurementStore'
 
 export function PRList() {
+  const navigate = useNavigate()
   const { purchaseRequests } = useProcurementStore()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -112,7 +114,7 @@ export function PRList() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filtered.map((pr) => (
-                <tr key={pr.id} className="hover:bg-gray-50">
+                <tr key={pr.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/purchase-requests/${pr.id}`)}>
                   <td className="px-4 py-3 text-sm text-blue-600 font-medium">{pr.code}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{pr.requester}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{pr.department}</td>

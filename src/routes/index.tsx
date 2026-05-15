@@ -7,6 +7,10 @@ import { BrandsPage } from '@/features/brands/BrandsPage'
 import { SourcesPage } from '@/features/sources/SourcesPage'
 import { PurchaseRequestsPage } from '@/features/purchase-requests/PurchaseRequestsPage'
 import { GoodsReceiptsPage } from '@/features/goods-receipts/GoodsReceiptsPage'
+import { SupplierDetail } from '@/features/suppliers/pages/SupplierDetail'
+import { PRDetail } from '@/features/purchaseRequest/pages/PRDetail'
+import { PODetail } from '@/features/purchaseOrder/pages/PODetail'
+import { GRNDetail } from '@/features/goodsReceipt/pages/GRNDetail'
 
 export const router = createBrowserRouter([
   {
@@ -17,9 +21,13 @@ export const router = createBrowserRouter([
       { path: 'brands', element: <BrandsPage /> },
       { path: 'supplier-sources', element: <SupplierSourcesPage /> },
       { path: 'suppliers', element: <SuppliersPage /> },
+      { path: 'suppliers/:id', element: <SupplierDetail /> },
       { path: 'purchase-requests', element: <PurchaseRequestsPage /> },
+      { path: 'purchase-requests/:id', element: <PRDetail /> },
       { path: 'goods-receipts', element: <GoodsReceiptsPage /> },
+      { path: 'goods-receipts/:id', element: <GRNDetail /> },
       { path: 'orders', element: <OrdersPage /> },
+      { path: 'orders/:id', element: <PODetail /> },
       { path: 'sources', element: <SourcesPage /> },
     ],
   },
