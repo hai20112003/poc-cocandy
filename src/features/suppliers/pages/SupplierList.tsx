@@ -40,7 +40,7 @@ export function SupplierList() {
             <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50">
               ↓ Export
             </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+            <button onClick={() => navigate('/suppliers/add')} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
               + Thêm NCC
             </button>
           </div>
