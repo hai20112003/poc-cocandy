@@ -1,6 +1,7 @@
 export interface PurchaseRequestItem {
   id: string
-  productCategory: 'Nguyên phụ liệu' | 'Thành phẩm'
+  /** Product category. Should be either 'Nguyên phụ liệu' (Raw Materials) or 'Thành phẩm' (Finished Products) */
+  productCategory: string
   productName: string
   specification: string
   quantity: number
