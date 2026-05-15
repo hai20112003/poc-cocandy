@@ -38,7 +38,7 @@ export function OrdersPage() {
   const { add, update } = useOrdersStore()
   const suppliers = useSuppliersStore((s) => s.suppliers)
   const supplierMap = useMemo(
-    () => Object.fromEntries(suppliers.map((s) => [s.id, { mccCode: s.mccCode, name: s.name }])),
+    () => Object.fromEntries(suppliers.map((s) => [s.id, { name: s.name }])),
     [suppliers]
   )
 

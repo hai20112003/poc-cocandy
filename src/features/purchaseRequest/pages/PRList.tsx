@@ -119,7 +119,7 @@ export function PRList() {
                   <td className="px-4 py-3 text-sm text-gray-900">{pr.requester}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{pr.department}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {new Date(pr.neededByDate).toLocaleDateString('vi-VN')}
+                    {new Date(pr.neededDate).toLocaleDateString('vi-VN')}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(pr.priority)}`}>

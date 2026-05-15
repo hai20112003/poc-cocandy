@@ -153,7 +153,7 @@ export function useGRNWorkflow() {
       ...grn,
       status: 'QC In Progress' as const,
       qcStatus: 'Pending' as const,
-      qcStartedAt: new Date().toISOString(),
+      qcStartedAt: new Date(),
       qcInspector: inspector,
     }
     updateGoodsReceipt(grnId, updatedGRN)
@@ -167,7 +167,7 @@ export function useGRNWorkflow() {
       ...grn,
       status: 'Completed' as const,
       qcStatus: 'Pass' as const,
-      qcCompletedAt: new Date().toISOString(),
+      qcCompletedAt: new Date(),
     }
     updateGoodsReceipt(grnId, updatedGRN)
   }

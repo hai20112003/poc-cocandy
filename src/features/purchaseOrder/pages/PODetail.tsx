@@ -173,15 +173,20 @@ export function PODetail() {
               <div className="text-sm text-gray-600">Created By</div>
               <div className="text-gray-900">{purchaseOrder.createdBy}</div>
             </div>
-            {purchaseOrder.relatedPRId && (
+            {purchaseOrder.relatedPRIds && purchaseOrder.relatedPRIds.length > 0 && (
               <div>
-                <div className="text-sm text-gray-600">Related PR</div>
-                <button
-                  onClick={() => navigate(`/purchase-requests/${purchaseOrder.relatedPRId}`)}
-                  className="text-blue-600 hover:underline"
-                >
-                  View PR
-                </button>
+                <div className="text-sm text-gray-600">Related PRs</div>
+                <div className="space-y-1">
+                  {purchaseOrder.relatedPRIds.map((prId) => (
+                    <button
+                      key={prId}
+                      onClick={() => navigate(`/purchase-requests/${prId}`)}
+                      className="text-blue-600 hover:underline block"
+                    >
+                      View PR
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>

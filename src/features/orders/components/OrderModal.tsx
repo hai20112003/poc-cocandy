@@ -239,7 +239,7 @@ export function OrderModal({ open, onClose, order, onSave }: OrderModalProps) {
           >
             <option value="">— Chọn nhà cung cấp —</option>
             {suppliers.map((s) => (
-              <option key={s.id} value={s.id}>{s.mccCode} — {s.name}</option>
+              <option key={s.id} value={s.id}>{s.code} — {s.name}</option>
             ))}
           </select>
           {errors.supplierId && <p className="mt-1 text-[10px] text-red-500">{errors.supplierId}</p>}
