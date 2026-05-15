@@ -22,7 +22,7 @@ export function usePRWorkflow() {
       ...pr,
       status: 'Approved' as const,
       approvedBy,
-      approvedAt: new Date(),
+      approvedAt: new Date().toISOString(),
     }
     updatePurchaseRequest(prId, updatedPR)
   }
@@ -64,7 +64,7 @@ export function usePOWorkflow() {
     const updatedPO = {
       ...po,
       status: 'Sent' as const,
-      sentAt: new Date(),
+      sentAt: new Date().toISOString(),
     }
     updatePurchaseOrder(poId, updatedPO)
   }
@@ -76,7 +76,7 @@ export function usePOWorkflow() {
     const updatedPO = {
       ...po,
       status: 'Confirmed' as const,
-      confirmedAt: new Date(),
+      confirmedAt: new Date().toISOString(),
       confirmedBy,
     }
     updatePurchaseOrder(poId, updatedPO)
@@ -100,7 +100,7 @@ export function usePOWorkflow() {
     const updatedPO = {
       ...po,
       status: 'Completed' as const,
-      completedAt: new Date(),
+      completedAt: new Date().toISOString(),
     }
     updatePurchaseOrder(poId, updatedPO)
   }
@@ -153,7 +153,7 @@ export function useGRNWorkflow() {
       ...grn,
       status: 'QC In Progress' as const,
       qcStatus: 'Pending' as const,
-      qcStartedAt: new Date(),
+      qcStartedAt: new Date().toISOString(),
       qcInspector: inspector,
     }
     updateGoodsReceipt(grnId, updatedGRN)
@@ -167,7 +167,7 @@ export function useGRNWorkflow() {
       ...grn,
       status: 'Completed' as const,
       qcStatus: 'Pass' as const,
-      qcCompletedAt: new Date(),
+      qcCompletedAt: new Date().toISOString(),
     }
     updateGoodsReceipt(grnId, updatedGRN)
   }

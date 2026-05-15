@@ -61,7 +61,7 @@ export function GRNDetail() {
     }
   }
 
-  const totalReceived = goodsReceipt.items.reduce((sum, item) => sum + item.quantityReceived, 0)
+  const totalReceived = goodsReceipt.items.reduce((sum, item) => sum + (item.quantityReceived ?? 0), 0)
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

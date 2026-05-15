@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronLeft, Edit, FileText, Clock, Truck, Check, Package, Send } from 'lucide-react'
+import { ChevronLeft, Edit, FileText, Clock, Truck, Check, Send } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { usePOWorkflow } from '@/hooks/useWorkflow'
 
@@ -76,7 +76,7 @@ export function PODetail() {
                 Edit
               </button>
               <button
-                onClick={() => sendPO(id || '', 'supplier@email.com')}
+                onClick={() => sendPO(id || '')}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 <Send size={18} />

@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { ChevronLeft, Plus, X, AlertCircle } from 'lucide-react'
+import { ChevronLeft, Plus, AlertCircle } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { IPurchaseRequest, IPurchaseRequestItem } from '../types'
 
@@ -40,8 +40,8 @@ export function PRForm() {
     subtotal: 0,
     tax: 0,
     total: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     approver: '',
   })
 
@@ -61,7 +61,7 @@ export function PRForm() {
     }
   }, [purchaseRequest])
 
-  const calculateTotal = () => items.reduce((sum, item) => sum + (item.quantity * item.estimatedPrice), 0)
+  const calculateTotal = () => items.reduce((sum, item) => sum + (item.quantity * (item.estimatedPrice ?? 0)), 0)
   const total = calculateTotal()
 
   const getApprovalLevel = () => {
@@ -109,7 +109,7 @@ export function PRForm() {
       subtotal: totalAmount,
       tax: 0,
       total: totalAmount,
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString(),
     } as IPurchaseRequest
 
     if (id && purchaseRequest) {

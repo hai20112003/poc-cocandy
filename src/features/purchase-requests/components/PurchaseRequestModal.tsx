@@ -15,7 +15,7 @@ interface PurchaseRequestModalProps {
 
 export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: PurchaseRequestModalProps) {
   const [formData, setFormData] = useState({
-    department: (data?.department ?? '') as string | null,
+    department: data?.department ?? '',
     neededDate: data?.neededDate ?? '',
     priority: data?.priority ?? 'medium',
     items: data?.items ?? [
@@ -106,7 +106,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
   }
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange} title={data ? 'Chỉnh sửa yêu cầu mua hàng' : 'Tạo yêu cầu mua hàng'}>
+    <Modal open={open} onClose={() => onOpenChange(false)} title={data ? 'Chỉnh sửa yêu cầu mua hàng' : 'Tạo yêu cầu mua hàng'}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto">
         {/* Department & Date */}
         <div className="grid grid-cols-2 gap-4">

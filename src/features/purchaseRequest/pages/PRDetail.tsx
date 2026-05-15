@@ -7,7 +7,6 @@ import { usePRWorkflow } from '@/hooks/useWorkflow'
 export function PRDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'items' | 'timeline'>('items')
   const [showRejectForm, setShowRejectForm] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
   const purchaseRequest = useProcurementStore((state) => state.getPurchaseRequest(id || ''))
@@ -62,7 +61,7 @@ export function PRDetail() {
     }
   }
 
-  const totalEstimated = purchaseRequest.items.reduce((sum, item) => sum + item.estimatedPrice * item.quantity, 0)
+  const totalEstimated = purchaseRequest.items.reduce((sum, item) => sum + (item.estimatedPrice ?? 0) * item.quantity, 0)
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
