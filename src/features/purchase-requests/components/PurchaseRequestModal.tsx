@@ -33,17 +33,27 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
     notes: data?.notes ?? '',
   })
 
-  const PRODUCTS = [
-    { name: 'Vải Cotton Trắng', unit: 'mét' },
-    { name: 'Vải Cotton Xanh Navy', unit: 'mét' },
-    { name: 'Vải Cotton Đỏ Đô', unit: 'mét' },
-    { name: 'Vải Lụa Kem', unit: 'mét' },
-    { name: 'Khóa Kéo 20cm', unit: 'cái' },
-    { name: 'Nút Áo 4 Lỗ', unit: 'cái' },
-    { name: 'Chỉ May Lụa', unit: 'cuộn' },
-    { name: 'Mex Lót Mỏng', unit: 'mét' },
-    { name: 'Túi Nilon 10x20', unit: 'cái' },
-  ]
+  const PRODUCTS_BY_CATEGORY = {
+    'Nguyên phụ liệu': [
+      { name: 'Vải Cotton Trắng', unit: 'mét' },
+      { name: 'Vải Cotton Xanh Navy', unit: 'mét' },
+      { name: 'Vải Cotton Đỏ Đô', unit: 'mét' },
+      { name: 'Vải Lụa Kem', unit: 'mét' },
+      { name: 'Khóa Kéo 20cm', unit: 'cái' },
+      { name: 'Nút Áo 4 Lỗ', unit: 'cái' },
+      { name: 'Chỉ May Lụa', unit: 'cuộn' },
+      { name: 'Mex Lót Mỏng', unit: 'mét' },
+      { name: 'Túi Nilon 10x20', unit: 'cái' },
+    ],
+    'Thành phẩm': [
+      { name: 'Áo Sơ Mi Cotton', unit: 'cái' },
+      { name: 'Quần Tây Nam', unit: 'cái' },
+      { name: 'Đầm Nữ Công Sở', unit: 'cái' },
+      { name: 'Áo Thun In Logo', unit: 'cái' },
+      { name: 'Quần Jeans Nam', unit: 'cái' },
+      { name: 'Áo Khoác Nữ', unit: 'cái' },
+    ],
+  }
 
   const SUPPLIERS = [
     'Vải ABC Trading',
@@ -81,7 +91,12 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
   }
 
   function handleProductChange(itemId: string, productName: string) {
-    const product = PRODUCTS.find((p) => p.name === productName)
+    const item = formData.items.find((i) => i.id === itemId)
+    const category = item?.productCategory
+    if (!category) return
+
+    const products = PRODUCTS_BY_CATEGORY[category as 'Nguyên phụ liệu' | 'Thành phẩm']
+    const product = products.find((p) => p.name === productName)
     handleItemChange(itemId, 'productName', productName)
     if (product) {
       handleItemChange(itemId, 'unit', product.unit)
@@ -159,12 +174,20 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
             {formData.items.map((item, idx) => (
               <div key={item.id} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
                 <div className="text-xs font-semibold text-slate-600">Dòng {idx + 1}</div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
+                  <div>
+                    <label className="text-xs">Loại sản phẩm</label>
+                    <Select value={item.productCategory || ''} onValueChange={(val) => handleItemChange(item.id, 'productCategory', val)}>
+                      <option value="">-- Chọn --</option>
+                      <option value="Nguyên phụ liệu">Nguyên phụ liệu</option>
+                      <option value="Thành phẩm">Thành phẩm</option>
+                    </Select>
+                  </div>
                   <div>
                     <label className="text-xs">Sản phẩm</label>
                     <Select value={item.productName || ''} onValueChange={(val) => handleProductChange(item.id, val || '')}>
                       <option value="">-- Chọn --</option>
-                      {PRODUCTS.map((p) => (
+                      {item.productCategory && PRODUCTS_BY_CATEGORY[item.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm']?.map((p) => (
                         <option key={p.name} value={p.name}>
                           {p.name}
                         </option>
@@ -189,7 +212,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <div>
                     <label className="text-xs">Đơn vị</label>
                     <Input value={item.unit} readOnly className="bg-slate-100" />
@@ -214,6 +237,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                       ))}
                     </Select>
                   </div>
+                  <div></div>
                 </div>
               </div>
             ))}
