@@ -33,7 +33,7 @@ export function PRForm() {
     code: `PR-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
     department: '',
     createdBy: currentUser,
-    neededDate: new Date(today),
+    neededDate: today,
     priority: 'Low' as const,
     status: 'Draft',
     items: [],
@@ -78,12 +78,16 @@ export function PRForm() {
     if (newItem.productName && newItem.quantity && newItem.unit) {
       const item: IPurchaseRequestItem = {
         id: `item-${Date.now()}`,
+        productId: '',
         productName: newItem.productName || '',
         specification: newItem.specification || '',
         quantity: newItem.quantity || 0,
         unit: newItem.unit || '',
+        unitPrice: 0,
         estimatedPrice: newItem.estimatedPrice || 0,
         suggestedSupplier: newItem.suggestedSupplier,
+        total: (newItem.quantity || 0) * (newItem.estimatedPrice || 0),
+        notes: '',
       }
       setItems([...items, item])
       setNewItem({ productName: '', specification: '', quantity: 0, unit: '', estimatedPrice: 0 })
@@ -229,7 +233,7 @@ export function PRForm() {
                   </label>
                   <input
                     type="date"
-                    value={formData.neededDate || today}
+                    value={typeof formData.neededDate === 'string' ? formData.neededDate : (formData.neededDate ? new Date(formData.neededDate).toISOString().split('T')[0] : today)}
                     onChange={(e) => setFormData({ ...formData, neededDate: e.target.value })}
                     min={today}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -325,7 +329,7 @@ export function PRForm() {
                       <td className="px-4 py-3 text-sm text-gray-900">{item.quantity}</td>
                       <td className="px-4 py-3 text-sm text-gray-600">{item.unit}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice)}
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice ?? 0)}
                       </td>
                       <td className="px-4 py-3 text-sm text-blue-600">{item.suggestedSupplier || '—'}</td>
                       <td className="px-4 py-3 text-center">

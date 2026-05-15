@@ -28,7 +28,7 @@ export function PurchaseRequestDetailModal({ open, onOpenChange, data }: Purchas
           <div>
             <div className="text-xs text-slate-600">Trạng thái</div>
             <div>
-              <StatusBadge variant={data.status === 'Approved' ? 'success' : 'info'}>{data.status}</StatusBadge>
+              <StatusBadge variant={data.status?.toLowerCase() === 'approved' ? 'success' : 'info'}>{data.status}</StatusBadge>
             </div>
           </div>
           <div>

@@ -47,18 +47,6 @@ export function GRNDetail() {
     }
   }
 
-  const getQCStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Pass':
-        return <CheckCircle size={20} className="text-green-600" />
-      case 'Fail':
-        return <AlertCircle size={20} className="text-red-600" />
-      case 'Pending':
-        return <Clock size={20} className="text-yellow-600" />
-      default:
-        return <Clock size={20} className="text-gray-400" />
-    }
-  }
 
   const getQCStatusColor = (status: string) => {
     switch (status) {
@@ -160,13 +148,13 @@ export function GRNDetail() {
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-600 mb-2">QC Status</div>
-          <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getQCStatusColor(goodsReceipt.qcStatus)}`}>
-            {goodsReceipt.qcStatus}
+          <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getQCStatusColor(goodsReceipt.qcStatus ?? '')}`}>
+            {goodsReceipt.qcStatus ?? ''}
           </div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-600 mb-2">Total Received</div>
-          <div className="text-lg font-semibold text-gray-900">{totalReceived} items</div>
+          <div className="text-lg font-semibold text-gray-900">{totalReceived ?? 0} items</div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-600 mb-2">Supplier</div>

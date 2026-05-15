@@ -1,9 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useMemo } from 'react'
-import { ChevronLeft, Edit, Check, X, Send, Clock, FileText, Package } from 'lucide-react'
+import { ChevronLeft, Edit, Check, X, Send, Package } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { usePRWorkflow } from '@/hooks/useWorkflow'
-import { IGRN } from '@/features/goodsReceipt/types'
 
 export function PRDetail() {
   const { id } = useParams<{ id: string }>()
@@ -251,11 +250,11 @@ export function PRDetail() {
                         <td className="px-4 py-3 text-right text-gray-900">{item.quantity}</td>
                         <td className="px-4 py-3 text-gray-600">{item.unit}</td>
                         <td className="px-4 py-3 text-right text-gray-900">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice)}
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice ?? 0)}
                         </td>
                         <td className="px-4 py-3 text-right font-medium text-gray-900">
                           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                            item.estimatedPrice * item.quantity
+                            (item.estimatedPrice ?? 0) * item.quantity
                           )}
                         </td>
                       </tr>

@@ -47,6 +47,9 @@ export interface IReturn {
   items: IReturnItem[]
   status: 'pending' | 'in_transit' | 'completed' | 'credited'
   creditNoteNo?: string
+  productName?: string
+  quantityReturned?: number
+  notes?: string
 }
 
 export interface IReturnItem {

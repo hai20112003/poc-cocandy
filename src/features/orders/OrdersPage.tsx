@@ -57,7 +57,6 @@ export function OrdersPage() {
       const sup = supplierMap[o.supplierId]
       return (
         o.id.toLowerCase().includes(q) ||
-        (sup?.mccCode ?? '').toLowerCase().includes(q) ||
         (sup?.name ?? '').toLowerCase().includes(q) ||
         o.items.some(
           (item) =>
@@ -91,9 +90,6 @@ export function OrdersPage() {
         const sup = supplierMap[getValue<string>()]
         return (
           <div className="leading-tight">
-            <div className="font-mono text-[10px] font-semibold text-slate-700 dark:text-slate-300">
-              {sup?.mccCode ?? getValue<string>()}
-            </div>
             <div className="text-[10px] text-slate-400 truncate max-w-[140px]">{sup?.name}</div>
           </div>
         )

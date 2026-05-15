@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronLeft, Edit, FileText, Truck, Check, Clock, Package, Send } from 'lucide-react'
+import { ChevronLeft, Edit, FileText, Clock, Truck, Check, Package, Send } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { usePOWorkflow } from '@/hooks/useWorkflow'
 
@@ -44,22 +44,6 @@ export function PODetail() {
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Draft':
-        return <FileText size={20} />
-      case 'Sent':
-        return <Clock size={20} />
-      case 'Confirmed':
-        return <Check size={20} />
-      case 'Receiving':
-        return <Truck size={20} />
-      case 'Completed':
-        return <Package size={20} />
-      default:
-        return <Clock size={20} />
-    }
-  }
 
   const totalItems = purchaseOrder.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
   const totalReceived = purchaseOrder.items.reduce((sum, item) => sum + (item.quantityReceived * item.unitPrice), 0)

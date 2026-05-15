@@ -225,11 +225,10 @@ export function SupplierForm() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Điều khoản thanh toán</label>
                   <select
-                    value={formData.paymentTerms || ''}
+                    value={formData.paymentTerms ?? 'NET 30'}
                     onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition focus:border-blue-500"
                   >
-                    <option value="">Chọn điều khoản</option>
                     <option value="NET 15">NET 15</option>
                     <option value="NET 30">NET 30</option>
                     <option value="NET 60">NET 60</option>

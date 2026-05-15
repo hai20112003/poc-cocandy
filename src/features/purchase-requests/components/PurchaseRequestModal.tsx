@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Modal } from '@/components/shared/Modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,7 +15,7 @@ interface PurchaseRequestModalProps {
 
 export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: PurchaseRequestModalProps) {
   const [formData, setFormData] = useState({
-    department: data?.department ?? '',
+    department: (data?.department ?? '') as string | null,
     neededDate: data?.neededDate ?? '',
     priority: data?.priority ?? 'medium',
     items: data?.items ?? [
@@ -70,12 +70,6 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
     }))
   }
 
-  function handleRemoveItem(itemId: string) {
-    setFormData((prev) => ({
-      ...prev,
-      items: prev.items.filter((item) => item.id !== itemId),
-    }))
-  }
 
   function handleItemChange(itemId: string, field: keyof PurchaseRequestItem, value: any) {
     setFormData((prev) => ({

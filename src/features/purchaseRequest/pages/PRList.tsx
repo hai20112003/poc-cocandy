@@ -116,7 +116,7 @@ export function PRList() {
               {filtered.map((pr) => (
                 <tr key={pr.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/purchase-requests/${pr.id}`)}>
                   <td className="px-4 py-3 text-sm text-blue-600 font-medium">{pr.code}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{pr.requester}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{pr.requester ?? ''}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{pr.department}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {new Date(pr.neededDate).toLocaleDateString('vi-VN')}

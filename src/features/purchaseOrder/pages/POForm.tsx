@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { ChevronLeft, Plus, X } from 'lucide-react'
+import { ChevronLeft, Plus } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { IPurchaseOrder, IPurchaseOrderItem } from '../types'
 
@@ -11,7 +11,6 @@ export function POForm() {
   const { addPurchaseOrder, updatePurchaseOrder, suppliers } = useProcurementStore()
 
   const currentUser = 'Trọng Nguyễn'
-  const today = new Date().toISOString().split('T')[0]
 
   const [formData, setFormData] = useState<Partial<IPurchaseOrder>>({
     code: `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
@@ -47,10 +46,16 @@ export function POForm() {
     if (newItem.productName && newItem.quantity && newItem.unitPrice) {
       const item: IPurchaseOrderItem = {
         id: `item-${Date.now()}`,
+        productId: '',
         productName: newItem.productName || '',
         quantity: newItem.quantity || 0,
         unitPrice: newItem.unitPrice || 0,
         quantityReceived: 0,
+        unit: '',
+        discountRate: 0,
+        taxRate: 0,
+        total: (newItem.quantity || 0) * (newItem.unitPrice || 0),
+        notes: '',
       }
       setItems([...items, item])
       setNewItem({ productName: '', quantity: 0, unitPrice: 0 })
