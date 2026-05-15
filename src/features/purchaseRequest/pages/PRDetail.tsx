@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { ChevronLeft, Edit, Check, X, Send, Clock, FileText, Package } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { usePRWorkflow } from '@/hooks/useWorkflow'
@@ -12,7 +12,8 @@ export function PRDetail() {
   const [showRejectForm, setShowRejectForm] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
   const purchaseRequest = useProcurementStore((state) => state.getPurchaseRequest(id || ''))
-  const goodsReceipts = useProcurementStore((state) => state.goodsReceipts.filter((grn) => grn.prId === id))
+  const allGoodsReceipts = useProcurementStore((state) => state.goodsReceipts)
+  const goodsReceipts = useMemo(() => allGoodsReceipts.filter((grn) => grn.prId === id), [allGoodsReceipts, id])
   const { submitPR, approvePR, rejectPR } = usePRWorkflow()
 
   if (!purchaseRequest) {
