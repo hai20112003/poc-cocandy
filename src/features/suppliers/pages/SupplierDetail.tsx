@@ -13,6 +13,21 @@ export function SupplierDetail() {
   const purchaseOrders = useProcurementStore((state) => state.purchaseOrders)
   const linkedOrders = useMemo(() => purchaseOrders.filter((po) => po.supplierId === id), [purchaseOrders, id])
 
+  const kpiMetrics = useMemo(() => {
+    const totalPOs = linkedOrders.length
+    const totalValue = linkedOrders.reduce((sum, po) => sum + po.total, 0)
+    // On-time delivery calculation (assuming if no cancelledAt, it was on-time)
+    const onTimeCount = linkedOrders.filter(po => po.status === 'Completed').length
+    const onTimePercent = linkedOrders.length > 0 ? Math.round((onTimeCount / linkedOrders.length) * 100) : 0
+
+    return {
+      totalPOs,
+      totalValue,
+      onTimePercent,
+      rating: supplier?.rating || 0
+    }
+  }, [linkedOrders, supplier])
+
   if (!supplier) {
     return (
       <div className="p-6">
@@ -132,7 +147,26 @@ export function SupplierDetail() {
         <div className="p-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-4 gap-4">
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="text-blue-600 font-bold text-2xl">{kpiMetrics.totalPOs}</div>
+                  <div className="text-gray-600 text-sm mt-1">Tổng PO</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="text-green-600 font-bold text-2xl">{(kpiMetrics.totalValue / 1000000).toFixed(0)}M</div>
+                  <div className="text-gray-600 text-sm mt-1">Giá trị mua tích lũy</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="text-yellow-600 font-bold text-2xl">{kpiMetrics.onTimePercent}%</div>
+                  <div className="text-gray-600 text-sm mt-1">On-time delivery</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="text-purple-600 font-bold text-2xl">{kpiMetrics.rating.toFixed(1)}</div>
+                  <div className="text-gray-600 text-sm mt-1">Rating tổng hợp</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="col-span-2 space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin cơ bản</h3>
                   <div className="space-y-3">
@@ -184,6 +218,116 @@ export function SupplierDetail() {
                       <div className="text-sm text-gray-600">Email</div>
                       <div className="text-blue-600">{supplier.email}</div>
                     </div>
+                  </div>
+                </div>
+                </div>
+                </div>
+
+                {/* Right sidebar */}
+                <div className="space-y-6">
+                  {/* Rating card */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="text-lg font-semibold text-gray-900 mb-4">Điểm đánh giá</div>
+                    <div className="text-center py-4">
+                      <div className="text-4xl font-bold text-gray-900">{supplier.rating.toFixed(1)}</div>
+                      <div className="text-yellow-400 text-2xl mt-2">★★★★★</div>
+                      <div className="text-xs text-gray-500 mt-2">Dựa trên {evaluations.length} kỳ đánh giá</div>
+                    </div>
+                    <div className="border-t border-gray-200 pt-4 mt-4">
+                      {evaluations.length > 0 && (
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-600">Chất lượng</span>
+                              <span className="text-gray-900 font-semibold">{evaluations[evaluations.length - 1]?.qualityScore || 0}/5</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded h-2">
+                              <div className="bg-green-600 h-2 rounded" style={{width: `${(evaluations[evaluations.length - 1]?.qualityScore || 0) * 20}%`}}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-600">Giao hàng</span>
+                              <span className="text-gray-900 font-semibold">{evaluations[evaluations.length - 1]?.deliveryScore || 0}/5</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded h-2">
+                              <div className="bg-yellow-500 h-2 rounded" style={{width: `${(evaluations[evaluations.length - 1]?.deliveryScore || 0) * 20}%`}}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-600">Giá cả</span>
+                              <span className="text-gray-900 font-semibold">{evaluations[evaluations.length - 1]?.priceScore || 0}/5</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded h-2">
+                              <div className="bg-green-600 h-2 rounded" style={{width: `${(evaluations[evaluations.length - 1]?.priceScore || 0) * 20}%`}}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-600">Hỗ trợ</span>
+                              <span className="text-gray-900 font-semibold">{evaluations[evaluations.length - 1]?.serviceScore || 0}/5</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded h-2">
+                              <div className="bg-green-600 h-2 rounded" style={{width: `${(evaluations[evaluations.length - 1]?.serviceScore || 0) * 20}%`}}></div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Contract card */}
+                  {contracts.length > 0 && (
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="text-lg font-semibold text-gray-900">Hợp đồng hiện hành</div>
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">● Active</span>
+                      </div>
+                      {contracts.filter(c => c.status === 'Active').length > 0 ? (
+                        <div className="bg-gray-50 rounded p-3 border border-gray-200">
+                          <div className="text-sm font-semibold text-blue-600 mb-1">
+                            {contracts.find(c => c.status === 'Active')?.contractNo}
+                          </div>
+                          <div className="text-xs text-gray-600 mb-2">
+                            {contracts.find(c => c.status === 'Active')?.startDate.toLocaleDateString('vi-VN')} – {contracts.find(c => c.status === 'Active')?.endDate.toLocaleDateString('vi-VN')}
+                          </div>
+                          <div className="text-xs text-gray-700 mb-3">
+                            {contracts.find(c => c.status === 'Active')?.paymentTerms} · Giảm {contracts.find(c => c.status === 'Active')?.discountRate}%
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                              <span>Tiến độ hợp đồng</span>
+                              <span>{Math.round(((Date.now() - contracts.find(c => c.status === 'Active')!.startDate.getTime()) / (contracts.find(c => c.status === 'Active')!.endDate.getTime() - contracts.find(c => c.status === 'Active')!.startDate.getTime())) * 100)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded h-2">
+                              <div className="bg-blue-600 h-2 rounded" style={{width: `${Math.min(100, Math.round(((Date.now() - contracts.find(c => c.status === 'Active')!.startDate.getTime()) / (contracts.find(c => c.status === 'Active')!.endDate.getTime() - contracts.find(c => c.status === 'Active')!.startDate.getTime())) * 100))}%`}}></div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-600">Không có hợp đồng hoạt động</div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Status card */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="text-lg font-semibold text-gray-900 mb-4">Quản lý trạng thái</div>
+                    <div className={`p-3 rounded border mb-3 ${supplier.status === 'Active' ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                      <div className="text-sm font-semibold mb-1">
+                        {supplier.status === 'Active' ? '✅ Hoạt động' : supplier.status === 'Suspended' ? '⏸ Tạm ngưng' : '⛔ Bị chặn'}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {supplier.status === 'Active' ? 'Hoạt động bình thường' : supplier.status === 'Suspended' ? 'Tạm dừng hợp tác' : 'Đã bị chặn từ hệ thống'}
+                      </div>
+                    </div>
+                    <button className="w-full px-3 py-2 border border-yellow-400 text-yellow-700 rounded text-sm font-medium hover:bg-yellow-50 mb-2">
+                      ⏸ Tạm ngưng
+                    </button>
+                    <button className="w-full px-3 py-2 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700">
+                      ⛔ Blacklist
+                    </button>
                   </div>
                 </div>
               </div>

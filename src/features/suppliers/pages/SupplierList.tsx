@@ -5,6 +5,7 @@ import { useProcurementStore } from '../../../store/procurementStore'
 export function SupplierList() {
   const navigate = useNavigate()
   const suppliers = useProcurementStore((state) => state.suppliers)
+  const purchaseOrders = useProcurementStore((state) => state.purchaseOrders)
   const getContractsBySupplier = useProcurementStore((state) => state.getContractsBySupplier)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -38,6 +39,16 @@ export function SupplierList() {
     return { status: 'None', label: 'Không có' }
   }, [getContractsBySupplier])
 
+  const getInitials = (name: string) => name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+
+  const poValues = useMemo(() => {
+    const values: Record<string, number> = {}
+    purchaseOrders.forEach(po => {
+      values[po.supplierId] = (values[po.supplierId] || 0) + po.total
+    })
+    return values
+  }, [purchaseOrders])
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -50,6 +61,9 @@ export function SupplierList() {
           <div className="flex gap-2">
             <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50">
               ↓ Xuất
+            </button>
+            <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50">
+              ⚙ Cấu hình đánh giá
             </button>
             <button onClick={() => navigate('/suppliers/add')} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
               + Thêm NCC
@@ -75,7 +89,7 @@ export function SupplierList() {
 
       {/* Filters */}
       <div className="px-8 py-4 bg-white border-b border-gray-200">
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center mb-4">
           <input
             type="text"
             placeholder="Tìm theo tên, mã, người liên hệ..."
@@ -83,16 +97,23 @@ export function SupplierList() {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-          >
-            <option value="All">Trạng thái: Tất cả</option>
-            <option value="Active">Hoạt động</option>
-            <option value="Suspended">Tạm ngưng</option>
-            <option value="Blacklisted">Bị chặn</option>
-          </select>
+        </div>
+        <div className="flex gap-4 items-center flex-wrap">
+          <div className="flex gap-2">
+            {['All', 'Active', 'Suspended', 'Blacklisted'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
+                  statusFilter === status
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {status === 'All' ? 'Tất cả' : status === 'Active' ? 'Hoạt động' : status === 'Suspended' ? 'Tạm ngưng' : 'Bị chặn'}
+              </button>
+            ))}
+          </div>
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
@@ -117,6 +138,7 @@ export function SupplierList() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Loại</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Lead time</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Điều khoản TT</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Tổng PO</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Rating</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Hợp đồng</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Trạng thái</th>
@@ -125,12 +147,23 @@ export function SupplierList() {
             <tbody className="divide-y divide-gray-200">
               {filtered.map((supplier) => {
                 const contractStatus = getContractStatus(supplier.id)
+                const contactInfo = supplier.contacts[0]
+                const poTotal = poValues[supplier.id] || 0
                 return (
                   <tr key={supplier.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/suppliers/${supplier.id}`)}>
                     <td className="px-4 py-3 text-sm text-blue-600 font-medium">{supplier.code}</td>
                     <td className="px-4 py-3 text-sm">
-                      <div className="font-medium text-gray-900">{supplier.name}</div>
-                      <div className="text-xs text-gray-500">{supplier.contacts[0]?.name || '—'}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-xs">
+                          {getInitials(supplier.name)}
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">{supplier.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {contactInfo ? `${contactInfo.name} · ${contactInfo.phone}` : '—'}
+                          </div>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
@@ -139,6 +172,9 @@ export function SupplierList() {
                     </td>
                     <td className="px-4 py-3 text-sm">{supplier.leadTime} ngày</td>
                     <td className="px-4 py-3 text-sm">{supplier.paymentTerms}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                      {(poTotal / 1000000).toFixed(0)}M
+                    </td>
                     <td className="px-4 py-3 text-sm">
                       <span className="text-yellow-500">★★★★★</span>
                       <span className="ml-1 font-semibold text-green-600">{supplier.rating.toFixed(1)}</span>
