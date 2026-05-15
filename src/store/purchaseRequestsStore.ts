@@ -30,6 +30,7 @@ export const usePurchaseRequestsStore = create<PurchaseRequestsStore>((set, get)
         {
           id: '1',
           productName: 'Vải Cotton Trắng',
+          productCategory: '',
           specification: 'Khổ 150cm, 100% cotton',
           quantity: 200,
           unit: 'mét',
@@ -54,6 +55,7 @@ export const usePurchaseRequestsStore = create<PurchaseRequestsStore>((set, get)
         {
           id: '1',
           productName: 'Khóa Kéo 20cm',
+          productCategory: '',
           specification: 'Màu đen, chất lượng tốt',
           quantity: 500,
           unit: 'cái',

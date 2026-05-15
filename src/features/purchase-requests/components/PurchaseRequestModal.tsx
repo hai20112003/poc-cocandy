@@ -22,6 +22,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
       {
         id: '1',
         productName: '',
+        productCategory: '',
         specification: '',
         quantity: 0,
         unit: 'mét',
@@ -60,6 +61,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
         {
           id: Math.random().toString(),
           productName: '',
+          productCategory: '',
           specification: '',
           quantity: 0,
           unit: 'mét',
