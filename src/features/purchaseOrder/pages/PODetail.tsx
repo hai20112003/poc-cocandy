@@ -1,13 +1,15 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronLeft, Edit, FileText, Truck, Check, Clock, Package } from 'lucide-react'
+import { ChevronLeft, Edit, FileText, Truck, Check, Clock, Package, Send } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
+import { usePOWorkflow } from '@/hooks/useWorkflow'
 
 export function PODetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'items' | 'timeline'>('items')
   const purchaseOrder = useProcurementStore((state) => state.getPurchaseOrder(id || ''))
+  const { sendPO, confirmPO, startReceiving, completePO } = usePOWorkflow()
   const supplier = purchaseOrder ? useProcurementStore((state) => state.getSupplier(purchaseOrder.supplierId)) : null
 
   if (!purchaseOrder) {
@@ -79,15 +81,53 @@ export function PODetail() {
             <p className="text-gray-600">Purchase Order</p>
           </div>
         </div>
-        {purchaseOrder.status === 'Draft' && (
-          <button
-            onClick={() => navigate(`/orders/${id}/edit`)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            <Edit size={18} />
-            Edit
-          </button>
-        )}
+        <div className="flex gap-2">
+          {purchaseOrder.status === 'Draft' && (
+            <>
+              <button
+                onClick={() => navigate(`/orders/${id}/edit`)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                <Edit size={18} />
+                Edit
+              </button>
+              <button
+                onClick={() => sendPO(id || '', 'supplier@email.com')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <Send size={18} />
+                Send to Supplier
+              </button>
+            </>
+          )}
+          {purchaseOrder.status === 'Sent' && (
+            <button
+              onClick={() => confirmPO(id || '', 'Manager')}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              <Check size={18} />
+              Confirm
+            </button>
+          )}
+          {purchaseOrder.status === 'Confirmed' && (
+            <button
+              onClick={() => startReceiving(id || '')}
+              className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+            >
+              <Truck size={18} />
+              Start Receiving
+            </button>
+          )}
+          {purchaseOrder.status === 'Receiving' && (
+            <button
+              onClick={() => completePO(id || '')}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            >
+              <Check size={18} />
+              Complete
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Status Cards */}

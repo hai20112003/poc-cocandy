@@ -1,13 +1,17 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronLeft, Edit, CheckCircle, AlertCircle, Clock, FileText, Package, Undo2 } from 'lucide-react'
+import { ChevronLeft, Edit, CheckCircle, AlertCircle, Clock, FileText, Package, Undo2, Check } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
+import { useGRNWorkflow } from '@/hooks/useWorkflow'
 
 export function GRNDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'items' | 'returns' | 'timeline'>('items')
   const goodsReceipt = useProcurementStore((state) => state.getGoodsReceipt(id || ''))
+  const { submitGRN, completeReceiving, startQC, completeQC, rejectQC } = useGRNWorkflow()
+  const [showRejectForm, setShowRejectForm] = useState(false)
+  const [rejectionReason, setRejectionReason] = useState('')
   const purchaseOrder = goodsReceipt ? useProcurementStore((state) => state.getPurchaseOrder(goodsReceipt.poId)) : null
   const supplier = purchaseOrder ? useProcurementStore((state) => state.getSupplier(purchaseOrder.supplierId)) : null
 
@@ -88,15 +92,62 @@ export function GRNDetail() {
             <p className="text-gray-600">Goods Receipt Note</p>
           </div>
         </div>
-        {goodsReceipt.status === 'Draft' && (
-          <button
-            onClick={() => navigate(`/goods-receipts/${id}/edit`)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            <Edit size={18} />
-            Edit
-          </button>
-        )}
+        <div className="flex gap-2">
+          {goodsReceipt.status === 'Draft' && (
+            <>
+              <button
+                onClick={() => navigate(`/goods-receipts/${id}/edit`)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                <Edit size={18} />
+                Edit
+              </button>
+              <button
+                onClick={() => submitGRN(id || '')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <Check size={18} />
+                Submit
+              </button>
+            </>
+          )}
+          {goodsReceipt.status === 'Submitted' && (
+            <button
+              onClick={() => completeReceiving(id || '')}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              <Check size={18} />
+              Confirm Received
+            </button>
+          )}
+          {goodsReceipt.status === 'Received' && (
+            <button
+              onClick={() => startQC(id || '', 'Inspector')}
+              className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+            >
+              <CheckCircle size={18} />
+              Start QC
+            </button>
+          )}
+          {goodsReceipt.status === 'QC In Progress' && (
+            <>
+              <button
+                onClick={() => completeQC(id || '')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <Check size={18} />
+                Pass QC
+              </button>
+              <button
+                onClick={() => setShowRejectForm(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <AlertCircle size={18} />
+                Fail QC
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Status Cards */}
@@ -184,6 +235,45 @@ export function GRNDetail() {
           </div>
         </div>
       </div>
+
+      {/* Rejection Modal */}
+      {showRejectForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Fail QC</h2>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Reason for QC failure"
+              rows={4}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowRejectForm(false)
+                  setRejectionReason('')
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (rejectionReason.trim()) {
+                    rejectQC(id || '', rejectionReason)
+                    setShowRejectForm(false)
+                    navigate('/goods-receipts')
+                  }
+                }}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Fail QC
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-sm">

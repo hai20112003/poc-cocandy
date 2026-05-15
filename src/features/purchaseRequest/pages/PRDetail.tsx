@@ -2,12 +2,16 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { ChevronLeft, Edit, Check, X, Send, Clock } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
+import { usePRWorkflow } from '@/hooks/useWorkflow'
 
 export function PRDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'items' | 'timeline'>('items')
+  const [showRejectForm, setShowRejectForm] = useState(false)
+  const [rejectionReason, setRejectionReason] = useState('')
   const purchaseRequest = useProcurementStore((state) => state.getPurchaseRequest(id || ''))
+  const { submitPR, approvePR, rejectPR } = usePRWorkflow()
 
   if (!purchaseRequest) {
     return (
@@ -69,15 +73,44 @@ export function PRDetail() {
             <p className="text-gray-600">Purchase Request</p>
           </div>
         </div>
-        {purchaseRequest.status === 'Draft' && (
-          <button
-            onClick={() => navigate(`/purchase-requests/${id}/edit`)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            <Edit size={18} />
-            Edit
-          </button>
-        )}
+        <div className="flex gap-2">
+          {purchaseRequest.status === 'Draft' && (
+            <>
+              <button
+                onClick={() => navigate(`/purchase-requests/${id}/edit`)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                <Edit size={18} />
+                Edit
+              </button>
+              <button
+                onClick={() => submitPR(id || '')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <Send size={18} />
+                Submit
+              </button>
+            </>
+          )}
+          {purchaseRequest.status === 'Submitted' && (
+            <>
+              <button
+                onClick={() => approvePR(id || '', 'Manager')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <Check size={18} />
+                Approve
+              </button>
+              <button
+                onClick={() => setShowRejectForm(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <X size={18} />
+                Reject
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Status Cards */}
@@ -166,6 +199,45 @@ export function PRDetail() {
           </div>
         </div>
       </div>
+
+      {/* Rejection Modal */}
+      {showRejectForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Reject Purchase Request</h2>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Reason for rejection"
+              rows={4}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowRejectForm(false)
+                  setRejectionReason('')
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (rejectionReason.trim()) {
+                    rejectPR(id || '', rejectionReason, 'Manager')
+                    setShowRejectForm(false)
+                    navigate('/purchase-requests')
+                  }
+                }}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-sm">
