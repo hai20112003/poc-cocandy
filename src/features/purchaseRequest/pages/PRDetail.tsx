@@ -419,7 +419,7 @@ export function PRDetail() {
                 <button
                   onClick={() => {
                     if (rejectionReason.trim()) {
-                      rejectPR(id || '', rejectionReason, 'Manager')
+                      rejectPR(id || '', rejectionReason)
                       setShowRejectForm(false)
                       navigate('/purchase-requests')
                     }

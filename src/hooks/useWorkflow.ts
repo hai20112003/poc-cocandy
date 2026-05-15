@@ -27,7 +27,7 @@ export function usePRWorkflow() {
     updatePurchaseRequest(prId, updatedPR)
   }
 
-  const rejectPR = (prId: string, reason: string, rejectedBy: string) => {
+  const rejectPR = (prId: string, reason: string) => {
     const pr = getPurchaseRequest(prId)
     if (!pr) return
 
@@ -35,7 +35,6 @@ export function usePRWorkflow() {
       ...pr,
       status: 'Rejected' as const,
       rejectionReason: reason,
-      rejectedBy,
     }
     updatePurchaseRequest(prId, updatedPR)
   }
@@ -47,7 +46,7 @@ export function usePRWorkflow() {
     const updatedPR = {
       ...pr,
       status: 'Converted' as const,
-      relatedPoId: poId,
+      convertedToPOId: poId,
     }
     updatePurchaseRequest(prId, updatedPR)
   }
