@@ -16,6 +16,7 @@ export interface IGRN {
   id: string
   code: string
   poId: string
+  prId?: string
   supplierId: string
   supplierName: string
   status: 'Draft' | 'Submitted' | 'Received' | 'QC In Progress' | 'Completed' | 'Rejected'

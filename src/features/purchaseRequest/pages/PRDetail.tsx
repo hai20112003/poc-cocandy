@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ChevronLeft, Edit, Check, X, Send, Clock, FileText, Package } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { usePRWorkflow } from '@/hooks/useWorkflow'
+import { IGRN } from '@/features/goodsReceipt/types'
 
 export function PRDetail() {
   const { id } = useParams<{ id: string }>()
@@ -11,6 +12,7 @@ export function PRDetail() {
   const [showRejectForm, setShowRejectForm] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
   const purchaseRequest = useProcurementStore((state) => state.getPurchaseRequest(id || ''))
+  const goodsReceipts = useProcurementStore((state) => state.goodsReceipts.filter((grn) => grn.prId === id))
   const { submitPR, approvePR, rejectPR } = usePRWorkflow()
 
   if (!purchaseRequest) {
@@ -277,9 +279,55 @@ export function PRDetail() {
                     + Tạo GRN
                   </button>
                 </div>
-                <div className="p-6 text-center text-gray-600">
-                  <p className="text-sm">Chưa có GRN nào. Hãy tạo GRN mới để bắt đầu nhập kho.</p>
-                </div>
+                {goodsReceipts.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left font-semibold text-gray-700">Mã GRN</th>
+                          <th className="px-6 py-3 text-left font-semibold text-gray-700">NCC</th>
+                          <th className="px-6 py-3 text-left font-semibold text-gray-700">Trạng thái</th>
+                          <th className="px-6 py-3 text-left font-semibold text-gray-700">Mặt hàng</th>
+                          <th className="px-6 py-3 text-right font-semibold text-gray-700">Ngày nhập</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {goodsReceipts.map((grn) => (
+                          <tr key={grn.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="px-6 py-3">
+                              <button
+                                onClick={() => navigate(`/goods-receipts/${grn.id}`)}
+                                className="font-medium text-blue-600 hover:underline"
+                              >
+                                {grn.code}
+                              </button>
+                            </td>
+                            <td className="px-6 py-3 text-gray-600">{grn.supplierName}</td>
+                            <td className="px-6 py-3">
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                grn.status === 'Completed' ? 'bg-green-100 text-green-800' :
+                                grn.status === 'QC In Progress' ? 'bg-yellow-100 text-yellow-800' :
+                                grn.status === 'Received' ? 'bg-blue-100 text-blue-800' :
+                                grn.status === 'Submitted' ? 'bg-purple-100 text-purple-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {grn.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-3 text-gray-600">{grn.items.length} mặt hàng</td>
+                            <td className="px-6 py-3 text-right text-gray-600">
+                              {new Date(grn.receivedDate).toLocaleDateString('vi-VN')}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-6 text-center text-gray-600">
+                    <p className="text-sm">Chưa có GRN nào. Hãy tạo GRN mới để bắt đầu nhập kho.</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
