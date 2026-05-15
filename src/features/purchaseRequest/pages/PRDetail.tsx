@@ -358,10 +358,24 @@ export function PRDetail() {
                       <div className="w-7 h-7 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center">
                         <Package size={14} />
                       </div>
+                      {purchaseRequest.status === 'Converted' && <div className="w-0.5 h-5 bg-green-200" />}
                     </div>
                     <div>
                       <div className="font-semibold text-gray-900">Nhập kho</div>
                       <div className="text-yellow-600 font-medium">GRN #2 chờ</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Completed */}
+                {purchaseRequest.status === 'Converted' && (
+                  <div className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-7 h-7 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold">✓</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Hoàn thành</div>
+                      <div className="text-gray-600">Đã hoàn thành nhập kho</div>
                     </div>
                   </div>
                 )}
