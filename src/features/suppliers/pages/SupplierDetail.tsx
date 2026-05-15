@@ -123,11 +123,11 @@ export function SupplierDetail() {
         <div className="flex border-b border-gray-200 overflow-x-auto">
           {[
             { key: 'overview' as const, label: 'Tổng quan' },
-            { key: 'contacts' as const, label: 'Liên hệ' },
-            { key: 'products' as const, label: 'Hàng hóa' },
-            { key: 'evaluations' as const, label: 'Đánh giá' },
-            { key: 'contracts' as const, label: 'Hợp đồng' },
-            { key: 'orders' as const, label: 'Đơn hàng' },
+            { key: 'contacts' as const, label: `Liên hệ (${supplier?.contacts.length || 0})` },
+            { key: 'products' as const, label: `Hàng hóa (${supplier?.products.length || 0})` },
+            { key: 'evaluations' as const, label: `Đánh giá (${evaluations.length} kỳ)` },
+            { key: 'contracts' as const, label: `Hợp đồng (${contracts.length})` },
+            { key: 'orders' as const, label: `Đơn hàng (${linkedOrders.length})` },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -550,31 +550,46 @@ export function SupplierDetail() {
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ngày</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tổng tiền</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Trạng thái</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">On-time?</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">GRN</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {linkedOrders.map((po) => (
-                        <tr key={po.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                          <td className="px-6 py-4 text-blue-600 font-medium cursor-pointer hover:underline">
-                            {po.code}
-                          </td>
-                          <td className="px-6 py-4 text-gray-600">
-                            {po.createdAt.toLocaleDateString('vi-VN')}
-                          </td>
-                          <td className="px-6 py-4 text-gray-900">
-                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                              po.total
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {po.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-gray-600">-</td>
-                        </tr>
-                      ))}
+                      {linkedOrders.map((po) => {
+                        const isOnTime = po.status === 'Completed' ? true : po.status === 'Cancelled' ? false : null
+                        return (
+                          <tr key={po.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                            <td className="px-6 py-4 text-blue-600 font-medium cursor-pointer hover:underline">
+                              {po.code}
+                            </td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {po.createdAt.toLocaleDateString('vi-VN')}
+                            </td>
+                            <td className="px-6 py-4 text-gray-900">
+                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                                po.total
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {po.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              {isOnTime !== null ? (
+                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                                  isOnTime ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {isOnTime ? '✓ Đúng hạn' : '✗ Trễ'}
+                                </span>
+                              ) : (
+                                <span className="text-gray-500 text-xs">—</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-gray-600">-</td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
