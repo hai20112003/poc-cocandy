@@ -7,9 +7,9 @@ export function SupplierDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'products' | 'evaluations' | 'contracts' | 'orders'>('overview')
-  const supplier = useProcurementStore((state) => state.getSupplier(id || ''))
-  const evaluations = useProcurementStore((state) => state.getEvaluationsBySupplier(id || ''))
-  const contracts = useProcurementStore((state) => state.getContractsBySupplier(id || ''))
+  const supplier = useMemo(() => useProcurementStore.getState().getSupplier(id || ''), [id])
+  const evaluations = useMemo(() => useProcurementStore.getState().getEvaluationsBySupplier(id || ''), [id])
+  const contracts = useMemo(() => useProcurementStore.getState().getContractsBySupplier(id || ''), [id])
   const purchaseOrders = useProcurementStore((state) => state.purchaseOrders)
   const linkedOrders = useMemo(() => purchaseOrders.filter((po) => po.supplierId === id), [purchaseOrders, id])
 
