@@ -17,7 +17,7 @@ const PRIORITY_LABEL: Record<string, string> = {
 
 export function PurchaseRequestDetailModal({ open, onOpenChange, data }: PurchaseRequestDetailModalProps) {
   return (
-    <Modal open={open} onOpenChange={onOpenChange} title={`Chi tiết yêu cầu mua hàng: ${data.code}`}>
+    <Modal open={open} onClose={() => onOpenChange(false)} title={`Chi tiết yêu cầu mua hàng: ${data.code}`}>
       <div className="space-y-4">
         {/* Header Info */}
         <div className="grid grid-cols-2 gap-4 p-3 bg-slate-50 rounded border">
@@ -28,7 +28,7 @@ export function PurchaseRequestDetailModal({ open, onOpenChange, data }: Purchas
           <div>
             <div className="text-xs text-slate-600">Trạng thái</div>
             <div>
-              <StatusBadge status={data.status} />
+              <StatusBadge variant={data.status === 'Approved' ? 'success' : 'info'}>{data.status}</StatusBadge>
             </div>
           </div>
           <div>
