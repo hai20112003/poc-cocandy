@@ -123,11 +123,11 @@ export function SupplierDetail() {
         <div className="flex border-b border-gray-200 overflow-x-auto">
           {[
             { key: 'overview' as const, label: 'Tổng quan' },
-            { key: 'contacts' as const, label: `Liên hệ (${supplier?.contacts.length || 0})` },
-            { key: 'products' as const, label: `Hàng hóa (${supplier?.products.length || 0})` },
-            { key: 'evaluations' as const, label: `Đánh giá (${evaluations.length} kỳ)` },
             { key: 'contracts' as const, label: `Hợp đồng (${contracts.length})` },
             { key: 'orders' as const, label: `Đơn hàng (${linkedOrders.length})` },
+            { key: 'products' as const, label: `Hàng hóa (${supplier?.products.length || 0})` },
+            { key: 'contacts' as const, label: `Liên hệ (${supplier?.contacts.length || 0})` },
+            { key: 'evaluations' as const, label: `Đánh giá (${evaluations.length} kỳ)` },
           ].map(({ key, label }) => (
             <button
               key={key}
