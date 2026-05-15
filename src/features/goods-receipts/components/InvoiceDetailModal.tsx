@@ -22,7 +22,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export function InvoiceDetailModal({ open, onOpenChange, data }: InvoiceDetailModalProps) {
   return (
-    <Modal open={open} onOpenChange={onOpenChange} title={`Chi tiết hóa đơn: ${data.code}`}>
+    <Modal open={open} onClose={() => onOpenChange(false)} title={`Chi tiết hóa đơn: ${data.code}`}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto">
         {/* Header Info */}
         <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded border">

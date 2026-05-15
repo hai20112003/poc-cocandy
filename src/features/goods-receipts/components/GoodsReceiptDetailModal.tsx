@@ -22,7 +22,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export function GoodsReceiptDetailModal({ open, onOpenChange, data }: GoodsReceiptDetailModalProps) {
   return (
-    <Modal open={open} onOpenChange={onOpenChange} title={`Chi tiết phiếu nhập kho: ${data.code}`}>
+    <Modal open={open} onClose={() => onOpenChange(false)} title={`Chi tiết phiếu nhập kho: ${data.code}`}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto">
         {/* Header Info */}
         <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded border">

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, Eye, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Search, Eye, CheckCircle2, AlertCircle, Package, Receipt } from 'lucide-react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { PageLayout } from '@/layouts/PageLayout'
 import { PageHeader } from '@/components/shared/PageHeader'
@@ -268,6 +268,7 @@ export function GoodsReceiptsPage() {
       {tab === 'grn' ? (
         filteredGRNs.length === 0 ? (
           <EmptyState
+            icon={Package}
             title="Không có phiếu nhập kho"
             description="Chưa có GRN được tạo"
           />
@@ -276,6 +277,7 @@ export function GoodsReceiptsPage() {
         )
       ) : filteredInvoices.length === 0 ? (
         <EmptyState
+          icon={Receipt}
           title="Không có hóa đơn"
           description="Chưa có hóa đơn được tạo"
         />
