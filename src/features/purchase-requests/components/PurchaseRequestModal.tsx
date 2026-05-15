@@ -58,14 +58,6 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
     ],
   }
 
-  const SUPPLIERS = [
-    'Vải ABC Trading',
-    'Phụ Liệu XYZ',
-    'Vải Lụa Hạnh Phúc',
-    'NCC Nút Bấm 123',
-    'Cotton Premium',
-  ]
-
   function handleAddItem() {
     setFormData((prev) => ({
       ...prev,
@@ -258,17 +250,7 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
                       onChange={(e) => handleItemChange(item.id, 'estimatedPrice', parseInt(e.target.value) || 0)}
                     />
                   </div>
-                  <div>
-                    <label className="text-xs">NCC gợi ý</label>
-                    <Select value={item.suggestedSupplier ?? ''} onValueChange={(val) => handleItemChange(item.id, 'suggestedSupplier', val)}>
-                      <option value="">-- Không --</option>
-                      {SUPPLIERS.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
+
                 </div>
               </div>
             ))}

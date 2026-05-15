@@ -151,6 +151,12 @@ export function PRDetail() {
           </div>
         </div>
 
+        {/* Supplier Card - Full Width */}
+        <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
+          <div className="text-sm text-gray-600 mb-2">Nhà cung cấp</div>
+          <div className="font-semibold text-gray-900">{purchaseRequest.supplier || '—'}</div>
+        </div>
+
         {/* Status Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -259,7 +265,6 @@ export function PRDetail() {
                       <th className="px-4 py-3 text-left font-semibold text-gray-700 w-20">SL</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-700 w-20">Đơn vị</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">Giá ước tính</th>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700">NCC gợi ý</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -274,7 +279,6 @@ export function PRDetail() {
                         <td className="px-4 py-3 text-sm text-gray-900">
                           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice ?? 0)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-blue-600">{item.suggestedSupplier || '—'}</td>
                       </tr>
                     ))}
                   </tbody>

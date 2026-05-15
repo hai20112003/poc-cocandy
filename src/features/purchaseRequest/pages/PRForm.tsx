@@ -42,6 +42,7 @@ export function PRForm() {
   const [formData, setFormData] = useState<Partial<IPurchaseRequest>>({
     code: `PR-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
     department: '',
+    supplier: '',
     createdBy: currentUser,
     neededDate: new Date(today),
     priority: 'Low' as const,
@@ -236,6 +237,26 @@ export function PRForm() {
                 </div>
               </div>
 
+              {/* Supplier & Priority */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhà cung cấp</label>
+                  <select
+                    value={formData.supplier || ''}
+                    onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">-- Chọn NCC --</option>
+                    {SUPPLIERS.map((supplier) => (
+                      <option key={supplier} value={supplier}>
+                        {supplier}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Nhà cung cấp chính cho yêu cầu này (tuỳ chọn)</p>
+                </div>
+              </div>
+
               {/* Needed Date & Created Date */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -328,7 +349,6 @@ export function PRForm() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-20">SL *</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-20">Đơn vị *</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 w-32">Giá ước tính</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">NCC gợi ý</th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 w-8"></th>
                   </tr>
                 </thead>
@@ -344,7 +364,6 @@ export function PRForm() {
                       <td className="px-4 py-3 text-sm text-gray-900">
                         {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.estimatedPrice ?? 0)}
                       </td>
-                      <td className="px-4 py-3 text-sm text-blue-600">{item.suggestedSupplier || '—'}</td>
                       <td className="px-4 py-3 text-center">
                         <button
                           type="button"

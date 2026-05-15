@@ -71,7 +71,6 @@ export function PurchaseRequestDetailModal({ open, onOpenChange, data }: Purchas
                   <th className="px-3 py-2 text-left font-semibold">Đơn vị</th>
                   <th className="px-3 py-2 text-right font-semibold">Giá ước tính</th>
                   <th className="px-3 py-2 text-right font-semibold">Thành tiền</th>
-                  <th className="px-3 py-2 text-left font-semibold">NCC gợi ý</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,7 +85,6 @@ export function PurchaseRequestDetailModal({ open, onOpenChange, data }: Purchas
                     <td className="px-3 py-2 text-right font-semibold text-slate-800">
                       {(item.quantity * item.estimatedPrice).toLocaleString('vi-VN')} ₫
                     </td>
-                    <td className="px-3 py-2 text-slate-600 text-xs">{item.suggestedSupplier || '—'}</td>
                   </tr>
                 ))}
               </tbody>

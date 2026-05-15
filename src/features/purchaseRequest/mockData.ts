@@ -42,6 +42,7 @@ export const mockPurchaseRequests: IPR[] = [
     code: 'PR-2026-041',
     department: 'SX',
     createdBy: 'Lê Thị C',
+    supplier: 'NCC Nút Bấm 123',
     status: 'Submitted',
     priority: 'High',
     items: [
@@ -90,6 +91,7 @@ export const mockPurchaseRequests: IPR[] = [
     code: 'PR-2026-040',
     department: 'KD',
     createdBy: 'Đỗ Văn E',
+    supplier: 'Vải ABC Trading',
     status: 'Approved',
     priority: 'Medium',
     items: [

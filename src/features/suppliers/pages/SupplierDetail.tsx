@@ -127,7 +127,7 @@ export function SupplierDetail() {
             { key: 'orders' as const, label: `Đơn hàng (${linkedOrders.length})` },
             { key: 'products' as const, label: `Hàng hóa (${supplier?.products.length || 0})` },
             { key: 'contacts' as const, label: `Liên hệ (${supplier?.contacts.length || 0})` },
-            { key: 'evaluations' as const, label: `Đánh giá (${evaluations.length} kỳ)` },
+            { key: 'evaluations' as const, label: `Đánh giá` },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -230,7 +230,7 @@ export function SupplierDetail() {
                     <div className="text-center py-4">
                       <div className="text-4xl font-bold text-gray-900">{supplier.rating.toFixed(1)}</div>
                       <div className="text-yellow-400 text-2xl mt-2">★★★★★</div>
-                      <div className="text-xs text-gray-500 mt-2">Dựa trên {evaluations.length} kỳ đánh giá</div>
+                      <div className="text-xs text-gray-500 mt-2">Dựa trên</div>
                     </div>
                     <div className="border-t border-gray-200 pt-4 mt-4">
                       {evaluations.length > 0 && (
@@ -421,7 +421,6 @@ export function SupplierDetail() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Kỳ</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Chất lượng</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Giao hàng</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Giá cả</th>
@@ -437,7 +436,6 @@ export function SupplierDetail() {
                           evaluation.totalScore >= 4 ? 'text-green-700' : evaluation.totalScore >= 3 ? 'text-yellow-700' : 'text-red-700'
                         return (
                           <tr key={evaluation.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                            <td className="px-6 py-4 text-gray-900 font-medium">{evaluation.period}</td>
                             <td className="px-6 py-4 text-gray-600">
                               {evaluation.qualityScore}/5 <span className="text-yellow-400">★</span>
                             </td>

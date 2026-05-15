@@ -18,6 +18,7 @@ export interface IPR {
   code: string
   department: string
   createdBy: string
+  supplier?: string
   status: 'Draft' | 'Submitted' | 'Approved' | 'Rejected' | 'Converted'
   priority: 'Low' | 'Medium' | 'High' | 'Urgent'
   items: IPRItem[]
