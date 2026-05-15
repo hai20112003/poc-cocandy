@@ -10,6 +10,14 @@ interface InvoiceDetailModalProps {
 }
 
 export function InvoiceDetailModal({ open, onOpenChange, data }: InvoiceDetailModalProps) {
+  if (!data) return null;
+
+  const STATUS_LABEL: Record<string, string> = {
+    paid: 'Đã TT',
+    partial: 'Tạm',
+    pending: 'Chờ TT',
+  }
+
   return (
     <Modal open={open} onClose={() => onOpenChange(false)} title={`Chi tiết hóa đơn: ${data.code}`}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto">
@@ -22,8 +30,8 @@ export function InvoiceDetailModal({ open, onOpenChange, data }: InvoiceDetailMo
           <div>
             <div className="text-xs font-medium text-slate-600 mb-1">Trạng thái TT</div>
             <div>
-              <StatusBadge variant={data.status?.toLowerCase() === 'paid' ? 'success' : data.status?.toLowerCase() === 'partial' ? 'warning' : 'info'}>
-                {data.status === 'paid' ? 'Đã TT' : data.status === 'partial' ? 'Tạm' : 'Chờ TT'}
+              <StatusBadge variant={data.status === 'paid' ? 'success' : data.status === 'partial' ? 'warning' : 'info'}>
+                {STATUS_LABEL[data.status] || 'Chờ TT'}
               </StatusBadge>
             </div>
           </div>
@@ -73,12 +81,14 @@ export function InvoiceDetailModal({ open, onOpenChange, data }: InvoiceDetailMo
                 </tr>
               </thead>
               <tbody>
-                {data.grnCodes?.map((code, idx) => (
-                  <tr key={idx} className="border-b hover:bg-slate-50">
-                    <td className="px-3 py-2 font-medium text-indigo-600">{code}</td>
-                    <td className="px-3 py-2 text-slate-600">—</td>
-                  </tr>
-                )) || (
+                {data.grnCodes && data.grnCodes.length > 0 ? (
+                  data.grnCodes.map((code) => (
+                    <tr key={code} className="border-b hover:bg-slate-50">
+                      <td className="px-3 py-2 font-medium text-indigo-600">{code}</td>
+                      <td className="px-3 py-2 text-slate-600">—</td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
                     <td colSpan={2} className="px-3 py-2 text-slate-500 text-center">Không có GRN liên kết</td>
                   </tr>
