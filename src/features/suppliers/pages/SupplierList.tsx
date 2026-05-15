@@ -4,7 +4,8 @@ import { useProcurementStore } from '../../../store/procurementStore'
 
 export function SupplierList() {
   const navigate = useNavigate()
-  const { suppliers, getContractsBySupplier } = useProcurementStore()
+  const suppliers = useProcurementStore((state) => state.suppliers)
+  const getContractsBySupplier = useProcurementStore((state) => state.getContractsBySupplier)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [typeFilter, setTypeFilter] = useState('All')
@@ -19,7 +20,7 @@ export function SupplierList() {
     })
   }, [suppliers, search, statusFilter, typeFilter])
 
-  const stats = {
+  const stats = useMemo(() => ({
     active: suppliers.filter(s => s.status === 'Active').length,
     suspended: suppliers.filter(s => s.status === 'Suspended').length,
     blacklisted: suppliers.filter(s => s.status === 'Blacklisted').length,
@@ -27,15 +28,15 @@ export function SupplierList() {
       const supplierContracts = getContractsBySupplier(s.id)
       return supplierContracts.some(c => c.status === 'Active')
     }).length,
-  }
+  }), [suppliers, getContractsBySupplier])
 
-  const getContractStatus = (supplierId: string) => {
+  const getContractStatus = useMemo(() => (supplierId: string) => {
     const supplierContracts = getContractsBySupplier(supplierId)
     const active = supplierContracts.find(c => c.status === 'Active')
     if (active) return { status: 'Active', label: 'Có HĐ' }
     if (supplierContracts.length > 0) return { status: 'Inactive', label: 'Hết HĐ' }
     return { status: 'None', label: 'Không có' }
-  }
+  }, [getContractsBySupplier])
 
   return (
     <div className="min-h-screen bg-gray-50">
