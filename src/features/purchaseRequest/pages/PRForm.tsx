@@ -366,9 +366,9 @@ export function PRForm() {
                 <Plus size={16} className="text-blue-600" />
                 Thêm dòng hàng mới
               </p>
-              <div className="grid grid-cols-8 gap-3">
+              <div className="grid grid-cols-12 gap-3">
                 {/* Loại Sản Phẩm */}
-                <div className="col-span-1.5">
+                <div className="col-span-2">
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Loại</label>
                   <select
                     value={newItem.productCategory || ''}
@@ -382,7 +382,7 @@ export function PRForm() {
                 </div>
 
                 {/* Sản Phẩm */}
-                <div className="col-span-1.5">
+                <div className="col-span-2">
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Sản phẩm</label>
                   {!newItem.productCategory ? (
                     <div className="w-full px-3 py-2 border border-dashed border-orange-300 rounded-lg text-sm bg-orange-50 text-orange-600 flex items-center gap-1">
@@ -409,7 +409,7 @@ export function PRForm() {
                 </div>
 
                 {/* Đặc Tả */}
-                <div className="col-span-1.5">
+                <div className="col-span-2">
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Đặc tả</label>
                   <input
                     type="text"
@@ -446,7 +446,7 @@ export function PRForm() {
                 </div>
 
                 {/* Giá */}
-                <div className="col-span-1.5">
+                <div className="col-span-2">
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Giá</label>
                   <input
                     type="number"
@@ -459,7 +459,7 @@ export function PRForm() {
                 </div>
 
                 {/* NCC */}
-                <div className="col-span-1">
+                <div className="col-span-2">
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">NCC</label>
                   <select
                     value={newItem.suggestedSupplier || ''}
