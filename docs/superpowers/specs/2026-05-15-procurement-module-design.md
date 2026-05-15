@@ -444,26 +444,146 @@ interface IGRNItem {
 
 Not in Phase 1, will add after core workflow works:
 
-1. **Supplier Ratings & Evaluation**
-   - Quarterly evaluation form: Quality | Delivery on-time | Competitive pricing | Service support
-   - Aggregate rating system
-   - Historical rating trends
+### 1. Supplier Ratings & Evaluation (Screen 05)
 
-2. **Supplier Contracts**
-   - Contract records with terms
-   - Payment conditions (NET 30/60, discounts from minimum order)
-   - Contract period tracking
-   - Renewal notifications
+**SupplierRatingForm:**
+- Header: Supplier name | Evaluation quarter (Q1/Q2/Q3/Q4/2026)
+- 4 Rating Criteria sections (each has):
+  - Criterion title + description
+  - 5-star rating input (interactive)
+  - Relevant metrics (e.g., "On-time: 5/6 PO (83%)")
+  - Notes textarea for detailed feedback
+- Overall Score card (right sidebar, sticky):
+  - Weighted calculation: Quality(35%) + Delivery(30%) + Price(20%) + Service(15%)
+  - Visual display with breakdown
+- Recommendations checkboxes:
+  - Extend contract
+  - Increase order limit
+  - Expand product catalog
+  - Improve delivery
+  - Warning — monitor closely
+- Submit button
 
-3. **Quality Metrics & On-time Tracking**
-   - Dashboard: On-time delivery rate, quality pass rate, price trends
-   - Supplier performance history
+**SupplierRatingHistory:**
+- Sub-tab in SupplierDetail: "Đánh giá (4 kỳ)"
+- Table of past evaluations: Quarter | Evaluator | Date | Score | Stars
+- Clickable to view full evaluation details
 
-4. **Invoice & Payment Management**
-   - Link GRN to invoice
-   - Track supplier debt (công nợ NCC)
-   - Payment recording
-   - Overdue invoice alerts
+**Data types:**
+```typescript
+interface IEvaluationCriterion {
+  id: string
+  name: string // "Chất lượng", "Giao hàng", etc
+  description: string
+  weight: number // 0.35, 0.30, etc
+  score: number // 1-5
+  notes: string
+}
+
+interface IEvaluation {
+  id: string
+  supplierId: string
+  quarter: string // Q1/2026, Q2/2026, etc
+  evaluator: string
+  criteria: IEvaluationCriterion[]
+  overallScore: number
+  recommendations: {
+    extendContract: boolean
+    increaseLimit: boolean
+    expandCatalog: boolean
+    improveDelivery: boolean
+    warning: boolean
+  }
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+---
+
+### 2. Supplier Contracts (Screen 06)
+
+**SupplierContractList:**
+- Header: Supplier name | "X hợp đồng tổng cộng"
+- Sections: "Đang hiệu lực" | "Đã hết hạn"
+- Active contracts display:
+  - Contract card with icon + details
+  - Contract number (link to detail)
+  - Status badge (Active/Expired)
+  - Key info: Effective → Expiry | Payment terms | Discount | Min order value
+  - Covered products (tags)
+  - Progress bar (days elapsed / total days)
+  - Price history timeline (visual)
+  - Actions: View PDF | Edit terms | Renew | Terminate
+
+**SupplierContractDetail:**
+- Full contract view with all terms
+- Price history timeline (visual):
+  - Signature → Price start
+  - Price adjustments (with date, old → new price, reason)
+  - Expiry warning (if < 60 days)
+- Edit form: Payment terms, discount, min order, product list
+- Renewal flow: Extend period, update prices, renegotiate terms
+
+**Data types:**
+```typescript
+interface IContractProduct {
+  productId: string
+  productName: string
+  appliedPrice: number
+}
+
+interface IPriceHistory {
+  id: string
+  effectiveDate: Date
+  oldPrice: number
+  newPrice: number
+  reason: string // "Market adjustment", "Volume discount", etc
+  changedBy: string
+}
+
+interface IContract {
+  id: string
+  code: string // CON-2026-003
+  supplierId: string
+  supplierName: string
+  status: 'Active' | 'Expired' | 'Terminated'
+  effectiveDate: Date
+  expiryDate: Date
+  paymentTerms: string // NET 30/60, COD, etc
+  discount: {
+    percentage: number
+    minimumOrder: number // minimum order amount to qualify
+  }
+  minOrderValue: number
+  coveredProducts: IContractProduct[]
+  priceHistory: IPriceHistory[]
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+---
+
+### 3. Invoice & Payment Management
+
+Not yet in HTML mockup, but needed for complete procurement loop:
+- Link GRN to invoice
+- Track supplier payables (công nợ NCC)
+- Payment status tracking
+- Overdue alerts
+- *(Design specs to follow when mockup is ready)*
+
+---
+
+### 4. Quality Metrics & On-time Tracking (Supplier Dashboard)
+
+Dashboard showing:
+- On-time delivery rate (%) by supplier
+- Quality pass rate (%) by supplier
+- Price trend analysis
+- Performance history charts
+- *(Detailed specs when dashboard mockup created)*
 
 ---
 
