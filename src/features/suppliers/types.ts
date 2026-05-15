@@ -79,3 +79,5 @@ export interface SuppliersState {
   loading: boolean
   error: string | null
 }
+
+export type Supplier = ISupplier

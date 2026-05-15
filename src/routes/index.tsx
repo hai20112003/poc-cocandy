@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppLayout } from '@/layouts/AppLayout'
-import { SuppliersPage } from '@/features/suppliers/SuppliersPage'
+import { SupplierList } from '@/features/suppliers/pages/SupplierList'
 import { SupplierSourcesPage } from '@/features/supplier-sources/SupplierSourcesPage'
 import { BrandsPage } from '@/features/brands/BrandsPage'
 import { SourcesPage } from '@/features/sources/SourcesPage'
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/brands" replace /> },
       { path: 'brands', element: <BrandsPage /> },
       { path: 'supplier-sources', element: <SupplierSourcesPage /> },
-      { path: 'suppliers', element: <SuppliersPage /> },
+      { path: 'suppliers', element: <SupplierList /> },
       { path: 'suppliers/add', element: <SupplierForm /> },
       { path: 'suppliers/:id', element: <SupplierDetail /> },
       { path: 'suppliers/:id/edit', element: <SupplierForm /> },
