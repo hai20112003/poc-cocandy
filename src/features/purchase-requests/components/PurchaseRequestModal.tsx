@@ -122,6 +122,16 @@ export function PurchaseRequestModal({ open, onOpenChange, onSave, data }: Purch
       return
     }
 
+    // Check each item has required fields
+    const hasInvalidItems = formData.items.some(
+      (item) => !item.productCategory || !item.productName || item.quantity <= 0
+    )
+
+    if (hasInvalidItems) {
+      alert('Vui lòng điền đầy đủ thông tin cho tất cả dòng hàng (loại sản phẩm, sản phẩm, số lượng)')
+      return
+    }
+
     onSave({
       code: data?.code ?? `PR-${Date.now()}`,
       ...formData,
