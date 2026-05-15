@@ -298,61 +298,106 @@ export function GRNDetail() {
           {activeTab === 'items' && (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Tên hàng</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">SL đặt PO</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Thực nhận</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Chấp nhận</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Từ chối</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">Còn lại</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700 w-24">Số lô</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700 w-24">Vị trí kho</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">QC Note</th>
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-6 py-3 text-left font-semibold text-gray-700">Tên hàng</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '65px'}}>SL đặt PO</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '80px'}}>Thực nhận</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '80px'}}>Chấp nhận</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '70px'}}>Từ chối</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700" style={{width: '70px'}}>Còn lại</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700" style={{width: '90px'}}>Số lô</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700" style={{width: '80px'}}>Vị trí kho</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">QC note</th>
                   </tr>
                 </thead>
                 <tbody>
                   {goodsReceipt.items.map((item) => {
                     const remaining = item.expectedQty - item.acceptedQty - item.rejectedQty
+                    const isBackorder = item.receivedQty === 0
                     return (
-                      <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                        <td className="px-4 py-3 font-medium text-gray-900">{item.productName}</td>
-                        <td className="px-4 py-3 text-center text-gray-900">{item.expectedQty}{item.unit}</td>
-                        <td className="px-4 py-3 text-center text-gray-900">{item.receivedQty}{item.unit}</td>
-                        <td className="px-4 py-3 text-center">
+                      <tr
+                        key={item.id}
+                        className="border-b border-gray-100"
+                        style={{
+                          background: isBackorder ? '#f8fafc' : 'white',
+                          color: isBackorder ? '#94a3b8' : 'inherit'
+                        }}
+                      >
+                        <td className="px-6 py-4 font-medium" style={{color: isBackorder ? '#94a3b8' : '#111827'}}>
+                          {item.productName}
+                        </td>
+                        <td className="px-4 py-4 text-center" style={{color: isBackorder ? '#94a3b8' : 'inherit'}}>
+                          {item.expectedQty}{item.unit}
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <input
+                            type="number"
+                            value={item.receivedQty}
+                            className="w-16 px-2 py-1 border rounded text-right text-sm"
+                            style={{
+                              width: '60px',
+                              padding: '4px 8px',
+                              border: isBackorder ? '1px solid #e2e8f0' : '1px solid #e2e8f0',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              textAlign: 'right',
+                              background: isBackorder ? '#f8fafc' : '#f8fafc',
+                              color: isBackorder ? '#94a3b8' : '#0f1729'
+                            }}
+                            disabled
+                          />
+                        </td>
+                        <td className="px-4 py-4 text-center">
                           <input
                             type="number"
                             value={item.acceptedQty}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-center text-sm"
-                            readOnly
+                            className="w-16 px-2 py-1 border rounded text-right text-sm"
+                            style={{
+                              width: '60px',
+                              padding: '4px 8px',
+                              border: isBackorder ? '1px solid #e2e8f0' : '1px solid #e2e8f0',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              textAlign: 'right',
+                              background: isBackorder ? '#f8fafc' : '#f8fafc',
+                              color: isBackorder ? '#94a3b8' : '#0f1729'
+                            }}
                           />
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-4 py-4 text-center">
                           <input
                             type="number"
                             value={item.rejectedQty}
-                            className={`w-full px-2 py-1 border rounded text-center text-sm ${
-                              item.rejectedQty > 0 ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                            }`}
-                            readOnly
+                            className="w-16 px-2 py-1 border rounded text-right text-sm"
+                            style={{
+                              width: '60px',
+                              padding: '4px 8px',
+                              border: isBackorder ? '1px solid #e2e8f0' : item.rejectedQty > 0 ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              textAlign: 'right',
+                              background: isBackorder ? '#f8fafc' : item.rejectedQty > 0 ? '#fff1f1' : '#f8fafc',
+                              color: isBackorder ? '#94a3b8' : item.rejectedQty > 0 ? '#dc2626' : '#0f1729'
+                            }}
                           />
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`font-semibold text-sm ${
-                            remaining === 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {remaining}{item.unit} {remaining === 0 ? '✓' : ''}
-                          </span>
+                        <td className="px-4 py-4 text-center" style={{
+                          color: remaining === 0 ? '#059669' : '#dc2626',
+                          fontWeight: '600',
+                          fontSize: '12px'
+                        }}>
+                          {remaining}{item.unit} {remaining === 0 ? '✓' : ''}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">{item.batchNo || '—'}</td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">{item.storageLocation || '—'}</td>
-                        <td className="px-4 py-3 text-xs">
+                        <td className="px-4 py-4 text-xs text-gray-500">{item.batchNo || '—'}</td>
+                        <td className="px-4 py-4 text-xs text-gray-500">{item.storageLocation || '—'}</td>
+                        <td className="px-4 py-4 text-xs">
                           {item.qcStatus === 'Pass' ? (
-                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded inline-block">✓ {item.notes}</span>
+                            <span style={{color: '#059669', fontWeight: '500', fontSize: '11px'}}>✓ {item.notes}</span>
                           ) : item.qcStatus === 'Pending' ? (
-                            <span className="text-yellow-600">⏳ {item.notes}</span>
+                            <span style={{color: '#d97706', fontWeight: '500', fontSize: '11px'}}>⏳ {item.notes}</span>
                           ) : (
-                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded inline-block">✕ {item.notes}</span>
+                            <span style={{color: '#dc2626', fontWeight: '500', fontSize: '11px'}}>✕ {item.notes}</span>
                           )}
                         </td>
                       </tr>
