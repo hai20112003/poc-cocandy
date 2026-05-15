@@ -52,7 +52,10 @@ export interface Invoice {
   vat: number
   discount: number
   total: number
+  paid?: number
+  paidDate?: string
   paymentTerms: string
   status: 'pending' | 'partial' | 'paid'
+  notes?: string
   createdAt: string
 }
