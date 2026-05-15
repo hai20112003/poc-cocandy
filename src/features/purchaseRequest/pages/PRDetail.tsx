@@ -347,6 +347,17 @@ export function PRDetail() {
               </div>
             </div>
 
+            {/* Create GRN Button */}
+            {['Approved', 'Converted'].includes(purchaseRequest.status) && (
+              <button
+                onClick={() => navigate('/goods-receipts/add')}
+                className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-medium flex items-center justify-center gap-2"
+              >
+                <Package size={18} />
+                Tạo GRN
+              </button>
+            )}
+
             {/* Summary Card */}
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
               <h3 className="text-sm font-semibold text-gray-900 mb-3">Tóm tắt</h3>
