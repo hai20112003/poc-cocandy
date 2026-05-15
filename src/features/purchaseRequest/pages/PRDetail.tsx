@@ -265,70 +265,82 @@ export function PRDetail() {
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Status Timeline */}
+            {/* Implementation Progress */}
             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Lịch sử</h3>
-              <div className="space-y-4 text-sm">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Tiến độ thực hiện</h3>
+              <div className="space-y-3 text-xs">
+                {/* Draft */}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700">
-                      <FileText size={16} />
-                    </div>
-                    {purchaseRequest.status !== 'Draft' && <div className="w-0.5 h-8 bg-gray-200 mt-2" />}
+                    <div className="w-7 h-7 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold">✓</div>
+                    {purchaseRequest.status !== 'Draft' && <div className="w-0.5 h-5 bg-green-200" />}
                   </div>
-                  <div className="pb-4">
-                    <div className="font-semibold text-gray-900">Tạo mới</div>
+                  <div className="pb-1">
+                    <div className="font-semibold text-gray-900">Draft</div>
                     <div className="text-gray-600">{new Date(purchaseRequest.createdAt).toLocaleDateString('vi-VN')}</div>
                   </div>
                 </div>
 
-                {purchaseRequest.status !== 'Draft' && (
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        ['Submitted', 'Approved', 'Rejected', 'Converted'].includes(purchaseRequest.status)
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        <Send size={16} />
-                      </div>
-                      {['Approved', 'Rejected', 'Converted'].includes(purchaseRequest.status) && (
-                        <div className="w-0.5 h-8 bg-gray-200 mt-2" />
-                      )}
+                {/* Submitted */}
+                <div className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold ${
+                      ['Submitted', 'Approved', 'Rejected', 'Converted'].includes(purchaseRequest.status)
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {['Submitted', 'Approved', 'Rejected', 'Converted'].includes(purchaseRequest.status) ? '✓' : '○'}
                     </div>
-                    <div className="pb-4">
-                      <div className="font-semibold text-gray-900">Gửi duyệt</div>
-                      <div className="text-gray-600">Chờ phê duyệt</div>
+                    {['Approved', 'Rejected', 'Converted'].includes(purchaseRequest.status) && (
+                      <div className="w-0.5 h-5 bg-green-200" />
+                    )}
+                  </div>
+                  <div className="pb-1">
+                    <div className="font-semibold text-gray-900">Submitted</div>
+                    <div className="text-gray-600">Gửi duyệt</div>
+                  </div>
+                </div>
+
+                {/* Approved/Rejected */}
+                <div className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold ${
+                      ['Approved', 'Converted'].includes(purchaseRequest.status)
+                        ? 'bg-green-100 text-green-700'
+                        : purchaseRequest.status === 'Rejected'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {['Approved', 'Converted'].includes(purchaseRequest.status) ? '✓' :
+                       purchaseRequest.status === 'Rejected' ? '✕' : '○'}
+                    </div>
+                    {['Approved', 'Converted'].includes(purchaseRequest.status) && (
+                      <div className="w-0.5 h-5 bg-green-200" />
+                    )}
+                  </div>
+                  <div className="pb-1">
+                    <div className="font-semibold text-gray-900">{purchaseRequest.status === 'Rejected' ? 'Rejected' : 'Approved'}</div>
+                    <div className="text-gray-600">
+                      {purchaseRequest.status === 'Approved' && purchaseRequest.approvedAt
+                        ? new Date(purchaseRequest.approvedAt).toLocaleDateString('vi-VN')
+                        : purchaseRequest.status === 'Rejected'
+                        ? 'Từ chối'
+                        : '—'}
                     </div>
                   </div>
-                )}
+                </div>
 
-                {purchaseRequest.status === 'Approved' && (
+                {/* Receiving (GRN #2 chờ) */}
+                {['Approved', 'Converted'].includes(purchaseRequest.status) && (
                   <div className="flex gap-3">
                     <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center">
-                        <Check size={16} />
+                      <div className="w-7 h-7 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center">
+                        <Package size={14} />
                       </div>
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-900">Đã duyệt</div>
-                      <div className="text-gray-600">
-                        {purchaseRequest.approvedAt ? new Date(purchaseRequest.approvedAt).toLocaleDateString('vi-VN') : '-'}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {purchaseRequest.status === 'Rejected' && (
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
-                        <X size={16} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">Từ chối</div>
-                      <div className="text-red-600 text-xs">{purchaseRequest.rejectionReason}</div>
+                      <div className="font-semibold text-gray-900">Receiving</div>
+                      <div className="text-yellow-600 font-medium">GRN #2 chờ</div>
                     </div>
                   </div>
                 )}
