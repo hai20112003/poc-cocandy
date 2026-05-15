@@ -32,15 +32,17 @@ export function PRForm() {
   const [formData, setFormData] = useState<Partial<IPurchaseRequest>>({
     code: `PR-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
     department: '',
-    requester: currentUser,
-    neededByDate: today,
-    priority: 'medium',
+    createdBy: currentUser,
+    neededDate: new Date(today),
+    priority: 'Low' as const,
     status: 'Draft',
     items: [],
-    totalEstimated: 0,
-    createdAt: new Date().toISOString(),
-    createdBy: currentUser,
-    notes: '',
+    subtotal: 0,
+    tax: 0,
+    total: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    approver: '',
   })
 
   const [items, setItems] = useState<IPurchaseRequestItem[]>([])
@@ -69,7 +71,7 @@ export function PRForm() {
   }
 
   const validateForm = () => {
-    return formData.department && formData.neededByDate && formData.priority && items.length > 0 && items.every(item => item.quantity > 0)
+    return formData.department && formData.neededDate && formData.priority && items.length > 0 && items.every(item => item.quantity > 0)
   }
 
   const handleAddItem = () => {
@@ -96,10 +98,14 @@ export function PRForm() {
     e.preventDefault()
     if (!validateForm()) return
 
+    const totalAmount = calculateTotal()
     const dataToSave: IPurchaseRequest = {
       ...formData,
       items,
-      totalEstimated: calculateTotal(),
+      subtotal: totalAmount,
+      tax: 0,
+      total: totalAmount,
+      updatedAt: new Date(),
     } as IPurchaseRequest
 
     if (id && purchaseRequest) {
@@ -135,9 +141,6 @@ export function PRForm() {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-            💾 Lưu nháp
-          </button>
           <button
             onClick={handleSubmit}
             disabled={!isFormValid}
@@ -160,8 +163,8 @@ export function PRForm() {
             <span className={!formData.department ? 'text-amber-600' : 'text-green-600'}>
               {!formData.department ? '✗ Chưa chọn bộ phận' : '✓ Bộ phận'}
             </span>
-            <span className={!formData.neededByDate ? 'text-amber-600' : 'text-green-600'}>
-              {!formData.neededByDate ? '✗ Chưa chọn ngày cần hàng' : '✓ Ngày cần hàng'}
+            <span className={!formData.neededDate ? 'text-amber-600' : 'text-green-600'}>
+              {!formData.neededDate ? '✗ Chưa chọn ngày cần hàng' : '✓ Ngày cần hàng'}
             </span>
             <span className={!formData.priority ? 'text-amber-600' : 'text-green-600'}>
               {!formData.priority ? '✗ Chưa chọn ưu tiên' : '✓ Ưu tiên'}
@@ -226,8 +229,8 @@ export function PRForm() {
                   </label>
                   <input
                     type="date"
-                    value={formData.neededByDate || today}
-                    onChange={(e) => setFormData({ ...formData, neededByDate: e.target.value })}
+                    value={formData.neededDate || today}
+                    onChange={(e) => setFormData({ ...formData, neededDate: e.target.value })}
                     min={today}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -493,10 +496,10 @@ export function PRForm() {
                 <span className={formData.department ? 'text-gray-900 font-medium' : 'text-gray-500'}>Chọn bộ phận yêu cầu</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={formData.neededByDate ? 'text-green-600' : 'text-gray-400'}>
-                  {formData.neededByDate ? '✓' : '○'}
+                <span className={formData.neededDate ? 'text-green-600' : 'text-gray-400'}>
+                  {formData.neededDate ? '✓' : '○'}
                 </span>
-                <span className={formData.neededByDate ? 'text-gray-900 font-medium' : 'text-gray-500'}>Điền ngày cần có hàng</span>
+                <span className={formData.neededDate ? 'text-gray-900 font-medium' : 'text-gray-500'}>Điền ngày cần có hàng</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className={formData.priority ? 'text-green-600' : 'text-gray-400'}>

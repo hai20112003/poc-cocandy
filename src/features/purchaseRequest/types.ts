@@ -13,20 +13,26 @@ export interface IPR {
   id: string
   code: string
   department: string
-  requester: string
+  createdBy: string
   status: 'Draft' | 'Submitted' | 'Approved' | 'Rejected' | 'Converted'
   priority: 'Low' | 'Medium' | 'High' | 'Urgent'
   items: IPRItem[]
   subtotal: number
   tax: number
   total: number
-  neededByDate: Date
+  neededDate: Date
   approver: string
+  approvedBy?: string
+  approvedAt?: Date
   rejectionReason?: string
   createdAt: Date
   updatedAt: Date
   convertedToPOId?: string
 }
+
+// Type aliases for backward compatibility
+export type IPurchaseRequest = IPR
+export type IPurchaseRequestItem = IPRItem
 
 export interface PurchaseRequestsState {
   items: IPR[]
