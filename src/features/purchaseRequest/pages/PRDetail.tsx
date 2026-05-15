@@ -297,7 +297,7 @@ export function PRDetail() {
                     {purchaseRequest.status !== 'Draft' && <div className="w-0.5 h-5 bg-green-200" />}
                   </div>
                   <div className="pb-1">
-                    <div className="font-semibold text-gray-900">Draft</div>
+                    <div className="font-semibold text-gray-900">Soạn thảo</div>
                     <div className="text-gray-600">{new Date(purchaseRequest.createdAt).toLocaleDateString('vi-VN')}</div>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export function PRDetail() {
                     )}
                   </div>
                   <div className="pb-1">
-                    <div className="font-semibold text-gray-900">Submitted</div>
+                    <div className="font-semibold text-gray-900">Đã gửi duyệt</div>
                     <div className="text-gray-600">Gửi duyệt</div>
                   </div>
                 </div>
@@ -340,7 +340,7 @@ export function PRDetail() {
                     )}
                   </div>
                   <div className="pb-1">
-                    <div className="font-semibold text-gray-900">{purchaseRequest.status === 'Rejected' ? 'Rejected' : 'Approved'}</div>
+                    <div className="font-semibold text-gray-900">{purchaseRequest.status === 'Rejected' ? 'Từ chối' : 'Đã duyệt'}</div>
                     <div className="text-gray-600">
                       {purchaseRequest.status === 'Approved' && purchaseRequest.approvedAt
                         ? new Date(purchaseRequest.approvedAt).toLocaleDateString('vi-VN')
@@ -360,7 +360,7 @@ export function PRDetail() {
                       </div>
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-900">Receiving</div>
+                      <div className="font-semibold text-gray-900">Nhập kho</div>
                       <div className="text-yellow-600 font-medium">GRN #2 chờ</div>
                     </div>
                   </div>
