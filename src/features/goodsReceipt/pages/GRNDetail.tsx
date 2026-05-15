@@ -391,15 +391,7 @@ export function GRNDetail() {
                         </td>
                         <td className="px-4 py-4 text-xs text-gray-500">{item.batchNo || '—'}</td>
                         <td className="px-4 py-4 text-xs text-gray-500">{item.storageLocation || '—'}</td>
-                        <td className="px-4 py-4 text-xs">
-                          {item.qcStatus === 'Pass' ? (
-                            <span style={{color: '#059669', fontWeight: '500', fontSize: '11px'}}>✓ {item.notes}</span>
-                          ) : item.qcStatus === 'Pending' ? (
-                            <span style={{color: '#d97706', fontWeight: '500', fontSize: '11px'}}>⏳ {item.notes}</span>
-                          ) : (
-                            <span style={{color: '#dc2626', fontWeight: '500', fontSize: '11px'}}>✕ {item.notes}</span>
-                          )}
-                        </td>
+                        <td className="px-4 py-4 text-xs text-gray-600">{item.notes || '—'}</td>
                       </tr>
                     )
                   })}
