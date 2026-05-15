@@ -60,16 +60,13 @@ export function SuppliersPage() {
   const filtered = useMemo(() => {
     if (!debouncedSearch) return suppliers
     const q = debouncedSearch.toLowerCase()
-    return suppliers.filter(
-      (s) =>
-        s.name.toLowerCase().includes(q) ||
-        s.mccCode.toLowerCase().includes(q) ||
-        s.brandIds.some((id) => (brandMap[id] ?? '').toLowerCase().includes(q)) ||
-        s.supplierSourceIds.some((id) => (sourceMap[id] ?? '').toLowerCase().includes(q)) ||
-        s.productCategories.some((c) => c.toLowerCase().includes(q)) ||
-        (s.nccInfo ?? '').toLowerCase().includes(q)
+    return suppliers.filter((s: Supplier) =>
+      s.name.toLowerCase().includes(q) ||
+      s.code.toLowerCase().includes(q) ||
+      s.email.toLowerCase().includes(q) ||
+      s.phone.toLowerCase().includes(q)
     )
-  }, [suppliers, debouncedSearch, brandMap, sourceMap])
+  }, [suppliers, debouncedSearch])
 
   function openAdd() { setSelected(null); setModalOpen(true) }
   function openEdit(s: Supplier) { setSelected(s); setModalOpen(true) }

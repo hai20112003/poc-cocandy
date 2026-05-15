@@ -48,12 +48,6 @@ export function SupplierModal({ open, onClose, supplier, onSave }: SupplierModal
   useEffect(() => {
     if (open) {
       setName(supplier?.name ?? '')
-      setMccCode(supplier?.mccCode ?? '')
-      setBrandIds(supplier?.brandIds ?? [])
-      setSupplierSourceIds(supplier?.supplierSourceIds ?? [])
-      setProductCategories(supplier?.productCategories ?? [])
-      setQrImageUrl(supplier?.qrImageUrl)
-      setNccInfo(supplier?.nccInfo ?? '')
       setErrors({})
     }
   }, [open, supplier])
@@ -61,17 +55,13 @@ export function SupplierModal({ open, onClose, supplier, onSave }: SupplierModal
   function validate(): boolean {
     const e: FormErrors = {}
     if (!name.trim()) e.name = 'Tên nhà cung cấp là bắt buộc'
-    if (!mccCode.trim()) e.mccCode = 'Mã MCC là bắt buộc'
-    if (brandIds.length === 0) e.brandIds = 'Vui lòng chọn ít nhất một Branch'
-    if (supplierSourceIds.length === 0) e.supplierSourceIds = 'Vui lòng chọn ít nhất một Suppliers-source'
-    if (productCategories.length === 0) e.productCategories = 'Vui lòng chọn ít nhất một loại mặt hàng'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
   function handleSave() {
     if (validate()) {
-      onSave({ name: name.trim(), mccCode: mccCode.trim(), brandIds, supplierSourceIds, productCategories, qrImageUrl, nccInfo: nccInfo.trim() || undefined })
+      onSave({ name: name.trim() } as Omit<Supplier, 'id'>)
       onClose()
     }
   }

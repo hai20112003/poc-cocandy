@@ -1,11 +1,11 @@
 export interface IContact {
   id: string
   name: string
-  title: string
+  title?: string
   phone: string
   email: string
-  role: 'Primary' | 'Accounting' | 'Logistics' | 'Other'
-  isPrimary: boolean
+  role?: 'Primary' | 'Accounting' | 'Logistics' | 'Other'
+  isPrimary?: boolean
 }
 
 export interface IProduct {
@@ -28,13 +28,15 @@ export interface ISupplier {
   phone: string
   email: string
   leadTime: number
-  paymentTerms: 'NET 15' | 'NET 30' | 'NET 60' | 'COD' | 'Prepaid'
+  paymentTerms: 'NET 15' | 'NET 30' | 'NET 45' | 'NET 60' | 'NET 90' | 'COD' | 'Prepaid'
   currency: string
   status: 'Active' | 'Suspended' | 'Blacklisted'
   blacklistReason?: string
   rating: number
   contacts: IContact[]
   products: IProduct[]
+  website?: string
+  minOrderValue?: number
   createdAt: Date
   updatedAt: Date
 }

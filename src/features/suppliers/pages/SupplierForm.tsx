@@ -13,12 +13,11 @@ export function SupplierForm() {
   const [formData, setFormData] = useState<Partial<ISupplier>>({
     name: '',
     code: '',
-    type: 'Importer',
+    type: 'Manufacturer',
     status: 'Active',
     leadTime: 0,
-    paymentTerms: '',
+    paymentTerms: 'NET 30',
     minOrderValue: 0,
-    businessRegistration: '',
     website: '',
     rating: 0,
     contacts: [],
@@ -47,7 +46,13 @@ export function SupplierForm() {
 
   const handleAddContact = () => {
     if (newContact.name && newContact.email) {
-      setContacts([...contacts, { ...newContact, id: `contact-${Date.now()}` }])
+      setContacts([...contacts, {
+        ...newContact,
+        id: `contact-${Date.now()}`,
+        title: newContact.position,
+        role: 'Other' as const,
+        isPrimary: false,
+      }])
       setNewContact({ name: '', position: '', phone: '', email: '' })
     }
   }
