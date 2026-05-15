@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProcurementStore } from '../../../store/procurementStore'
-import { ISupplier } from '../types'
 
 export function SupplierList() {
   const navigate = useNavigate()
-  const { suppliers } = useProcurementStore()
+  const { suppliers, getContractsBySupplier } = useProcurementStore()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [typeFilter, setTypeFilter] = useState('All')
@@ -24,7 +23,18 @@ export function SupplierList() {
     active: suppliers.filter(s => s.status === 'Active').length,
     suspended: suppliers.filter(s => s.status === 'Suspended').length,
     blacklisted: suppliers.filter(s => s.status === 'Blacklisted').length,
-    withContract: suppliers.filter(s => s.status === 'Active').length,
+    withContract: suppliers.filter(s => {
+      const supplierContracts = getContractsBySupplier(s.id)
+      return supplierContracts.some(c => c.status === 'Active')
+    }).length,
+  }
+
+  const getContractStatus = (supplierId: string) => {
+    const supplierContracts = getContractsBySupplier(supplierId)
+    const active = supplierContracts.find(c => c.status === 'Active')
+    if (active) return { status: 'Active', label: 'Có HĐ' }
+    if (supplierContracts.length > 0) return { status: 'Inactive', label: 'Hết HĐ' }
+    return { status: 'None', label: 'Không có' }
   }
 
   return (
@@ -107,41 +117,54 @@ export function SupplierList() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Lead time</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Điều khoản TT</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Rating</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Hợp đồng</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Trạng thái</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filtered.map((supplier) => (
-                <tr key={supplier.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/suppliers/${supplier.id}`)}>
-                  <td className="px-4 py-3 text-sm text-blue-600 font-medium">{supplier.code}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <div className="font-medium text-gray-900">{supplier.name}</div>
-                    <div className="text-xs text-gray-500">{supplier.contacts[0]?.name || '—'}</div>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-                      {supplier.type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">{supplier.leadTime} ngày</td>
-                  <td className="px-4 py-3 text-sm">{supplier.paymentTerms}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="text-yellow-500">★★★★★</span>
-                    <span className="ml-1 font-semibold text-green-600">{supplier.rating.toFixed(1)}</span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      supplier.status === 'Active' ? 'bg-green-100 text-green-700' :
-                      supplier.status === 'Suspended' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {supplier.status === 'Active' ? '● Active' :
-                       supplier.status === 'Suspended' ? '○ Inactive' :
-                       '✕ Blacklisted'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((supplier) => {
+                const contractStatus = getContractStatus(supplier.id)
+                return (
+                  <tr key={supplier.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/suppliers/${supplier.id}`)}>
+                    <td className="px-4 py-3 text-sm text-blue-600 font-medium">{supplier.code}</td>
+                    <td className="px-4 py-3 text-sm">
+                      <div className="font-medium text-gray-900">{supplier.name}</div>
+                      <div className="text-xs text-gray-500">{supplier.contacts[0]?.name || '—'}</div>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                        {supplier.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">{supplier.leadTime} ngày</td>
+                    <td className="px-4 py-3 text-sm">{supplier.paymentTerms}</td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className="text-yellow-500">★★★★★</span>
+                      <span className="ml-1 font-semibold text-green-600">{supplier.rating.toFixed(1)}</span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        contractStatus.status === 'Active' ? 'bg-green-100 text-green-700' :
+                        contractStatus.status === 'Inactive' ? 'bg-gray-100 text-gray-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {contractStatus.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        supplier.status === 'Active' ? 'bg-green-100 text-green-700' :
+                        supplier.status === 'Suspended' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {supplier.status === 'Active' ? '● Active' :
+                         supplier.status === 'Suspended' ? '○ Inactive' :
+                         '✕ Blacklisted'}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

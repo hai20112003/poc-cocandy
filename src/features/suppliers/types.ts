@@ -39,6 +39,34 @@ export interface ISupplier {
   updatedAt: Date
 }
 
+export interface ISupplierEvaluation {
+  id: string
+  supplierId: string
+  period: string
+  qualityScore: number
+  deliveryScore: number
+  priceScore: number
+  serviceScore: number
+  totalScore: number
+  note: string
+  evaluatedBy: string
+  createdAt: Date
+}
+
+export interface IContract {
+  id: string
+  supplierId: string
+  contractNo: string
+  startDate: Date
+  endDate: Date
+  paymentTerms: string
+  discountRate: number
+  minOrderValue: number
+  status: 'Draft' | 'Active' | 'Expired' | 'Terminated'
+  fileUrl?: string
+  createdAt: Date
+}
+
 export interface SuppliersState {
   items: ISupplier[]
   selected: ISupplier | null

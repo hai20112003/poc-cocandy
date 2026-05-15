@@ -1,14 +1,17 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { ChevronLeft, Edit, Plus, Phone, Mail, MapPin, Package } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { ChevronLeft, Edit, Plus, Phone, Mail, Package, Star, FileText } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
-import { ISupplier } from '../types'
 
 export function SupplierDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'products' | 'orders'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'products' | 'evaluations' | 'contracts' | 'orders'>('overview')
   const supplier = useProcurementStore((state) => state.getSupplier(id || ''))
+  const evaluations = useProcurementStore((state) => state.getEvaluationsBySupplier(id || ''))
+  const contracts = useProcurementStore((state) => state.getContractsBySupplier(id || ''))
+  const purchaseOrders = useProcurementStore((state) => state.purchaseOrders)
+  const linkedOrders = useMemo(() => purchaseOrders.filter((po) => po.supplierId === id), [purchaseOrders, id])
 
   if (!supplier) {
     return (
@@ -102,18 +105,25 @@ export function SupplierDetail() {
 
       {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-sm mb-6">
-        <div className="flex border-b border-gray-200">
-          {(['overview', 'contacts', 'products', 'orders'] as const).map((tab) => (
+        <div className="flex border-b border-gray-200 overflow-x-auto">
+          {[
+            { key: 'overview' as const, label: 'Tổng quan' },
+            { key: 'contacts' as const, label: 'Liên hệ' },
+            { key: 'products' as const, label: 'Hàng hóa' },
+            { key: 'evaluations' as const, label: 'Đánh giá' },
+            { key: 'contracts' as const, label: 'Hợp đồng' },
+            { key: 'orders' as const, label: 'Đơn hàng' },
+          ].map(({ key, label }) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 font-medium transition ${
-                activeTab === tab
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`px-6 py-3 font-medium transition whitespace-nowrap ${
+                activeTab === key
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {label}
             </button>
           ))}
         </div>
@@ -124,40 +134,55 @@ export function SupplierDetail() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin cơ bản</h3>
                   <div className="space-y-3">
                     <div>
-                      <div className="text-sm text-gray-600">Code</div>
+                      <div className="text-sm text-gray-600">Mã</div>
                       <div className="text-gray-900">{supplier.code}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">Business Registration</div>
-                      <div className="text-gray-900">{supplier.businessRegistration || 'N/A'}</div>
+                      <div className="text-sm text-gray-600">Mã số thuế</div>
+                      <div className="text-gray-900">{supplier.taxId}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">Website</div>
-                      <div className="text-blue-600">{supplier.website || 'N/A'}</div>
+                      <div className="text-sm text-gray-600">Loại</div>
+                      <div className="text-gray-900">{supplier.type}</div>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Terms</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Điều khoản</h3>
                   <div className="space-y-3">
                     <div>
-                      <div className="text-sm text-gray-600">Lead Time</div>
-                      <div className="text-gray-900">{supplier.leadTime} days</div>
+                      <div className="text-sm text-gray-600">Lead time</div>
+                      <div className="text-gray-900">{supplier.leadTime} ngày</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">Payment Terms</div>
-                      <div className="text-gray-900">{supplier.paymentTerms} days</div>
+                      <div className="text-sm text-gray-600">Điều khoản thanh toán</div>
+                      <div className="text-gray-900">{supplier.paymentTerms}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">Min Order Value</div>
-                      <div className="text-gray-900">
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                          supplier.minOrderValue
-                        )}
-                      </div>
+                      <div className="text-sm text-gray-600">Tiền tệ</div>
+                      <div className="text-gray-900">{supplier.currency}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Liên hệ</h3>
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-gray-600">Địa chỉ</div>
+                    <div className="text-gray-900">{supplier.address}</div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-600">Điện thoại</div>
+                      <div className="text-gray-900">{supplier.phone}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Email</div>
+                      <div className="text-blue-600">{supplier.email}</div>
                     </div>
                   </div>
                 </div>
@@ -168,10 +193,10 @@ export function SupplierDetail() {
           {activeTab === 'contacts' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Contacts</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Liên hệ</h3>
                 <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                   <Plus size={18} />
-                  Add Contact
+                  Thêm liên hệ
                 </button>
               </div>
               <div className="space-y-3">
@@ -180,7 +205,7 @@ export function SupplierDetail() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="font-semibold text-gray-900">{contact.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">{contact.position}</div>
+                        <div className="text-sm text-gray-600 mt-1">{contact.title}</div>
                         <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
                           <div className="flex items-center gap-2">
                             <Phone size={16} />
@@ -203,33 +228,35 @@ export function SupplierDetail() {
           {activeTab === 'products' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Products</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Hàng hóa</h3>
                 <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                   <Plus size={18} />
-                  Add Product
+                  Thêm hàng
                 </button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Product Name</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">SKU</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Category</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Unit Price</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Stock</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tên hàng</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">ĐVT</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Đơn giá</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">MOQ</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Lead time</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ghi chú</th>
                     </tr>
                   </thead>
                   <tbody>
                     {supplier.products.map((product) => (
                       <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
                         <td className="px-6 py-4 text-gray-900">{product.name}</td>
-                        <td className="px-6 py-4 text-gray-600">{product.sku}</td>
-                        <td className="px-6 py-4 text-gray-600">{product.category}</td>
+                        <td className="px-6 py-4 text-gray-600">{product.unit}</td>
                         <td className="px-6 py-4 text-gray-900">
                           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.unitPrice)}
                         </td>
-                        <td className="px-6 py-4 text-gray-900">{product.stock}</td>
+                        <td className="px-6 py-4 text-gray-600">{product.moq}</td>
+                        <td className="px-6 py-4 text-gray-600">{product.leadTime} ngày</td>
+                        <td className="px-6 py-4 text-gray-600">{product.notes}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -238,13 +265,176 @@ export function SupplierDetail() {
             </div>
           )}
 
+          {activeTab === 'evaluations' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Lịch sử đánh giá</h3>
+              {evaluations.length === 0 ? (
+                <div className="text-center py-8 text-gray-600">
+                  <Star size={40} className="mx-auto mb-2 text-gray-400" />
+                  <p>Chưa có đánh giá</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Kỳ</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Chất lượng</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Giao hàng</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Giá cả</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Hỗ trợ</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tổng</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Người đánh giá</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ghi chú</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {evaluations.map((evaluation) => {
+                        const totalColor =
+                          evaluation.totalScore >= 4 ? 'text-green-700' : evaluation.totalScore >= 3 ? 'text-yellow-700' : 'text-red-700'
+                        return (
+                          <tr key={evaluation.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                            <td className="px-6 py-4 text-gray-900 font-medium">{evaluation.period}</td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {evaluation.qualityScore}/5 <span className="text-yellow-400">★</span>
+                            </td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {evaluation.deliveryScore}/5 <span className="text-yellow-400">★</span>
+                            </td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {evaluation.priceScore}/5 <span className="text-yellow-400">★</span>
+                            </td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {evaluation.serviceScore}/5 <span className="text-yellow-400">★</span>
+                            </td>
+                            <td className={`px-6 py-4 font-semibold ${totalColor}`}>{evaluation.totalScore.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-gray-600">{evaluation.evaluatedBy}</td>
+                            <td className="px-6 py-4 text-gray-600">{evaluation.note}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'contracts' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Hợp đồng khung</h3>
+                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                  <Plus size={18} />
+                  Thêm hợp đồng
+                </button>
+              </div>
+              {contracts.length === 0 ? (
+                <div className="text-center py-8 text-gray-600">
+                  <FileText size={40} className="mx-auto mb-2 text-gray-400" />
+                  <p>Chưa có hợp đồng</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Số HĐ</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Từ ngày</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Đến ngày</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Điều khoản TT</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Chiết khấu</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Giá trị tối thiểu</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Trạng thái</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contracts.map((contract) => {
+                        const statusColor =
+                          contract.status === 'Active'
+                            ? 'bg-green-100 text-green-800'
+                            : contract.status === 'Draft'
+                              ? 'bg-gray-100 text-gray-800'
+                              : contract.status === 'Expired'
+                                ? 'bg-gray-100 text-gray-800'
+                                : 'bg-red-100 text-red-800'
+                        return (
+                          <tr key={contract.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                            <td className="px-6 py-4 text-gray-900 font-medium">{contract.contractNo}</td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {contract.startDate.toLocaleDateString('vi-VN')}
+                            </td>
+                            <td className="px-6 py-4 text-gray-600">{contract.endDate.toLocaleDateString('vi-VN')}</td>
+                            <td className="px-6 py-4 text-gray-600">{contract.paymentTerms}</td>
+                            <td className="px-6 py-4 text-gray-600">{contract.discountRate}%</td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                                contract.minOrderValue
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${statusColor}`}
+                              >
+                                {contract.status}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === 'orders' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Purchase Orders</h3>
-              <div className="text-center py-8 text-gray-600">
-                <Package size={40} className="mx-auto mb-2 text-gray-400" />
-                <p>No orders yet</p>
-              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Đơn hàng</h3>
+              {linkedOrders.length === 0 ? (
+                <div className="text-center py-8 text-gray-600">
+                  <Package size={40} className="mx-auto mb-2 text-gray-400" />
+                  <p>Chưa có đơn hàng</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Mã PO</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ngày</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tổng tiền</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Trạng thái</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">GRN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {linkedOrders.map((po) => (
+                        <tr key={po.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                          <td className="px-6 py-4 text-blue-600 font-medium cursor-pointer hover:underline">
+                            {po.code}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {po.createdAt.toLocaleDateString('vi-VN')}
+                          </td>
+                          <td className="px-6 py-4 text-gray-900">
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                              po.total
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {po.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">-</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </div>

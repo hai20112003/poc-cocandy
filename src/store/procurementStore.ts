@@ -1,9 +1,9 @@
 import { create } from 'zustand'
-import { ISupplier } from '../features/suppliers/types'
+import { ISupplier, ISupplierEvaluation, IContract } from '../features/suppliers/types'
 import { IPR } from '../features/purchaseRequest/types'
 import { IPO } from '../features/purchaseOrder/types'
 import { IGRN, IReturn } from '../features/goodsReceipt/types'
-import { mockSuppliers } from '../features/suppliers/mockData'
+import { mockSuppliers, mockEvaluations, mockContracts } from '../features/suppliers/mockData'
 import { mockPurchaseRequests } from '../features/purchaseRequest/mockData'
 import { mockPurchaseOrders } from '../features/purchaseOrder/mockData'
 import { mockGoodsReceipts, mockReturns } from '../features/goodsReceipt/mockData'
@@ -36,6 +36,17 @@ interface ProcurementStore {
   addReturn: (ret: IReturn) => void
   updateReturn: (id: string, data: Partial<IReturn>) => void
   getReturn: (id: string) => IReturn | undefined
+
+  // Supplier Evaluations
+  evaluations: ISupplierEvaluation[]
+  addEvaluation: (evaluation: ISupplierEvaluation) => void
+  getEvaluationsBySupplier: (supplierId: string) => ISupplierEvaluation[]
+
+  // Supplier Contracts
+  contracts: IContract[]
+  addContract: (contract: IContract) => void
+  updateContract: (id: string, data: Partial<IContract>) => void
+  getContractsBySupplier: (supplierId: string) => IContract[]
 }
 
 export const useProcurementStore = create<ProcurementStore>((set, get) => ({
@@ -45,6 +56,8 @@ export const useProcurementStore = create<ProcurementStore>((set, get) => ({
   purchaseOrders: mockPurchaseOrders,
   goodsReceipts: mockGoodsReceipts,
   returns: mockReturns,
+  evaluations: mockEvaluations,
+  contracts: mockContracts,
 
   // Suppliers
   addSupplier: (supplier) =>
@@ -114,5 +127,29 @@ export const useProcurementStore = create<ProcurementStore>((set, get) => ({
   getReturn: (id) => {
     const state = get()
     return state.returns.find((r) => r.id === id)
+  },
+
+  // Supplier Evaluations
+  addEvaluation: (evaluation) =>
+    set((state) => ({
+      evaluations: [...state.evaluations, evaluation],
+    })),
+  getEvaluationsBySupplier: (supplierId) => {
+    const state = get()
+    return state.evaluations.filter((e) => e.supplierId === supplierId)
+  },
+
+  // Supplier Contracts
+  addContract: (contract) =>
+    set((state) => ({
+      contracts: [...state.contracts, contract],
+    })),
+  updateContract: (id, data) =>
+    set((state) => ({
+      contracts: state.contracts.map((c) => (c.id === id ? { ...c, ...data } : c)),
+    })),
+  getContractsBySupplier: (supplierId) => {
+    const state = get()
+    return state.contracts.filter((c) => c.supplierId === supplierId)
   },
 }))
