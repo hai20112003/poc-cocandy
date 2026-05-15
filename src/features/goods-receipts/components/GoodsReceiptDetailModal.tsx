@@ -1,5 +1,6 @@
 import { Modal } from '@/components/shared/Modal'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/utils/cn'
 import type { GoodsReceipt } from '../types'
 
 interface GoodsReceiptDetailModalProps {
@@ -21,6 +22,8 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 export function GoodsReceiptDetailModal({ open, onOpenChange, data }: GoodsReceiptDetailModalProps) {
+  if (!data) return null
+
   return (
     <Modal open={open} onClose={() => onOpenChange(false)} title={`Chi tiết phiếu nhập kho: ${data.code}`}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto">
@@ -99,7 +102,7 @@ export function GoodsReceiptDetailModal({ open, onOpenChange, data }: GoodsRecei
                       <div>{item.lotNumber}</div>
                       <div>{item.warehouseLocation}</div>
                     </td>
-                    <td className="px-3 py-2 text-xs text-slate-600">{item.qcNote}</td>
+                    <td className="px-3 py-2 text-xs text-slate-600">{item.qcNote || '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -124,11 +127,12 @@ export function GoodsReceiptDetailModal({ open, onOpenChange, data }: GoodsRecei
         </div>
 
         {/* QC Status Section */}
-        <div className={`p-4 rounded border ${
-          data.qcStatus === 'passed' ? 'bg-green-50 border-green-200' :
-          data.qcStatus === 'failed' ? 'bg-red-50 border-red-200' :
-          'bg-amber-50 border-amber-200'
-        }`}>
+        <div className={cn(
+          'p-4 rounded border',
+          data.qcStatus === 'passed' && 'bg-green-50 border-green-200',
+          data.qcStatus === 'failed' && 'bg-red-50 border-red-200',
+          data.qcStatus === 'pending' && 'bg-amber-50 border-amber-200'
+        )}>
           <div className="text-sm font-semibold">
             {data.qcStatus === 'passed' ? '✓' : data.qcStatus === 'failed' ? '✕' : '⏳'} QC: {QC_STATUS_LABEL[data.qcStatus]}
           </div>
