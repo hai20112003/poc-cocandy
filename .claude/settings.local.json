@@ -28,7 +28,18 @@
       "Bash(/Users/hainv03/.nvm/versions/node/v20.20.1/bin/node node_modules/.bin/tsc --noEmit)",
       "Bash(/Users/hainv03/.nvm/versions/node/v20.20.1/bin/node node_modules/.bin/vite build)",
       "Bash(Get-ChildItem -Path \"D:\\\\project\\\\poc\\\\poc-cocandy\" -Force)",
-      "Bash(Select-Object Name, PSIsContainer)"
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Bash(npm test *)",
+      "Bash(netstat -tulnp)",
+      "Bash(rtk curl *)",
+      "Bash(rtk gh *)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(pkill -f \"npm run dev\")",
+      "Bash(rtk ps *)",
+      "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")"
     ]
   }
 }
