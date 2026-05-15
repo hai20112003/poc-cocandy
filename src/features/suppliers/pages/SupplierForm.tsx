@@ -159,26 +159,7 @@ export function SupplierForm() {
                     <option value="Blacklisted">Bị chặn</option>
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá (0-5)</label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="number"
-                      min="0"
-                      max="5"
-                      step="0.1"
-                      value={formData.rating || 0}
-                      onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })}
-                      className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition focus:border-blue-500"
-                    />
-                    <div className="text-2xl text-yellow-400">★</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                   <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
                   <input
                     type="url"
@@ -189,6 +170,10 @@ export function SupplierForm() {
                   />
                 </div>
 
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Mã số thuế</label>
                   <input
