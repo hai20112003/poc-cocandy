@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cocandy ERP — Procurement Module</title>
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; background: #f1f5f9; color: #0f1729; }
+
+  /* ── TOP SWITCHER ── */
+  .screen-switcher {
+    position: sticky; top: 0; z-index: 100;
+    background: #0f1729;
+    display: flex; align-items: center; gap: 0;
+    padding: 0 24px;
+    border-bottom: 1px solid #1e2d4a;
+  }
+  .switcher-logo {
+    font-size: 14px; font-weight: 600; color: #fff;
+    padding: 14px 24px 14px 0;
+    border-right: 1px solid #1e2d4a;
+    margin-right: 16px;
+    white-space: nowrap;
+  }
+  .switcher-label {
+    font-size: 11px; color: #6b7fa8; margin-right: 12px; white-space: nowrap;
+  }
+  .switcher-tabs { display: flex; gap: 2px; overflow-x: auto; padding: 8px 0; }
+  .stab {
+    padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; color: #94a3c8; border: none; background: transparent;
+    white-space: nowrap; transition: background .15s, color .15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stab:hover { background: #18243c; color: #fff; }
+  .stab.active { background: #2563eb; color: #fff; }
+  .stab .screen-num {
+    background: rgba(255,255,255,.15); border-radius: 4px;
+    padding: 1px 5px; font-size: 10px;
+  }
+  .stab.active .screen-num { background: rgba(255,255,255,.25); }
+  .switcher-hint {
+    margin-left: auto; font-size: 11px; color: #6b7fa8; white-space: nowrap; padding-left: 16px;
+  }
+
+  /* ── SCREEN WRAPPER ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── SHARED ERP SHELL ── */
+  .erp-shell {
+    display: flex; min-height: calc(100vh - 52px);
+  }
+  .sidebar {
+    width: 240px; min-height: 100%; background: #0f1729;
+    flex-shrink: 0; display: flex; flex-direction: column;
+    position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto;
+  }
+  .sb-logo {
+    padding: 18px 20px; background: #18243c;
+    font-size: 15px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #1e2d4a;
+  }
+  .sb-logo svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .sb-section-label {
+    font-size: 9px; font-weight: 600; color: #4a5a7a; letter-spacing: .08em;
+    text-transform: uppercase; padding: 16px 20px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px 10px 16px; margin: 1px 8px;
+    border-radius: 8px; cursor: pointer; color: #7a8fba;
+    font-size: 13px; transition: background .12s, color .12s;
+  }
+  .nav-item:hover { background: #18243c; color: #c8d5ee; }
+  .nav-item.active { background: #2563eb; color: #fff; font-weight: 500; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .85; }
+  .nav-item.active svg { opacity: 1; }
+  .nav-badge {
+    margin-left: auto; background: #dc2626; color: #fff;
+    border-radius: 10px; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; min-width: 18px; text-align: center;
+  }
+  .sb-footer {
+    margin-top: auto; padding: 16px; border-top: 1px solid #1e2d4a;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sb-avatar {
+    width: 34px; height: 34px; background: #2563eb; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .sb-user-info { font-size: 12px; color: #c8d5ee; line-height: 1.4; }
+  .sb-user-info small { color: #6b7fa8; font-size: 10px; display: block; }
+
+  .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: #fff; border-bottom: 1px solid #e2e8f0;
+    padding: 0 28px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; position: sticky; top: 52px; z-index: 10;
+  }
+  .topbar-left h1 { font-size: 18px; font-weight: 700; color: #0f1729; }
+  .topbar-left p { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0;
+    background: #f8fafc; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #64748b;
+  }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #374151;
+    transition: background .12s;
+  }
+  .btn:hover { background: #f1f5f9; }
+  .btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn svg { width: 15px; height: 15px; }
+
+  /* ── CONTENT PADDING ── */
+  .content { padding: 24px 28px; flex: 1; background: #f8fafc; }
+
+  /* ── KPI CARDS ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card {
+    background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
+    padding: 20px; display: flex; align-items: flex-start; gap: 0;
+    position: relative; overflow: hidden;
+  }
+  .kpi-accent { position: absolute; left: 0; top: 20px; bottom: 20px; width: 4px; border-radius: 0 4px 4px 0; }
+  .kpi-body { padding-left: 20px; flex: 1; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: #0f1729; line-height: 1.1; }
+  .kpi-label { font-size: 12px; color: #64748b; margin-top: 6px; }
+  .kpi-sub { font-size: 11px; font-weight: 500; margin-top: 4px; }
+  .kpi-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .kpi-icon svg { width: 20px; height: 20px; }
+
+  /* ── GRID LAYOUT ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 280px; gap: 20px; margin-bottom: 20px; }
+  .grid-2-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* ── CARD ── */
+  .card {
+    background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-header h3 { font-size: 14px; font-weight: 600; color: #0f1729; }
+  .card-header p { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+  .card-body { padding: 16px 20px; }
+  .view-all { font-size: 12px; color: #2563eb; font-weight: 500; cursor: pointer; text-decoration: none; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f8fafc; }
+  th {
+    padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600;
+    color: #64748b; border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+  }
+  td { padding: 12px 14px; font-size: 13px; color: #0f1729; border-bottom: 1px solid #f1f5f9; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #fafbfc; }
+  .td-link { color: #2563eb; font-weight: 500; cursor: pointer; }
+  .td-muted { color: #94a3b8; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .b-success  { background: #ecfdf5; color: #065f3d; }
+  .b-warning  { background: #fffbeb; color: #92400e; }
+  .b-danger   { background: #fef2f2; color: #991b1b; }
+  .b-info     { background: #eff6ff; color: #1e40af; }
+  .b-muted    { background: #f1f5f9; color: #475569; }
+  .b-orange   { background: #fff7ed; color: #9a3412; }
+
+  /* ── STAT MINI CARDS (Supplier page) ── */
+  .stat-mini-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-mini {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .stat-mini-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .stat-mini-v { font-size: 22px; font-weight: 700; }
+  .stat-mini-l { font-size: 11px; color: #64748b; margin-top: 1px; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .search-box {
+    position: relative; flex: 1;
+  }
+  .search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #94a3b8; }
+  .search-box input {
+    width: 100%; padding: 7px 12px 7px 32px;
+    border: 1px solid #e2e8f0; border-radius: 7px; font-size: 13px;
+    background: #f8fafc; color: #0f1729; outline: none;
+  }
+  .search-box input:focus { border-color: #93c5fd; background: #fff; }
+  .filter-tabs { display: flex; gap: 4px; }
+  .ftab {
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b;
+    white-space: nowrap; transition: all .12s;
+  }
+  .ftab:hover { background: #f1f5f9; }
+  .ftab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .select-input {
+    padding: 7px 12px; border: 1px solid #e2e8f0; border-radius: 7px;
+    font-size: 12px; background: #f8fafc; color: #374151;
+    cursor: pointer; outline: none;
+  }
+
+  /* ── PAGINATION ── */
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid #f1f5f9; }
+  .pagination-info { font-size: 12px; color: #64748b; }
+  .pagination-pages { display: flex; gap: 4px; }
+  .pg-btn {
+    width: 32px; height: 32px; border-radius: 7px; border: 1px solid #e2e8f0;
+    background: #fff; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: #374151;
+  }
+  .pg-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; font-weight: 600; }
+
+  /* ── PENDING APPROVALS SIDEBAR ── */
+  .approval-item {
+    background: #f8fafc; border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+  }
+  .approval-info { flex: 1; min-width: 0; }
+  .approval-info .pr-no { font-size: 12px; font-weight: 600; color: #2563eb; }
+  .approval-info .pr-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  /* ── STARS ── */
+  .stars { color: #f59e0b; font-size: 12px; }
+
+  /* ── SUPPLIER TABLE AVATAR ── */
+  .sup-avatar {
+    width: 30px; height: 30px; border-radius: 50%; background: #eff6ff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #2563eb; flex-shrink: 0;
+  }
+  td.td-sup { display: flex; align-items: center; gap: 10px; }
+
+  /* ── PO DETAIL ── */
+  .info-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+  .info-item label { font-size: 11px; color: #64748b; display: block; margin-bottom: 2px; }
+  .info-item span { font-size: 13px; color: #0f1729; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; align-items: flex-start; padding: 16px 20px; gap: 0; }
+  .t-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+  .t-step:not(:last-child)::after {
+    content: ''; position: absolute; top: 14px; left: 60%; right: -40%;
+    height: 2px; background: #e2e8f0;
+  }
+  .t-step.done::after { background: #2563eb; }
+  .t-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid #e2e8f0; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1; flex-shrink: 0;
+  }
+  .t-dot svg { width: 13px; height: 13px; }
+  .t-dot.done { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+  .t-dot.current { border-color: #059669; background: #ecfdf5; color: #059669; }
+  .t-dot.pending { border-color: #e2e8f0; color: #94a3b8; }
+  .t-label { font-size: 10px; color: #64748b; margin-top: 5px; text-align: center; }
+  .t-date { font-size: 10px; color: #2563eb; text-align: center; }
+
+  /* ── TOTALS ── */
+  .totals {
+    display: flex; justify-content: flex-end; gap: 24px; padding: 14px 20px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .total-item { text-align: right; }
+  .total-item label { font-size: 11px; color: #64748b; display: block; }
+  .total-item span { font-size: 14px; font-weight: 500; color: #0f1729; }
+  .total-item.grand span { font-size: 16px; font-weight: 700; color: #2563eb; }
+
+  /* ── 3-WAY MATCH ── */
+  .match-grid { display: grid; grid-template-columns: 1fr 36px 1fr 36px 1fr; align-items: start; padding: 16px 20px; gap: 0; }
+  .match-col { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; }
+  .match-col-title { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+  .match-col-title svg { width: 14px; height: 14px; }
+  .match-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+  .match-row:last-child { border-bottom: none; }
+  .match-row label { font-size: 11px; color: #64748b; }
+  .match-row span { font-size: 12px; font-weight: 500; }
+  .match-arrow { display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+  .match-arrow svg { width: 18px; height: 18px; }
+  .match-result {
+    grid-column: 1 / -1; margin-top: 14px;
+    background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 10px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .match-result svg { width: 22px; height: 22px; color: #059669; flex-shrink: 0; }
+  .match-result h4 { font-size: 13px; font-weight: 600; color: #065f3d; }
+  .match-result p { font-size: 11px; color: #047857; margin-top: 2px; }
+
+  /* ── QC TABLE ── */
+  .qc-pass { color: #059669; font-weight: 500; font-size: 11px; }
+  .qc-warn { color: #d97706; font-weight: 500; font-size: 11px; }
+  .qty-input {
+    width: 60px; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px;
+    font-size: 12px; text-align: right; background: #f8fafc; color: #0f1729;
+  }
+  .qty-input.reject { border-color: #fca5a5; background: #fff1f1; color: #dc2626; }
+
+  /* ── BOTTOM MINI CARDS ── */
+  .mini-row { display: flex; flex-direction: column; gap: 8px; }
+  .mini-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+  .mini-item:last-child { border-bottom: none; }
+  .mini-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .mini-label { flex: 1; font-size: 12px; }
+  .mini-val { font-size: 12px; font-weight: 600; }
+
+  /* ── ACTION BUTTONS ROW ── */
+  .actions-row { display: flex; gap: 8px; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group label { font-size: 11px; color: #64748b; font-weight: 500; }
+  .form-group input, .form-group select {
+    padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 7px;
+    font-size: 13px; background: #f8fafc; color: #0f1729; outline: none;
+  }
+  .form-group input:focus { border-color: #93c5fd; background: #fff; }
+
+  /* ── PR PRIORITY DOT ── */
+  .pri { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+  .pri-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { display: flex; align-items: center; gap: 8px; }
+  .progress-bar { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; background: #2563eb; }
+  .progress-label { font-size: 11px; color: #64748b; white-space: nowrap; }
+  /* ── PR FORM EXTRAS ── */
+  .section-title {
+    font-size: 11px; font-weight: 700; color: #0f1729; text-transform: uppercase;
+    letter-spacing: .06em; padding: 14px 20px 10px; border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .form-full { grid-column: 1 / -1; }
+  .required-star { color: #dc2626; margin-left: 2px; }
+  .field-hint { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .input-with-badge { position: relative; }
+  .input-with-badge input { width: 100%; padding-right: 70px; }
+  .input-badge {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-size: 10px; font-weight: 600; color: #64748b;
+    background: #f1f5f9; padding: 2px 6px; border-radius: 4px;
+  }
+  .item-row {
+    display: grid;
+    grid-template-columns: 28px 2fr 1.4fr 80px 90px 110px 1.2fr 36px;
+    gap: 8px; align-items: start; padding: 10px 16px;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .item-row:last-child { border-bottom: none; }
+  .item-row:hover { background: #fafbfc; }
+  .item-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; margin-top: 6px;
+  }
+  .item-row input, .item-row select {
+    padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 7px;
+    font-size: 12px; background: #f8fafc; color: #0f1729; outline: none; width: 100%;
+  }
+  .item-row input:focus, .item-row select:focus { border-color: #93c5fd; background: #fff; }
+  .item-row input.required-empty { border-color: #fca5a5; background: #fff5f5; }
+  .del-btn {
+    width: 28px; height: 28px; border-radius: 6px; border: 1px solid #fca5a5;
+    background: #fff5f5; color: #dc2626; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .del-btn:hover { background: #fee2e2; }
+  .add-row-btn {
+    display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+    color: #2563eb; font-size: 12px; font-weight: 500; cursor: pointer;
+    border-top: 1px dashed #e2e8f0; background: #fafeff;
+  }
+  .add-row-btn:hover { background: #eff6ff; }
+  .summary-box {
+    background: #f8fafc; border-top: 1px solid #e2e8f0;
+    padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .summary-box .est-total { font-size: 20px; font-weight: 700; color: #0f1729; }
+  .summary-box .est-label { font-size: 11px; color: #64748b; }
+  .validation-bar {
+    background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+    margin: 0 0 16px;
+  }
+  .validation-bar.ok { background: #ecfdf5; border-color: #6ee7b7; }
+  .vcheck { font-size: 11px; display: flex; align-items: center; gap: 4px; }
+  .vcheck.pass { color: #059669; }
+  .vcheck.fail { color: #d97706; }
+  .priority-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pri-btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b;
+    transition: all .12s;
+  }
+  .pri-btn:hover { background: #f1f5f9; }
+  .pri-btn.sel-low    { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+  .pri-btn.sel-medium { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+  .pri-btn.sel-high   { background: #fffbeb; color: #d97706; border-color: #fcd34d; }
+  .pri-btn.sel-urgent { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+  .col-label { font-size: 10px; color: #94a3b8; font-weight: 500; padding: 0 0 4px; }
+
+/* ── SUPPLIER MODULE EXTRAS ── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f1f5f9; color: #0f1729; }
+
+/* ── SWITCHER ── */
+.screen-switcher {
+  position: sticky; top: 0; z-index: 100;
+  background: #0f1729; display: flex; align-items: center; gap: 0;
+  padding: 0 24px; border-bottom: 1px solid #1e2d4a;
+}
+.switcher-logo { font-size: 14px; font-weight: 600; color: #fff; padding: 14px 24px 14px 0; border-right: 1px solid #1e2d4a; margin-right: 16px; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.switcher-label { font-size: 11px; color: #6b7fa8; margin-right: 12px; white-space: nowrap; }
+.switcher-tabs { display: flex; gap: 2px; overflow-x: auto; padding: 8px 0; }
+.stab { padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: #94a3c8; border: none; background: transparent; white-space: nowrap; transition: background .15s, color .15s; display: flex; align-items: center; gap: 6px; }
+.stab:hover { background: #18243c; color: #fff; }
+.stab.active { background: #2563eb; color: #fff; }
+.stab .sn { background: rgba(255,255,255,.15); border-radius: 4px; padding: 1px 5px; font-size: 10px; }
+.stab.active .sn { background: rgba(255,255,255,.25); }
+.switcher-hint { margin-left: auto; font-size: 11px; color: #6b7fa8; white-space: nowrap; padding-left: 16px; }
+
+/* ── SCREEN ── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── SHELL ── */
+.erp-shell { display: flex; min-height: calc(100vh - 52px); }
+.sidebar { width: 220px; min-height: 100%; background: #0f1729; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; }
+.sb-logo { padding: 16px 18px; background: #18243c; font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1e2d4a; }
+.sb-section-label { font-size: 9px; font-weight: 600; color: #4a5a7a; letter-spacing: .08em; text-transform: uppercase; padding: 14px 18px 5px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 11px 9px 14px; margin: 1px 7px; border-radius: 7px; cursor: pointer; color: #7a8fba; font-size: 12px; transition: background .12s, color .12s; }
+.nav-item:hover { background: #18243c; color: #c8d5ee; }
+.nav-item.active { background: #2563eb; color: #fff; font-weight: 500; }
+.nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .85; }
+.nav-badge { margin-left: auto; background: #dc2626; color: #fff; border-radius: 10px; font-size: 10px; font-weight: 600; padding: 1px 5px; }
+.sb-footer { margin-top: auto; padding: 14px; border-top: 1px solid #1e2d4a; display: flex; align-items: center; gap: 9px; }
+.sb-avatar { width: 32px; height: 32px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.sb-user-info { font-size: 11px; color: #c8d5ee; line-height: 1.4; }
+.sb-user-info small { color: #6b7fa8; font-size: 10px; display: block; }
+
+.main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* ── TOPBAR ── */
+.topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; position: sticky; top: 52px; z-index: 10; }
+.topbar-left h1 { font-size: 17px; font-weight: 700; }
+.topbar-left p { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #374151; transition: background .12s; white-space: nowrap; }
+.btn:hover { background: #f1f5f9; }
+.btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-green { background: #059669; color: #fff; border-color: #059669; }
+.btn-green:hover { background: #047857; }
+.btn svg { width: 13px; height: 13px; }
+
+/* ── CONTENT ── */
+.content { padding: 20px 24px; flex: 1; background: #f8fafc; }
+
+/* ── CARD ── */
+.card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; }
+.card-header { padding: 14px 18px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+.card-header h3 { font-size: 13px; font-weight: 600; }
+.card-header p { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.card-body { padding: 14px 18px; }
+
+/* ── BADGE ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.b-success { background: #ecfdf5; color: #065f3d; }
+.b-warning { background: #fffbeb; color: #92400e; }
+.b-danger  { background: #fef2f2; color: #991b1b; }
+.b-info    { background: #eff6ff; color: #1e40af; }
+.b-muted   { background: #f1f5f9; color: #475569; }
+.b-orange  { background: #fff7ed; color: #9a3412; }
+.b-purple  { background: #f5f3ff; color: #6d28d9; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: #f8fafc; }
+th { padding: 9px 13px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+td { padding: 11px 13px; font-size: 12px; color: #0f1729; border-bottom: 1px solid #f1f5f9; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: #fafbfc; }
+.td-link { color: #2563eb; font-weight: 500; cursor: pointer; }
+.td-muted { color: #94a3b8; }
+.stars { color: #f59e0b; font-size: 11px; letter-spacing: -1px; }
+
+/* ── STAT MINI ── */
+.stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; }
+.stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 9px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.stat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.stat-v { font-size: 22px; font-weight: 700; }
+.stat-l { font-size: 11px; color: #64748b; }
+
+/* ── TOOLBAR ── */
+.toolbar { background: #fff; border: 1px solid #e2e8f0; border-radius: 9px; padding: 9px 14px; display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+.search-box { position: relative; flex: 1; }
+.search-box svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #94a3b8; }
+.search-box input { width: 100%; padding: 7px 11px 7px 30px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; background: #f8fafc; color: #0f1729; outline: none; }
+.search-box input:focus { border-color: #93c5fd; background: #fff; }
+.filter-tabs { display: flex; gap: 3px; }
+.ftab { padding: 5px 11px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b; white-space: nowrap; transition: all .12s; }
+.ftab:hover { background: #f1f5f9; }
+.ftab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+select.sel { padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 11px; background: #f8fafc; color: #374151; cursor: pointer; outline: none; }
+
+/* ── PAGINATION ── */
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 11px 18px; border-top: 1px solid #f1f5f9; }
+.pagination-info { font-size: 11px; color: #64748b; }
+.pg-btn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #374151; }
+.pg-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; font-weight: 600; }
+
+/* ── AVATAR ── */
+.sup-avatar { width: 28px; height: 28px; border-radius: 50%; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #2563eb; flex-shrink: 0; }
+.sup-avatar-lg { width: 52px; height: 52px; border-radius: 12px; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #2563eb; flex-shrink: 0; }
+
+/* ── GRID ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.g2r { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
+
+/* ── FORM ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fg3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 11px; color: #64748b; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 12px; background: #f8fafc; color: #0f1729; outline: none; width: 100%; font-family: inherit; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #93c5fd; background: #fff; }
+.form-group input[readonly] { background: #f1f5f9; color: #64748b; }
+.req { color: #dc2626; }
+.field-hint { font-size: 10px; color: #94a3b8; }
+.form-section { padding: 14px 18px; border-bottom: 1px solid #f1f5f9; }
+.form-section:last-child { border-bottom: none; }
+.form-section-title { font-size: 11px; font-weight: 700; color: #0f1729; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+.fsec-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── INFO ITEM ── */
+.info-item label { font-size: 10px; color: #64748b; display: block; margin-bottom: 2px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+.info-item span { font-size: 13px; color: #0f1729; }
+
+/* ── TABS ── */
+.sub-tabs { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 24px; display: flex; gap: 0; }
+.sub-tab { padding: 11px 18px; font-size: 12px; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: color .12s; }
+.sub-tab.active { color: #2563eb; font-weight: 600; border-bottom-color: #2563eb; }
+.sub-tab:hover:not(.active) { color: #374151; }
+
+/* ── KPI CARDS (detail) ── */
+.kpi-mini-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+.kpi-mini { background: #fff; border: 1px solid #e2e8f0; border-radius: 9px; padding: 14px; position: relative; overflow: hidden; }
+.kpi-mini-accent { position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; }
+.kpi-mini-v { font-size: 22px; font-weight: 700; padding-left: 12px; }
+.kpi-mini-l { font-size: 11px; color: #64748b; padding-left: 12px; margin-top: 2px; }
+
+/* ── SCORE BARS ── */
+.score-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f8fafc; }
+.score-row:last-child { border-bottom: none; }
+.score-label { font-size: 12px; color: #374151; width: 140px; flex-shrink: 0; }
+.score-bar { flex: 1; height: 7px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 4px; }
+.score-val { font-size: 12px; font-weight: 600; width: 28px; text-align: right; }
+
+/* ── TIMELINE ── */
+.timeline-v { display: flex; flex-direction: column; gap: 0; padding: 4px 0; }
+.tv-item { display: flex; gap: 14px; padding-bottom: 16px; position: relative; }
+.tv-item:last-child { padding-bottom: 0; }
+.tv-item:not(:last-child)::before { content:''; position: absolute; left: 11px; top: 24px; bottom: 0; width: 2px; background: #f1f5f9; }
+.tv-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e2e8f0; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
+.tv-dot.done { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+.tv-dot.warn { border-color: #f59e0b; background: #fffbeb; color: #f59e0b; }
+.tv-content { flex: 1; }
+.tv-title { font-size: 12px; font-weight: 600; color: #0f1729; }
+.tv-sub { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+/* ── RATING STARS BIG ── */
+.rating-big { display: flex; gap: 4px; }
+.star-big { font-size: 20px; cursor: pointer; transition: transform .1s; }
+.star-big:hover { transform: scale(1.2); }
+.star-big.filled { color: #f59e0b; }
+.star-big.empty { color: #e2e8f0; }
+
+/* ── CONTRACT STATUS ── */
+.contract-progress { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.contract-fill { height: 100%; border-radius: 3px; }
+
+/* ── PRODUCT TAG ── */
+.product-tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 11px; margin: 2px; }
+.product-tag .unit { color: #94a3b8; }
+
+/* ── ACTIONS ROW ── */
+.actions-row { display: flex; gap: 7px; flex-wrap: wrap; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
+
+</style>
+</head>
+<body>
+
+<nav class="screen-switcher">
+  <div class="switcher-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/></svg>
+    Cocandy ERP
+  </div>
+  <span class="switcher-label">Procurement Module · 11 màn hình</span>
+  <div class="switcher-tabs">
+    <button class="stab active" onclick="go(0)"><span class="screen-num">01</span>Dashboard</button>
+    <button class="stab" onclick="go(1)"><span class="screen-num">02</span>NCC — List</button>
+    <button class="stab" onclick="go(2)"><span class="screen-num">03</span>NCC — Chi tiết</button>
+    <button class="stab" onclick="go(3)"><span class="screen-num">04</span>NCC — Form</button>
+    <button class="stab" onclick="go(4)"><span class="screen-num">05</span>NCC — Đánh giá</button>
+    <button class="stab" onclick="go(5)"><span class="screen-num">06</span>NCC — HĐ</button>
+    <button class="stab" onclick="go(6)"><span class="screen-num">07</span>PR — Danh sách</button>
+    <button class="stab" onclick="go(7)"><span class="screen-num">08</span>PR — Tạo mới</button>
+    <button class="stab" onclick="go(8)"><span class="screen-num">09</span>PO — Chi tiết</button>
+    <button class="stab" onclick="go(9)"><span class="screen-num">10</span>GRN & Invoice</button>
+    <button class="stab" onclick="go(10)"><span class="screen-num">11</span>Partial GRN</button>
+  </div>
+  <span class="switcher-hint">v4.0 · Full Module</span>
+</nav>
+
+<div class="screen active" id="sc0">
+<div class="erp-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>
+      Cocandy ERP
+    </div>
+    <div class="sb-section-label">Main Menu</div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>
+      Suppliers
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Purchase Request
+      <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Purchase Order
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM1 16l4 4"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Goods Receipt
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inventory
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Invoice &amp; Payment
+    </div>
+    <div class="sb-footer">
+      <div class="sb-avatar">TN</div>
+      <div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Dashboard</h1>
+        <p>Tổng quan hệ thống · Thứ Tư, 13/05/2026</p>
+      </div>
+      <div class="topbar-right">
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <div class="sb-avatar" style="width:36px;height:36px">TN</div>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- KPI Row -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-accent" style="background:#f59e0b"></div>
+          <div class="kpi-body">
+            <div class="kpi-value">12</div>
+            <div class="kpi-label">Chờ Duyệt (PR)</div>
+            <div class="kpi-sub" style="color:#d97706">4 urgent</div>
+          </div>
+          <div class="kpi-icon" style="background:#fffbeb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-accent" style="background:#2563eb"></div>
+          <div class="kpi-body">
+            <div class="kpi-value">28</div>
+            <div class="kpi-label">Đơn Hàng Active</div>
+            <div class="kpi-sub" style="color:#2563eb">8 chờ NCC xác nhận</div>
+          </div>
+          <div class="kpi-icon" style="background:#eff6ff">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-accent" style="background:#059669"></div>
+          <div class="kpi-body">
+            <div class="kpi-value">5</div>
+            <div class="kpi-label">GRN Hôm nay</div>
+            <div class="kpi-sub" style="color:#059669">2 QC pending</div>
+          </div>
+          <div class="kpi-icon" style="background:#ecfdf5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-accent" style="background:#dc2626"></div>
+          <div class="kpi-body">
+            <div class="kpi-value">142M</div>
+            <div class="kpi-label">Công Nợ NCC</div>
+            <div class="kpi-sub" style="color:#dc2626">3 hóa đơn quá hạn TT</div>
+          </div>
+          <div class="kpi-icon" style="background:#fef2f2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle Row -->
+      <div class="grid-2" style="align-items:start">
+        <!-- PO Table -->
+        <div class="card">
+          <div class="card-header">
+            <div><h3>Đơn Đặt Hàng Gần Đây</h3><p>5 đơn mới nhất</p></div>
+            <a class="view-all">Xem tất cả →</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Mã PO</th><th>Nhà Cung Cấp</th><th>Ngày</th><th>Tổng Tiền</th><th>Trạng Thái</th></tr></thead>
+              <tbody>
+                <tr><td class="td-link">PO-2026-028</td><td>Vải ABC Trading</td><td>12/05</td><td>45,200,000đ</td><td><span class="badge b-success">✓ Confirmed</span></td></tr>
+                <tr><td class="td-link">PO-2026-027</td><td>Phụ Liệu XYZ</td><td>11/05</td><td>12,800,000đ</td><td><span class="badge b-info">◑ Nhận 1 phần</span></td></tr>
+                <tr><td class="td-link">PO-2026-026</td><td>Vải Lụa HP</td><td>10/05</td><td>78,500,000đ</td><td><span class="badge b-warning">→ Đã gửi</span></td></tr>
+                <tr><td class="td-link">PO-2026-025</td><td>NCC Nút Bấm 123</td><td>09/05</td><td>3,400,000đ</td><td><span class="badge b-muted">● Hoàn thành</span></td></tr>
+                <tr><td class="td-link">PO-2026-024</td><td>Vải ABC Trading</td><td>08/05</td><td>22,000,000đ</td><td><span class="badge b-danger">✕ Đã hủy</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pending Approvals -->
+        <div class="card">
+          <div class="card-header">
+            <div><h3>⏳ Chờ Phê Duyệt</h3><p>4 yêu cầu mua hàng</p></div>
+          </div>
+          <div class="card-body">
+            <div class="approval-item">
+              <div class="approval-info">
+                <div class="pr-no">PR-2026-042</div>
+                <div class="pr-meta">Kho · 2,400,000đ</div>
+              </div>
+              <span class="badge b-danger">Urgent</span>
+            </div>
+            <div class="approval-item">
+              <div class="approval-info">
+                <div class="pr-no">PR-2026-041</div>
+                <div class="pr-meta">SX · 15,600,000đ</div>
+              </div>
+              <span class="badge b-warning">High</span>
+            </div>
+            <div class="approval-item">
+              <div class="approval-info">
+                <div class="pr-no">PR-2026-040</div>
+                <div class="pr-meta">KD · 8,900,000đ</div>
+              </div>
+              <span class="badge b-info">Medium</span>
+            </div>
+            <div class="approval-item">
+              <div class="approval-info">
+                <div class="pr-no">PR-2026-039</div>
+                <div class="pr-meta">Kho · 1,200,000đ</div>
+              </div>
+              <span class="badge b-muted">Low</span>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px">Xem tất cả →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="grid-2-equal">
+        <div class="card">
+          <div class="card-header"><h3>🏭 Top Nhà Cung Cấp</h3></div>
+          <div class="card-body">
+            <div class="mini-row">
+              <div class="mini-item"><div class="mini-dot" style="background:#059669"></div><span class="mini-label">Vải ABC Trading</span><span class="stars">★★★★★</span><span class="mini-val" style="color:#059669;margin-left:4px">4.8</span><span class="td-muted" style="font-size:11px;margin-left:8px">24 PO</span></div>
+              <div class="mini-item"><div class="mini-dot" style="background:#059669"></div><span class="mini-label">Phụ Liệu XYZ</span><span class="stars">★★★★½</span><span class="mini-val" style="color:#059669;margin-left:4px">4.5</span><span class="td-muted" style="font-size:11px;margin-left:8px">18 PO</span></div>
+              <div class="mini-item"><div class="mini-dot" style="background:#f59e0b"></div><span class="mini-label">Vải Lụa Hạnh Phúc</span><span class="stars">★★★★☆</span><span class="mini-val" style="color:#f59e0b;margin-left:4px">4.1</span><span class="td-muted" style="font-size:11px;margin-left:8px">12 PO</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⚠️ Cảnh Báo Tồn Kho</h3></div>
+          <div class="card-body">
+            <div class="mini-row">
+              <div class="mini-item"><div class="mini-dot" style="background:#dc2626"></div><span class="mini-label">Vải Cotton Trắng</span><span class="mini-val" style="color:#dc2626">380m / 450m (ROP)</span></div>
+              <div class="mini-item"><div class="mini-dot" style="background:#f59e0b"></div><span class="mini-label">Khóa Kéo 20cm</span><span class="mini-val" style="color:#f59e0b">820 / 1,000 cái</span></div>
+              <div class="mini-item"><div class="mini-dot" style="background:#f59e0b"></div><span class="mini-label">Mex Lót Mỏng</span><span class="mini-val" style="color:#f59e0b">290m / 300m</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-area -->
+</div><!-- /erp-shell -->
+</div>
+
+<div class="screen" id="sc1">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Procurement</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1M9 12h1M14 12h1"/></svg>Nhà Cung Cấp</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Quản Lý Nhà Cung Cấp</h1><p>48 nhà cung cấp · Cập nhật 14/05/2026</p></div>
+      <div class="topbar-right">
+        <button class="btn">↓ Export</button>
+        <button class="btn">⚙ Cấu hình đánh giá</button>
+        <button class="btn btn-primary" onclick="go(3)">+ Thêm NCC</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-dot" style="background:#059669"></div><div><div class="stat-v" style="color:#059669">38</div><div class="stat-l">Đang hoạt động</div></div></div>
+        <div class="stat-card"><div class="stat-dot" style="background:#f59e0b"></div><div><div class="stat-v" style="color:#f59e0b">6</div><div class="stat-l">Tạm ngưng</div></div></div>
+        <div class="stat-card"><div class="stat-dot" style="background:#dc2626"></div><div><div class="stat-v" style="color:#dc2626">4</div><div class="stat-l">Blacklisted</div></div></div>
+        <div class="stat-card"><div class="stat-dot" style="background:#2563eb"></div><div><div class="stat-v" style="color:#2563eb">24</div><div class="stat-l">Có hợp đồng</div></div></div>
+      </div>
+      <div class="toolbar">
+        <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Tìm theo tên, mã, người liên hệ..." /></div>
+        <div class="filter-tabs">
+          <button class="ftab active">Tất cả</button>
+          <button class="ftab">Active</button>
+          <button class="ftab">Inactive</button>
+          <button class="ftab">Blacklist</button>
+        </div>
+        <select class="sel"><option>Loại: Tất cả</option><option>Manufacturer</option><option>Trader</option><option>Individual</option></select>
+        <select class="sel"><option>Sắp xếp: Rating ↓</option><option>Tên A–Z</option><option>Mới nhất</option><option>Nhiều PO nhất</option></select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:90px">Mã NCC</th>
+                <th>Tên công ty</th>
+                <th style="width:110px">Loại</th>
+                <th style="width:80px">Lead time</th>
+                <th style="width:110px">Điều khoản TT</th>
+                <th style="width:80px">Tổng PO</th>
+                <th style="width:120px">Rating</th>
+                <th style="width:110px">Trạng thái</th>
+                <th style="width:130px">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-link">SUP-001</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="sup-avatar">V</div><div><div style="font-weight:500">Vải ABC Trading Co.</div><div style="font-size:10px;color:#94a3b8">Nguyễn Văn An · 0901 234 567</div></div></div></td>
+                <td><span class="badge b-info">Manufacturer</span></td>
+                <td>5 ngày</td><td>NET 30</td><td style="font-weight:600">247M</td>
+                <td><span class="stars">★★★★★</span> <strong style="color:#059669">4.8</strong></td>
+                <td><span class="badge b-success">● Active</span></td>
+                <td><div class="actions-row"><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(2)">👁 Xem</button><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(3)">✏ Sửa</button></div></td>
+              </tr>
+              <tr>
+                <td class="td-link">SUP-002</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="sup-avatar">P</div><div><div style="font-weight:500">Phụ Liệu XYZ</div><div style="font-size:10px;color:#94a3b8">Trần Thị Bình · 0912 345 678</div></div></div></td>
+                <td><span class="badge b-purple">Trader</span></td>
+                <td>3 ngày</td><td>COD</td><td style="font-weight:600">98M</td>
+                <td><span class="stars">★★★★½</span> <strong style="color:#059669">4.5</strong></td>
+                <td><span class="badge b-success">● Active</span></td>
+                <td><div class="actions-row"><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(2)">👁 Xem</button><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(3)">✏ Sửa</button></div></td>
+              </tr>
+              <tr>
+                <td class="td-link">SUP-003</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="sup-avatar">V</div><div><div style="font-weight:500">Vải Lụa Hạnh Phúc</div><div style="font-size:10px;color:#94a3b8">Lê Minh Châu · 0923 456 789</div></div></div></td>
+                <td><span class="badge b-info">Manufacturer</span></td>
+                <td>10 ngày</td><td>NET 60</td><td style="font-weight:600">183M</td>
+                <td><span class="stars">★★★★☆</span> <strong style="color:#f59e0b">4.1</strong></td>
+                <td><span class="badge b-success">● Active</span></td>
+                <td><div class="actions-row"><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(2)">👁 Xem</button><button class="btn" style="padding:3px 9px;font-size:11px">✏ Sửa</button></div></td>
+              </tr>
+              <tr>
+                <td class="td-link">SUP-004</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="sup-avatar">N</div><div><div style="font-weight:500">NCC Nút Bấm 123</div><div style="font-size:10px;color:#94a3b8">Phạm Quốc Hùng · 0934 567 890</div></div></div></td>
+                <td><span class="badge b-purple">Trader</span></td>
+                <td>2 ngày</td><td>Prepaid</td><td style="font-weight:600">41M</td>
+                <td><span class="stars">★★★½☆</span> <strong style="color:#f59e0b">3.8</strong></td>
+                <td><span class="badge b-success">● Active</span></td>
+                <td><div class="actions-row"><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(2)">👁 Xem</button><button class="btn" style="padding:3px 9px;font-size:11px">✏ Sửa</button></div></td>
+              </tr>
+              <tr>
+                <td class="td-link">SUP-005</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="sup-avatar" style="background:#fff7ed;color:#d97706">K</div><div><div style="font-weight:500">Khóa Kéo Việt Nam</div><div style="font-size:10px;color:#94a3b8">Ngô Thị Dung · 0945 678 901</div></div></div></td>
+                <td><span class="badge b-muted">Individual</span></td>
+                <td>7 ngày</td><td>NET 15</td><td style="font-weight:600">17M</td>
+                <td><span class="stars">★★★☆☆</span> <strong style="color:#dc2626">3.2</strong></td>
+                <td><span class="badge b-warning">○ Inactive</span></td>
+                <td><div class="actions-row"><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(2)">👁 Xem</button><button class="btn" style="padding:3px 9px;font-size:11px">✏ Sửa</button></div></td>
+              </tr>
+              <tr>
+                <td class="td-link">SUP-007</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="sup-avatar" style="background:#fef2f2;color:#dc2626">N</div><div><div style="font-weight:500;color:#dc2626">NCC Hàng Giả Bị Ban</div><div style="font-size:10px;color:#94a3b8">— · Đã xử lý 02/2026</div></div></div></td>
+                <td><span class="badge b-muted">Trader</span></td>
+                <td>—</td><td>—</td><td class="td-muted">—</td>
+                <td><span class="stars" style="color:#e2e8f0">★☆☆☆☆</span> <strong style="color:#dc2626">1.0</strong></td>
+                <td><span class="badge b-danger">✕ Blacklisted</span></td>
+                <td><div class="actions-row"><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(2)">👁 Xem</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pagination-info">Hiển thị 1–6 của 48 nhà cung cấp</span>
+          <div style="display:flex;gap:4px"><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><button class="pg-btn" style="width:auto;padding:0 10px">Tiếp →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc2">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Procurement</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1M9 12h1M14 12h1"/></svg>Nhà Cung Cấp</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:10px">
+        <button class="btn" style="padding:5px 11px" onclick="go(1)">← Danh sách</button>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="sup-avatar-lg">V</div>
+          <div>
+            <h1 style="display:flex;align-items:center;gap:8px">Vải ABC Trading Co. <span class="badge b-success" style="font-size:11px">● Active</span></h1>
+            <p>SUP-001 · Manufacturer · Cập nhật 10/05/2026</p>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" onclick="go(4)">📊 Đánh giá</button>
+        <button class="btn" onclick="go(5)">📄 Hợp đồng</button>
+        <button class="btn btn-primary" onclick="go(3)">✏ Chỉnh sửa</button>
+      </div>
+    </div>
+
+    <!-- Sub tabs -->
+    <div class="sub-tabs">
+      <div class="sub-tab active">Thông tin chung</div>
+      <div class="sub-tab">Danh mục hàng (8)</div>
+      <div class="sub-tab">Lịch sử PO (24)</div>
+      <div class="sub-tab">Đánh giá (4 kỳ)</div>
+      <div class="sub-tab">Hợp đồng (2)</div>
+      <div class="sub-tab">Ghi chú nội bộ</div>
+    </div>
+
+    <div class="content">
+      <!-- KPI row -->
+      <div class="kpi-mini-row">
+        <div class="kpi-mini"><div class="kpi-mini-accent" style="background:#2563eb"></div><div class="kpi-mini-v" style="color:#2563eb">24</div><div class="kpi-mini-l">Tổng PO</div></div>
+        <div class="kpi-mini"><div class="kpi-mini-accent" style="background:#059669"></div><div class="kpi-mini-v" style="color:#059669">247M</div><div class="kpi-mini-l">Giá trị mua tích lũy</div></div>
+        <div class="kpi-mini"><div class="kpi-mini-accent" style="background:#f59e0b"></div><div class="kpi-mini-v" style="color:#f59e0b">96%</div><div class="kpi-mini-l">On-time delivery</div></div>
+        <div class="kpi-mini"><div class="kpi-mini-accent" style="background:#8b5cf6"></div><div class="kpi-mini-v" style="color:#8b5cf6">4.8</div><div class="kpi-mini-l">Rating tổng hợp</div></div>
+      </div>
+
+      <div class="g2r">
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Thông tin cơ bản -->
+          <div class="card">
+            <div class="card-header"><h3>Thông tin cơ bản</h3><span class="badge b-info">Manufacturer</span></div>
+            <div class="card-body">
+              <div class="form-grid" style="gap:14px">
+                <div class="info-item"><label>Mã NCC</label><span class="td-link">SUP-001</span></div>
+                <div class="info-item"><label>Tên công ty</label><span>Vải ABC Trading Co.</span></div>
+                <div class="info-item"><label>Mã số thuế</label><span>0312456789</span></div>
+                <div class="info-item"><label>Tiền tệ</label><span>VND</span></div>
+                <div class="info-item"><label>Điều khoản TT</label><span class="badge b-info" style="font-size:11px">NET 30</span></div>
+                <div class="info-item"><label>Lead time TB</label><span>5 ngày làm việc</span></div>
+                <div class="info-item" style="grid-column:1/-1"><label>Địa chỉ</label><span>123 Đường Vải Sợi, P. Phú Thọ Hòa, Q. Tân Phú, TP.HCM</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liên hệ -->
+          <div class="card">
+            <div class="card-header"><h3>Người liên hệ</h3><button class="btn" style="padding:3px 9px;font-size:11px">+ Thêm liên hệ</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Họ tên</th><th>Chức vụ</th><th>Điện thoại</th><th>Email</th><th>Phụ trách</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:500">Nguyễn Văn An</td><td class="td-muted">Giám đốc kinh doanh</td><td>0901 234 567</td><td>an@vaiabctrading.vn</td><td><span class="badge b-success" style="font-size:10px">Liên hệ chính</span></td></tr>
+                  <tr><td style="font-weight:500">Trần Thị Lan</td><td class="td-muted">Kế toán công nợ</td><td>0901 234 568</td><td>lan@vaiabctrading.vn</td><td><span class="badge b-muted" style="font-size:10px">Thanh toán</span></td></tr>
+                  <tr><td style="font-weight:500">Lê Văn Kho</td><td class="td-muted">Thủ kho / Giao hàng</td><td>0901 234 569</td><td>—</td><td><span class="badge b-muted" style="font-size:10px">Logistics</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Danh mục hàng cung cấp -->
+          <div class="card">
+            <div class="card-header"><h3>Danh mục hàng cung cấp</h3><button class="btn" style="padding:3px 9px;font-size:11px">+ Thêm mặt hàng</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Sản phẩm</th><th>Đơn vị</th><th>Đơn giá NCC</th><th>MOQ</th><th>Lead time riêng</th><th>Ghi chú</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:500">Vải Cotton Trắng</td><td class="td-muted">mét</td><td>120,000đ</td><td>50m</td><td>5 ngày</td><td class="td-muted" style="font-size:11px">Khổ 150cm</td></tr>
+                  <tr><td style="font-weight:500">Vải Cotton Xanh Navy</td><td class="td-muted">mét</td><td>135,000đ</td><td>50m</td><td>5 ngày</td><td class="td-muted" style="font-size:11px">Nhuộm theo order</td></tr>
+                  <tr><td style="font-weight:500">Vải Cotton Đỏ Đô</td><td class="td-muted">mét</td><td>140,000đ</td><td>30m</td><td>7 ngày</td><td class="td-muted" style="font-size:11px">Màu theo mẫu</td></tr>
+                  <tr><td style="font-weight:500">Vải Linen Tự Nhiên</td><td class="td-muted">mét</td><td>185,000đ</td><td>20m</td><td>10 ngày</td><td class="td-muted" style="font-size:11px">Nhập từ Ấn Độ</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Lịch sử PO gần đây -->
+          <div class="card">
+            <div class="card-header"><h3>Lịch sử PO gần đây</h3><a style="font-size:12px;color:#2563eb;cursor:pointer">Xem tất cả 24 PO →</a></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Mã PO</th><th>Ngày đặt</th><th>Tổng tiền</th><th>Trạng thái</th><th>On-time?</th></tr></thead>
+                <tbody>
+                  <tr><td class="td-link">PO-2026-028</td><td>12/05/2026</td><td style="font-weight:600">47,200,000đ</td><td><span class="badge b-info">◑ Đang nhận</span></td><td><span class="badge b-success" style="font-size:10px">✓ Đúng hạn</span></td></tr>
+                  <tr><td class="td-link">PO-2026-011</td><td>02/04/2026</td><td style="font-weight:600">82,500,000đ</td><td><span class="badge b-muted">✓ Hoàn thành</span></td><td><span class="badge b-success" style="font-size:10px">✓ Đúng hạn</span></td></tr>
+                  <tr><td class="td-link">PO-2025-098</td><td>15/11/2025</td><td style="font-weight:600">34,800,000đ</td><td><span class="badge b-muted">✓ Hoàn thành</span></td><td><span class="badge b-danger" style="font-size:10px">✗ Trễ 3 ngày</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Rating card -->
+          <div class="card">
+            <div class="card-header"><h3>Điểm đánh giá</h3><span class="badge b-success">Q1/2026</span></div>
+            <div class="card-body">
+              <div style="text-align:center;padding:12px 0">
+                <div style="font-size:40px;font-weight:800;color:#0f1729">4.8</div>
+                <div class="stars" style="font-size:18px;letter-spacing:1px">★★★★★</div>
+                <div style="font-size:11px;color:#64748b;margin-top:4px">Dựa trên 4 kỳ đánh giá</div>
+              </div>
+              <div class="divider"></div>
+              <div>
+                <div class="score-row"><span class="score-label">Chất lượng hàng</span><div class="score-bar"><div class="score-fill" style="width:96%;background:#059669"></div></div><span class="score-val" style="color:#059669">4.8</span></div>
+                <div class="score-row"><span class="score-label">Giao hàng đúng hạn</span><div class="score-bar"><div class="score-fill" style="width:86%;background:#f59e0b"></div></div><span class="score-val" style="color:#f59e0b">4.3</span></div>
+                <div class="score-row"><span class="score-label">Cạnh tranh giá</span><div class="score-bar"><div class="score-fill" style="width:96%;background:#059669"></div></div><span class="score-val" style="color:#059669">4.8</span></div>
+                <div class="score-row"><span class="score-label">Hỗ trợ dịch vụ</span><div class="score-bar"><div class="score-fill" style="width:100%;background:#059669"></div></div><span class="score-val" style="color:#059669">5.0</span></div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px;font-size:12px" onclick="go(4)">+ Tạo đánh giá mới</button>
+            </div>
+          </div>
+
+          <!-- Hợp đồng active -->
+          <div class="card">
+            <div class="card-header"><h3>Hợp đồng hiện hành</h3><button class="btn" style="padding:3px 9px;font-size:11px" onclick="go(5)">Xem tất cả</button></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div style="background:#f8fafc;border-radius:8px;padding:12px;border:1px solid #e2e8f0">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:#2563eb">CON-2026-003</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px">01/01/2026 – 31/12/2026</div>
+                  </div>
+                  <span class="badge b-success" style="font-size:10px">● Active</span>
+                </div>
+                <div style="font-size:11px;color:#374151;margin-top:8px">NET 30 · Giảm 3% từ 50M · Giá cố định 12 tháng</div>
+                <div style="margin-top:8px">
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-bottom:3px"><span>Tiến độ hợp đồng</span><span>134 / 365 ngày</span></div>
+                  <div class="contract-progress"><div class="contract-fill" style="width:37%;background:#2563eb"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trạng thái NCC -->
+          <div class="card">
+            <div class="card-header"><h3>Quản lý trạng thái</h3></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <div style="padding:10px;background:#ecfdf5;border-radius:8px;border:1px solid #6ee7b7;display:flex;align-items:center;gap:8px">
+                <span style="font-size:16px">✅</span>
+                <div><div style="font-size:12px;font-weight:600;color:#065f3d">Trạng thái: Active</div><div style="font-size:10px;color:#059669">Hoạt động bình thường</div></div>
+              </div>
+              <button class="btn" style="font-size:11px;width:100%;justify-content:center;color:#d97706;border-color:#fcd34d">⏸ Tạm ngưng hợp tác</button>
+              <button class="btn btn-danger" style="font-size:11px;width:100%;justify-content:center">⛔ Blacklist NCC</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc3">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Procurement</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1M9 12h1M14 12h1"/></svg>Nhà Cung Cấp</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:10px">
+        <button class="btn" style="padding:5px 11px" onclick="go(2)">← Quay lại</button>
+        <div><h1>Chỉnh sửa Nhà Cung Cấp</h1><p>SUP-001 · Vải ABC Trading Co.</p></div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">✕ Hủy thay đổi</button>
+        <button class="btn btn-primary">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+    <div class="content" style="padding-bottom:48px">
+      <div class="g2r">
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- 1. Thông tin công ty -->
+          <div class="card">
+            <div class="form-section">
+              <div class="form-section-title"><div class="fsec-dot" style="background:#2563eb"></div>Thông tin công ty</div>
+              <div class="form-grid" style="gap:10px">
+                <div class="form-group"><label>Mã NCC</label><input value="SUP-001" readonly /><span class="field-hint">Tự sinh — không thể thay đổi</span></div>
+                <div class="form-group"><label>Loại nhà cung cấp <span class="req">*</span></label>
+                  <select><option>Manufacturer</option><option>Trader</option><option>Individual</option></select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1"><label>Tên công ty <span class="req">*</span></label><input value="Vải ABC Trading Co." /></div>
+                <div class="form-group"><label>Mã số thuế</label><input value="0312456789" /></div>
+                <div class="form-group"><label>Website</label><input value="vaiabctrading.vn" /></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Địa chỉ</label><input value="123 Đường Vải Sợi, P. Phú Thọ Hòa, Q. Tân Phú, TP.HCM" /></div>
+                <div class="form-group"><label>Tỉnh / Thành</label><select><option>TP. Hồ Chí Minh</option><option>Hà Nội</option><option>Đà Nẵng</option></select></div>
+                <div class="form-group"><label>Quốc gia</label><select><option>Việt Nam</option><option>Trung Quốc</option><option>Ấn Độ</option></select></div>
+              </div>
+            </div>
+
+            <!-- 2. Liên hệ -->
+            <div class="form-section">
+              <div class="form-section-title"><div class="fsec-dot" style="background:#059669"></div>Người liên hệ chính</div>
+              <div class="form-grid fg3" style="gap:10px">
+                <div class="form-group"><label>Họ và tên <span class="req">*</span></label><input value="Nguyễn Văn An" /></div>
+                <div class="form-group"><label>Chức vụ</label><input value="Giám đốc kinh doanh" /></div>
+                <div class="form-group"><label>Điện thoại <span class="req">*</span></label><input value="0901 234 567" /></div>
+                <div class="form-group" style="grid-column:1/3"><label>Email</label><input value="an@vaiabctrading.vn" /></div>
+                <div class="form-group"><label>Zalo / Viber</label><input value="0901 234 567" /></div>
+              </div>
+            </div>
+
+            <!-- 3. Điều khoản -->
+            <div class="form-section">
+              <div class="form-section-title"><div class="fsec-dot" style="background:#f59e0b"></div>Điều khoản thương mại</div>
+              <div class="form-grid" style="gap:10px">
+                <div class="form-group"><label>Điều khoản thanh toán <span class="req">*</span></label>
+                  <select><option>NET 30</option><option>NET 15</option><option>NET 60</option><option>COD</option><option>Prepaid</option></select>
+                </div>
+                <div class="form-group"><label>Tiền tệ <span class="req">*</span></label>
+                  <select><option>VND</option><option>USD</option><option>CNY</option></select>
+                </div>
+                <div class="form-group"><label>Lead time trung bình (ngày) <span class="req">*</span></label><input type="number" value="5" /></div>
+                <div class="form-group"><label>Giá trị đơn hàng tối thiểu (MOQ value)</label><input value="5,000,000" /></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Tài khoản ngân hàng</label><input value="0123456789 · VietcomBank · CN Tân Phú" /></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Ghi chú điều khoản</label><textarea style="height:56px">Giao hàng tận kho · Bao bì theo tiêu chuẩn · Đổi trả trong 7 ngày nếu lỗi sản xuất</textarea></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: preview & status -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="card-header"><h3>Xem trước</h3></div>
+            <div class="card-body">
+              <div style="text-align:center;padding:8px 0 14px">
+                <div class="sup-avatar-lg" style="width:56px;height:56px;margin:0 auto;font-size:22px">V</div>
+                <div style="font-size:15px;font-weight:700;margin-top:10px">Vải ABC Trading Co.</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px">SUP-001 · Manufacturer</div>
+                <span class="badge b-success" style="margin-top:8px">● Active</span>
+              </div>
+              <div class="divider"></div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#64748b">Điều khoản TT</span><strong>NET 30</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#64748b">Lead time</span><strong>5 ngày</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#64748b">Tiền tệ</span><strong>VND</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#64748b">Rating hiện tại</span><strong style="color:#059669">★ 4.8</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Trạng thái</h3></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:8px">
+                <div style="flex:1;padding:10px;border:2px solid #2563eb;border-radius:8px;text-align:center;cursor:pointer;background:#eff6ff">
+                  <div style="font-size:14px">✅</div><div style="font-size:11px;font-weight:600;color:#2563eb;margin-top:4px">Active</div>
+                </div>
+                <div style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:14px">⏸</div><div style="font-size:11px;color:#64748b;margin-top:4px">Inactive</div>
+                </div>
+              </div>
+              <div style="font-size:10px;color:#94a3b8;padding:4px">Blacklist chỉ được set từ màn hình chi tiết sau khi ghi nhận lý do vi phạm.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Lưu ý</h3></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:11px;color:#64748b;display:flex;gap:6px"><span>•</span><span>Thay đổi điều khoản TT <strong>không ảnh hưởng</strong> PO đã tạo</span></div>
+              <div style="font-size:11px;color:#64748b;display:flex;gap:6px"><span>•</span><span>Lead time mới áp dụng cho PO <strong>từ lần tạo tiếp theo</strong></span></div>
+              <div style="font-size:11px;color:#64748b;display:flex;gap:6px"><span>•</span><span>Mã NCC không thể thay đổi sau khi tạo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc4">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Procurement</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1M9 12h1M14 12h1"/></svg>Nhà Cung Cấp</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:10px">
+        <button class="btn" style="padding:5px 11px" onclick="go(2)">← Chi tiết NCC</button>
+        <div><h1>Đánh Giá Nhà Cung Cấp</h1><p>Vải ABC Trading Co. · SUP-001 · Kỳ Q2/2026</p></div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">Xem lịch sử đánh giá</button>
+        <button class="btn btn-primary" id="saveEvalBtn">💾 Lưu đánh giá</button>
+      </div>
+    </div>
+    <div class="content" style="padding-bottom:48px">
+      <div class="g2r">
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Context từ dữ liệu thực -->
+          <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:9px;padding:14px 16px;display:flex;gap:16px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" style="width:18px;height:18px;flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div style="font-size:12px;color:#1e40af">
+              <strong>Dữ liệu tự động tổng hợp từ Q2/2026:</strong> 6 PO · 3 GRN · 1 lần giao trễ · 2m hàng bị từ chối · Tỷ lệ on-time: 83% · Giá trị mua: 124M
+            </div>
+          </div>
+
+          <!-- Form đánh giá từng tiêu chí -->
+          <div class="card">
+            <div class="card-header"><h3>Chấm điểm theo tiêu chí</h3><span style="font-size:11px;color:#94a3b8">Mỗi tiêu chí từ 1–5 · Click sao để chọn</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:20px">
+
+              <!-- Tiêu chí 1 -->
+              <div style="border:1px solid #f1f5f9;border-radius:9px;padding:14px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                  <div>
+                    <div style="font-size:13px;font-weight:600">1. Chất lượng hàng hóa</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px">Hàng đúng quy cách, ít lỗi, QC pass rate cao</div>
+                  </div>
+                  <div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#059669" id="q1score">5</div><div style="font-size:10px;color:#64748b">/ 5</div></div>
+                </div>
+                <div class="rating-big" id="q1stars" onclick="setScore(this,'q1score',event)">
+                  <span class="star-big filled" data-v="1">★</span><span class="star-big filled" data-v="2">★</span><span class="star-big filled" data-v="3">★</span><span class="star-big filled" data-v="4">★</span><span class="star-big filled" data-v="5">★</span>
+                </div>
+                <div style="margin-top:10px">
+                  <div style="font-size:11px;color:#64748b;margin-bottom:4px">Từ dữ liệu thực tế</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span style="font-size:11px;background:#ecfdf5;color:#065f3d;padding:2px 8px;border-radius:4px">✓ QC pass: 366/368m (99.5%)</span>
+                    <span style="font-size:11px;background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:4px">✗ Từ chối: 2m phai màu</span>
+                  </div>
+                </div>
+                <textarea style="margin-top:8px;width:100%;padding:7px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;background:#f8fafc;resize:none;height:48px;font-family:inherit;outline:none" placeholder="Ghi chú thêm về chất lượng...">Hàng đạt chất lượng cao, chỉ 1 trường hợp nhỏ phai màu ở lô Đỏ Đô, đã xử lý return.</textarea>
+              </div>
+
+              <!-- Tiêu chí 2 -->
+              <div style="border:1px solid #f1f5f9;border-radius:9px;padding:14px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                  <div>
+                    <div style="font-size:13px;font-weight:600">2. Giao hàng đúng hạn</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px">Tỷ lệ on-time, xử lý khi trễ hạn</div>
+                  </div>
+                  <div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#f59e0b" id="q2score">4</div><div style="font-size:10px;color:#64748b">/ 5</div></div>
+                </div>
+                <div class="rating-big" id="q2stars" onclick="setScore(this,'q2score',event)">
+                  <span class="star-big filled" data-v="1">★</span><span class="star-big filled" data-v="2">★</span><span class="star-big filled" data-v="3">★</span><span class="star-big filled" data-v="4">★</span><span class="star-big empty" data-v="5">★</span>
+                </div>
+                <div style="margin-top:10px">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span style="font-size:11px;background:#ecfdf5;color:#065f3d;padding:2px 8px;border-radius:4px">✓ On-time: 5/6 PO (83%)</span>
+                    <span style="font-size:11px;background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:4px">✗ Trễ 1 lần: PO-2025-098 (+3 ngày)</span>
+                  </div>
+                </div>
+                <textarea style="margin-top:8px;width:100%;padding:7px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;background:#f8fafc;resize:none;height:48px;font-family:inherit;outline:none" placeholder="Ghi chú thêm về giao hàng...">1 lần trễ do lỗi vận chuyển GHN, không phải lỗi NCC. Đã thông báo kịp thời.</textarea>
+              </div>
+
+              <!-- Tiêu chí 3 -->
+              <div style="border:1px solid #f1f5f9;border-radius:9px;padding:14px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                  <div>
+                    <div style="font-size:13px;font-weight:600">3. Cạnh tranh giá</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px">So sánh với thị trường, khả năng đàm phán</div>
+                  </div>
+                  <div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#059669" id="q3score">5</div><div style="font-size:10px;color:#64748b">/ 5</div></div>
+                </div>
+                <div class="rating-big" id="q3stars" onclick="setScore(this,'q3score',event)">
+                  <span class="star-big filled" data-v="1">★</span><span class="star-big filled" data-v="2">★</span><span class="star-big filled" data-v="3">★</span><span class="star-big filled" data-v="4">★</span><span class="star-big filled" data-v="5">★</span>
+                </div>
+                <textarea style="margin-top:10px;width:100%;padding:7px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;background:#f8fafc;resize:none;height:48px;font-family:inherit;outline:none" placeholder="Ghi chú về giá cả...">Giá cạnh tranh so với 2 NCC cùng phân khúc. Đã được giảm thêm 2% trong hợp đồng khung.</textarea>
+              </div>
+
+              <!-- Tiêu chí 4 -->
+              <div style="border:1px solid #f1f5f9;border-radius:9px;padding:14px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                  <div>
+                    <div style="font-size:13px;font-weight:600">4. Hỗ trợ dịch vụ</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px">Phản hồi nhanh, giải quyết khiếu nại, linh hoạt</div>
+                  </div>
+                  <div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#059669" id="q4score">5</div><div style="font-size:10px;color:#64748b">/ 5</div></div>
+                </div>
+                <div class="rating-big" id="q4stars" onclick="setScore(this,'q4score',event)">
+                  <span class="star-big filled" data-v="1">★</span><span class="star-big filled" data-v="2">★</span><span class="star-big filled" data-v="3">★</span><span class="star-big filled" data-v="4">★</span><span class="star-big filled" data-v="5">★</span>
+                </div>
+                <textarea style="margin-top:10px;width:100%;padding:7px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;background:#f8fafc;resize:none;height:48px;font-family:inherit;outline:none" placeholder="Ghi chú về dịch vụ...">Phản hồi trong vòng 2 giờ. Xử lý return hàng lỗi ngay trong ngày. Rất hài lòng.</textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Ghi chú tổng hợp -->
+          <div class="card">
+            <div class="card-header"><h3>Nhận xét tổng hợp & Khuyến nghị</h3></div>
+            <div class="card-body">
+              <textarea style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:7px;font-size:12px;background:#f8fafc;resize:vertical;min-height:80px;font-family:inherit;outline:none" placeholder="Nhận xét tổng hợp...">NCC đáng tin cậy, chất lượng ổn định qua nhiều kỳ. Đề xuất gia hạn hợp đồng khung thêm 1 năm và tăng hạn mức từ 100M lên 150M/quý.</textarea>
+              <div style="margin-top:10px">
+                <div style="font-size:11px;color:#64748b;margin-bottom:6px;font-weight:500">Khuyến nghị hành động</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked /> Gia hạn hợp đồng</label>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" /> Tăng hạn mức</label>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" /> Mở rộng danh mục hàng</label>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" /> Cần cải thiện giao hàng</label>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" /> Cảnh báo — theo dõi thêm</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: tổng điểm live -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card" style="position:sticky;top:72px">
+            <div class="card-header"><h3>Điểm tổng hợp</h3><span class="badge b-info">Q2/2026</span></div>
+            <div class="card-body">
+              <div style="text-align:center;padding:12px 0">
+                <div style="font-size:44px;font-weight:900;color:#059669" id="totalScore">4.8</div>
+                <div class="stars" style="font-size:20px">★★★★★</div>
+                <div style="font-size:11px;color:#64748b;margin-top:4px">Điểm tổng hợp có trọng số</div>
+              </div>
+              <div class="divider"></div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                  <span style="color:#64748b">Chất lượng (35%)</span>
+                  <span style="font-weight:700;color:#059669" id="d1">5.0 → 1.75</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                  <span style="color:#64748b">Giao hàng (30%)</span>
+                  <span style="font-weight:700;color:#f59e0b" id="d2">4.0 → 1.20</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                  <span style="color:#64748b">Giá cả (20%)</span>
+                  <span style="font-weight:700;color:#059669" id="d3">5.0 → 1.00</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                  <span style="color:#64748b">Dịch vụ (15%)</span>
+                  <span style="font-weight:700;color:#059669" id="d4">5.0 → 0.75</span>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700">
+                  <span>Tổng</span><span style="color:#059669">= 4.70</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lịch sử đánh giá -->
+          <div class="card">
+            <div class="card-header"><h3>Lịch sử đánh giá</h3></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8fafc;border-radius:7px">
+                <div><div style="font-size:12px;font-weight:600">Q1/2026</div><div style="font-size:10px;color:#64748b">Trọng Nguyễn · 02/04</div></div>
+                <div style="text-align:right"><div style="font-size:14px;font-weight:700;color:#059669">4.8</div><div class="stars" style="font-size:10px">★★★★★</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8fafc;border-radius:7px">
+                <div><div style="font-size:12px;font-weight:600">Q4/2025</div><div style="font-size:10px;color:#64748b">Thu Hà · 05/01/2026</div></div>
+                <div style="text-align:right"><div style="font-size:14px;font-weight:700;color:#059669">4.6</div><div class="stars" style="font-size:10px">★★★★½</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8fafc;border-radius:7px">
+                <div><div style="font-size:12px;font-weight:600">Q3/2025</div><div style="font-size:10px;color:#64748b">Trọng Nguyễn · 04/10/2025</div></div>
+                <div style="text-align:right"><div style="font-size:14px;font-weight:700;color:#f59e0b">4.3</div><div class="stars" style="font-size:10px">★★★★☆</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc5">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Procurement</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1M9 12h1M14 12h1"/></svg>Nhà Cung Cấp</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:10px">
+        <button class="btn" style="padding:5px 11px" onclick="go(2)">← Chi tiết NCC</button>
+        <div><h1>Hợp Đồng Khung</h1><p>Vải ABC Trading Co. · SUP-001 · 2 hợp đồng</p></div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">↓ Tải PDF</button>
+        <button class="btn btn-primary">+ Tạo hợp đồng mới</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- Contract đang active -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Đang hiệu lực</div>
+        <div class="card">
+          <div style="padding:20px;display:flex;gap:20px;align-items:flex-start">
+            <!-- Icon -->
+            <div style="width:48px;height:48px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">📄</div>
+            <!-- Info -->
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                <span style="font-size:16px;font-weight:700;color:#2563eb">CON-2026-003</span>
+                <span class="badge b-success">● Active</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:12px">Hợp đồng mua hàng vải dài hạn · Ký 01/01/2026 · Có hiệu lực 12 tháng</div>
+              <div class="g3" style="gap:12px;margin-bottom:14px">
+                <div class="info-item"><label>Hiệu lực từ</label><span>01/01/2026</span></div>
+                <div class="info-item"><label>Hết hạn</label><span style="color:#f59e0b;font-weight:600">31/12/2026</span></div>
+                <div class="info-item"><label>Còn lại</label><span style="font-weight:600">231 ngày</span></div>
+                <div class="info-item"><label>Điều khoản TT</label><span>NET 30</span></div>
+                <div class="info-item"><label>Chiết khấu</label><span style="color:#059669;font-weight:600">3% từ 50M/đơn</span></div>
+                <div class="info-item"><label>Giá trị tối thiểu/đơn</label><span>5,000,000đ</span></div>
+              </div>
+              <!-- Progress -->
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:4px"><span>Tiến độ hợp đồng (theo thời gian)</span><span>134 / 365 ngày (37%)</span></div>
+                <div class="contract-progress" style="height:8px"><div class="contract-fill" style="width:37%;background:#2563eb"></div></div>
+              </div>
+              <!-- Sản phẩm áp dụng -->
+              <div>
+                <div style="font-size:11px;color:#64748b;margin-bottom:6px;font-weight:500">Sản phẩm áp dụng trong hợp đồng</div>
+                <div>
+                  <span class="product-tag">Vải Cotton Trắng <span class="unit">120K/m</span></span>
+                  <span class="product-tag">Vải Cotton Xanh Navy <span class="unit">135K/m</span></span>
+                  <span class="product-tag">Vải Cotton Đỏ Đô <span class="unit">140K/m</span></span>
+                  <span class="product-tag">Vải Linen Tự Nhiên <span class="unit">185K/m</span></span>
+                </div>
+              </div>
+            </div>
+            <!-- Actions -->
+            <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+              <button class="btn" style="font-size:11px">📎 Xem file PDF</button>
+              <button class="btn" style="font-size:11px">✏ Sửa điều khoản</button>
+              <button class="btn" style="font-size:11px;color:#059669;border-color:#6ee7b7">🔄 Gia hạn</button>
+              <button class="btn" style="font-size:11px;color:#dc2626;border-color:#fca5a5">⛔ Chấm dứt</button>
+            </div>
+          </div>
+
+          <!-- Lịch sử giá trong hợp đồng -->
+          <div style="border-top:1px solid #f1f5f9;padding:16px 20px">
+            <div style="font-size:12px;font-weight:600;margin-bottom:10px">Lịch sử thay đổi giá trong hợp đồng</div>
+            <div class="timeline-v">
+              <div class="tv-item">
+                <div class="tv-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="tv-content"><div class="tv-title">Ký hợp đồng — Giá khởi điểm</div><div class="tv-sub">01/01/2026 · Cotton Trắng: 118K/m → NET 30</div></div>
+              </div>
+              <div class="tv-item">
+                <div class="tv-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="tv-content"><div class="tv-title">Điều chỉnh giá theo biến động nguyên liệu</div><div class="tv-sub">01/03/2026 · Cotton Trắng: 118K → 120K/m (tăng 1.7%)</div></div>
+              </div>
+              <div class="tv-item">
+                <div class="tv-dot warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px"><circle cx="12" cy="12" r="8"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="15" x2="12" y2="15"/></svg></div>
+                <div class="tv-content"><div class="tv-title" style="color:#d97706">Sắp hết hạn — cần gia hạn</div><div class="tv-sub">31/12/2026 · Còn 231 ngày · Đề xuất gia hạn trước 60 ngày</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contract đã hết hạn -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Đã hết hạn</div>
+        <div class="card">
+          <div style="padding:18px 20px;display:flex;gap:16px;align-items:center;opacity:.65">
+            <div style="width:44px;height:44px;background:#f1f5f9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">📋</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+                <span style="font-size:14px;font-weight:600">CON-2025-008</span>
+                <span class="badge b-muted" style="font-size:10px">Expired</span>
+              </div>
+              <div style="font-size:11px;color:#64748b">01/01/2025 – 31/12/2025 · NET 30 · Giảm 2% từ 30M</div>
+              <div style="margin-top:8px">
+                <div class="contract-progress"><div class="contract-fill" style="width:100%;background:#94a3b8"></div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn" style="font-size:11px">📎 Xem file</button>
+              <button class="btn" style="font-size:11px;color:#059669;border-color:#6ee7b7">🔄 Gia hạn lại</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc6">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Main Menu</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1"/></svg>Suppliers</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Yêu Cầu Mua Hàng</h1><p>Purchase Request · 36 yêu cầu tổng cộng</p></div>
+      <div class="topbar-right"><button class="btn btn-primary">+ Tạo PR Mới</button></div>
+    </div>
+    <div class="content">
+      <div class="kpi-row">
+        <div class="kpi-card"><div class="kpi-accent" style="background:#f59e0b"></div><div class="kpi-body"><div class="kpi-value">12</div><div class="kpi-label">Chờ duyệt</div></div><div class="kpi-icon" style="background:#fffbeb"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+        <div class="kpi-card"><div class="kpi-accent" style="background:#059669"></div><div class="kpi-body"><div class="kpi-value">8</div><div class="kpi-label">Đã duyệt</div></div><div class="kpi-icon" style="background:#ecfdf5"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
+        <div class="kpi-card"><div class="kpi-accent" style="background:#dc2626"></div><div class="kpi-body"><div class="kpi-value">3</div><div class="kpi-label">Từ chối</div></div><div class="kpi-icon" style="background:#fef2f2"><svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div>
+        <div class="kpi-card"><div class="kpi-accent" style="background:#2563eb"></div><div class="kpi-body"><div class="kpi-value">13</div><div class="kpi-label">Đã tạo PO</div></div><div class="kpi-icon" style="background:#eff6ff"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></div></div>
+      </div>
+      <div class="toolbar">
+        <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Tìm PR theo mã, người tạo, bộ phận..." /></div>
+        <div class="filter-tabs">
+          <button class="ftab active">Tất cả</button>
+          <button class="ftab">Pending</button>
+          <button class="ftab">Approved</button>
+          <button class="ftab">Rejected</button>
+          <button class="ftab">Converted</button>
+        </div>
+        <select class="select-input"><option>Bộ phận: Tất cả</option><option>Kho</option><option>Sản xuất</option><option>Kinh doanh</option></select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Mã PR</th><th>Người tạo</th><th>Bộ phận</th><th>Ngày tạo</th><th>Cần hàng</th><th>Ưu tiên</th><th>Tổng ước tính</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody>
+              <tr><td class="td-link">PR-2026-042</td><td>Minh Khoa</td><td>Kho</td><td>13/05</td><td>14/05</td><td><div class="pri"><div class="pri-dot" style="background:#dc2626"></div>Urgent</div></td><td>2,400,000đ</td><td><span class="badge b-warning">⏳ Pending</span></td><td><div class="actions-row"><button class="btn btn-primary" style="padding:4px 12px;font-size:11px">Duyệt</button><button class="btn" style="padding:4px 10px;font-size:11px">Từ chối</button></div></td></tr>
+              <tr><td class="td-link">PR-2026-041</td><td>Thu Hà</td><td>SX</td><td>12/05</td><td>16/05</td><td><div class="pri"><div class="pri-dot" style="background:#f59e0b"></div>High</div></td><td>15,600,000đ</td><td><span class="badge b-warning">⏳ Pending</span></td><td><div class="actions-row"><button class="btn btn-primary" style="padding:4px 12px;font-size:11px">Duyệt</button><button class="btn" style="padding:4px 10px;font-size:11px">Từ chối</button></div></td></tr>
+              <tr><td class="td-link">PR-2026-040</td><td>Bảo Long</td><td>KD</td><td>11/05</td><td>20/05</td><td><div class="pri"><div class="pri-dot" style="background:#2563eb"></div>Medium</div></td><td>8,900,000đ</td><td><span class="badge b-success">✓ Approved</span></td><td><div class="actions-row"><button class="btn" style="padding:4px 12px;font-size:11px;color:#2563eb;border-color:#93c5fd">Tạo PO</button></div></td></tr>
+              <tr><td class="td-link">PR-2026-039</td><td>Minh Khoa</td><td>Kho</td><td>10/05</td><td>25/05</td><td><div class="pri"><div class="pri-dot" style="background:#94a3b8"></div>Low</div></td><td>1,200,000đ</td><td><span class="badge b-success">✓ Approved</span></td><td><div class="actions-row"><button class="btn" style="padding:4px 12px;font-size:11px;color:#2563eb;border-color:#93c5fd">Tạo PO</button></div></td></tr>
+              <tr><td class="td-link">PR-2026-038</td><td>Lan Anh</td><td>SX</td><td>09/05</td><td>18/05</td><td><div class="pri"><div class="pri-dot" style="background:#f59e0b"></div>High</div></td><td>34,000,000đ</td><td><span class="badge b-info">→ Converted</span></td><td><div class="actions-row"><button class="btn" style="padding:4px 10px;font-size:11px">Xem PO</button></div></td></tr>
+              <tr><td class="td-link">PR-2026-037</td><td>Bảo Long</td><td>Kho</td><td>08/05</td><td>12/05</td><td><div class="pri"><div class="pri-dot" style="background:#94a3b8"></div>Low</div></td><td>5,500,000đ</td><td><span class="badge b-danger">✕ Rejected</span></td><td><div class="actions-row"><button class="btn" style="padding:4px 10px;font-size:11px">Sửa lại</button></div></td></tr>
+              <tr><td class="td-link">PR-2026-036</td><td>Thu Hà</td><td>SX</td><td>07/05</td><td>30/05</td><td><div class="pri"><div class="pri-dot" style="background:#2563eb"></div>Medium</div></td><td>12,000,000đ</td><td><span class="badge b-muted">◌ Draft</span></td><td><div class="actions-row"><button class="btn" style="padding:4px 10px;font-size:11px">Submit</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination"><span class="pagination-info">Hiển thị 1–7 của 36 yêu cầu</span><div class="pagination-pages"><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><button class="pg-btn" style="width:auto;padding:0 10px">Tiếp →</button></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc7">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Main Menu</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1"/></svg>Suppliers</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>Purchase Request<span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+
+  <div class="main-area">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:12px">
+        <button class="btn" style="padding:6px 12px">← Danh sách PR</button>
+        <div>
+          <h1 style="display:flex;align-items:center;gap:10px">
+            Tạo Yêu Cầu Mua Hàng
+            <span class="badge b-muted" style="font-size:12px">◌ Draft</span>
+          </h1>
+          <p>PR-2026-043 · Tự động sinh · Trọng Nguyễn · 14/05/2026 09:41</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">💾 Lưu nháp</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Submit duyệt
+        </button>
+      </div>
+    </div>
+
+    <div class="content" style="padding-bottom:48px">
+
+      <!-- Validation bar -->
+      <div class="validation-bar" id="validationBar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;flex:1">
+          <span class="vcheck fail" id="vDept">✗ Chưa chọn bộ phận</span>
+          <span class="vcheck fail" id="vDate">✗ Chưa chọn ngày cần hàng</span>
+          <span class="vcheck fail" id="vPri">✗ Chưa chọn ưu tiên</span>
+          <span class="vcheck fail" id="vItems">✗ Chưa có dòng hàng</span>
+        </div>
+        <span style="font-size:11px;color:#d97706;white-space:nowrap">Điền đủ để submit</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+
+        <!-- LEFT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Section 1: Thông tin chung -->
+          <div class="card">
+            <div class="section-title"><div class="dot" style="background:#2563eb"></div>Thông tin chung</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+
+              <div class="form-grid">
+                <!-- Bộ phận -->
+                <div class="form-group">
+                  <label>Bộ phận yêu cầu <span class="required-star">*</span></label>
+                  <select id="dept" onchange="validate()">
+                    <option value="">-- Chọn bộ phận --</option>
+                    <option>Kho</option>
+                    <option>Sản xuất</option>
+                    <option>Kinh doanh</option>
+                  </select>
+                  <span class="field-hint">Bộ phận chịu trách nhiệm yêu cầu này</span>
+                </div>
+
+                <!-- Người tạo (readonly) -->
+                <div class="form-group">
+                  <label>Người tạo</label>
+                  <input value="Trọng Nguyễn" readonly style="background:#f1f5f9;color:#64748b" />
+                  <span class="field-hint">Tự lấy từ tài khoản đang đăng nhập</span>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <!-- Ngày cần hàng -->
+                <div class="form-group">
+                  <label>Ngày cần có hàng <span class="required-star">*</span></label>
+                  <input type="date" id="neededDate" onchange="validate()" min="2026-05-15" />
+                  <span class="field-hint">Phải sau hôm nay — dùng để tính deadline gửi PO cho NCC</span>
+                </div>
+
+                <!-- Ngày tạo (readonly) -->
+                <div class="form-group">
+                  <label>Ngày tạo</label>
+                  <input value="14/05/2026 09:41" readonly style="background:#f1f5f9;color:#64748b" />
+                </div>
+              </div>
+
+              <!-- Priority -->
+              <div class="form-group">
+                <label>Mức độ ưu tiên <span class="required-star">*</span></label>
+                <div class="priority-group" id="priGroup">
+                  <button class="pri-btn" onclick="setPri(this,'low','sel-low')">● Low</button>
+                  <button class="pri-btn" onclick="setPri(this,'medium','sel-medium')">● Medium</button>
+                  <button class="pri-btn" onclick="setPri(this,'high','sel-high')">● High</button>
+                  <button class="pri-btn" onclick="setPri(this,'urgent','sel-urgent')">🔴 Urgent</button>
+                </div>
+                <span class="field-hint">Urgent — cần duyệt trong ngày. High — trong 24h.</span>
+              </div>
+
+              <!-- Ghi chú -->
+              <div class="form-group">
+                <label>Ghi chú</label>
+                <textarea style="padding:8px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:13px;background:#f8fafc;color:#0f1729;outline:none;width:100%;resize:vertical;min-height:64px;font-family:inherit" placeholder="Lý do mua, yêu cầu đặc biệt, ghi chú cho người duyệt..."></textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Section 2: Danh sách hàng -->
+          <div class="card">
+            <div class="section-title" style="justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="dot" style="background:#059669"></div>
+                Danh sách hàng cần mua
+                <span class="badge b-info" style="font-size:10px" id="itemCount">0 dòng</span>
+              </div>
+              <span style="font-size:10px;color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0">Ít nhất 1 dòng hàng</span>
+            </div>
+
+            <!-- Column headers -->
+            <div style="display:grid;grid-template-columns:28px 2fr 1.4fr 80px 90px 110px 1.2fr 36px;gap:8px;padding:8px 16px 4px;background:#f8fafc;border-bottom:1px solid #f1f5f9">
+              <div></div>
+              <div class="col-label">Sản phẩm <span class="required-star">*</span></div>
+              <div class="col-label">Đặc tả / Quy cách</div>
+              <div class="col-label">Số lượng <span class="required-star">*</span></div>
+              <div class="col-label">Đơn vị <span class="required-star">*</span></div>
+              <div class="col-label">Giá ước tính</div>
+              <div class="col-label">NCC gợi ý</div>
+              <div></div>
+            </div>
+
+            <!-- Item rows -->
+            <div id="itemRows">
+              <div class="item-row" id="row-1">
+                <div class="item-num">1</div>
+                <div>
+                  <select onchange="updateUnit(this, 1); validate()">
+                    <option value="">-- Chọn sản phẩm --</option>
+                    <option value="Vải Cotton Trắng" data-unit="mét">Vải Cotton Trắng</option>
+                    <option value="Vải Cotton Xanh Navy" data-unit="mét">Vải Cotton Xanh Navy</option>
+                    <option value="Vải Cotton Đỏ Đô" data-unit="mét">Vải Cotton Đỏ Đô</option>
+                    <option value="Vải Lụa Kem" data-unit="mét">Vải Lụa Kem</option>
+                    <option value="Khóa Kéo 20cm" data-unit="cái">Khóa Kéo 20cm</option>
+                    <option value="Nút Áo 4 Lỗ" data-unit="cái">Nút Áo 4 Lỗ</option>
+                    <option value="Chỉ May Lụa" data-unit="cuộn">Chỉ May Lụa</option>
+                    <option value="Mex Lót Mỏng" data-unit="mét">Mex Lót Mỏng</option>
+                    <option value="Túi Nilon 10x20" data-unit="cái">Túi Nilon 10x20</option>
+                  </select>
+                </div>
+                <div><input placeholder="Màu, khổ, chất liệu..." id="spec-1" /></div>
+                <div><input type="number" min="1" placeholder="0" id="qty-1" onchange="calcPRTotal(); validate()" /></div>
+                <div><input placeholder="mét" id="unit-1" /></div>
+                <div>
+                  <div class="input-with-badge">
+                    <input type="number" min="0" placeholder="0" id="price-1" onchange="calcPRTotal()" />
+                    <span class="input-badge">VND</span>
+                  </div>
+                </div>
+                <div>
+                  <select id="sup-1">
+                    <option value="">-- Không --</option>
+                    <option>Vải ABC Trading</option>
+                    <option>Phụ Liệu XYZ</option>
+                    <option>Vải Lụa Hạnh Phúc</option>
+                    <option>NCC Nút Bấm 123</option>
+                    <option>Cotton Premium</option>
+                  </select>
+                </div>
+                <button class="del-btn" onclick="removeRow(1)" title="Xóa dòng">×</button>
+              </div>
+            </div>
+
+            <!-- Add row button -->
+            <div class="add-row-btn" onclick="addRow()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Thêm dòng hàng
+            </div>
+
+            <!-- Summary -->
+            <div class="summary-box">
+              <div>
+                <div class="est-label">Tổng giá trị ước tính</div>
+                <div class="est-total" id="estTotal">0 ₫</div>
+                <div class="est-label" style="margin-top:2px">Dựa trên giá ước tính đã nhập · Chưa chính thức</div>
+              </div>
+              <div style="text-align:right">
+                <div class="est-label">Số dòng hàng</div>
+                <div style="font-size:20px;font-weight:700;color:#2563eb" id="rowCount">1</div>
+                <div class="est-label">dòng</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Preview & Rules -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Approval routing preview -->
+          <div class="card">
+            <div class="section-title"><div class="dot" style="background:#f59e0b"></div>Dự kiến luồng duyệt</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+                <div style="font-size:11px;color:#64748b;margin-bottom:6px">Tổng ước tính</div>
+                <div style="font-size:22px;font-weight:700;color:#0f1729" id="sideTotal">0 ₫</div>
+              </div>
+
+              <div id="approvalRoute">
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px dashed #e2e8f0">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span style="font-size:12px;color:#94a3b8">Nhập giá ước tính để xem cấp duyệt</span>
+                </div>
+              </div>
+
+              <!-- Rules reference -->
+              <div style="font-size:11px;color:#64748b;padding-top:4px;border-top:1px solid #f1f5f9">
+                <div style="font-weight:600;margin-bottom:6px;color:#0f1729">Quy tắc cấp duyệt</div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div style="display:flex;justify-content:space-between"><span>Dưới 5 triệu</span><span style="color:#059669;font-weight:500">Quản lý Kho / Bộ phận</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>5 – 50 triệu</span><span style="color:#f59e0b;font-weight:500">Trưởng phòng</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Trên 50 triệu</span><span style="color:#dc2626;font-weight:500">Giám đốc</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checklist field bắt buộc -->
+          <div class="card">
+            <div class="section-title"><div class="dot" style="background:#059669"></div>Checklist trước khi submit</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px" id="chk1">
+                <span style="font-size:14px">○</span><span style="color:#94a3b8">Chọn bộ phận yêu cầu</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px" id="chk2">
+                <span style="font-size:14px">○</span><span style="color:#94a3b8">Điền ngày cần có hàng</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px" id="chk3">
+                <span style="font-size:14px">○</span><span style="color:#94a3b8">Chọn mức độ ưu tiên</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px" id="chk4">
+                <span style="font-size:14px">○</span><span style="color:#94a3b8">Thêm ít nhất 1 dòng hàng</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px" id="chk5">
+                <span style="font-size:14px">○</span><span style="color:#94a3b8">Tất cả dòng hàng có SL > 0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info không cần nhập -->
+          <div class="card">
+            <div class="section-title"><div class="dot" style="background:#94a3b8"></div>Không cần nhập lúc này</div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:11px;color:#94a3b8;display:flex;align-items:flex-start;gap:6px">
+                <span>—</span><span><strong>Giá chính thức</strong> — xác định khi hỏi NCC / tạo PO</span>
+              </div>
+              <div style="font-size:11px;color:#94a3b8;display:flex;align-items:flex-start;gap:6px">
+                <span>—</span><span><strong>NCC chính thức</strong> — chọn khi tạo PO sau duyệt</span>
+              </div>
+              <div style="font-size:11px;color:#94a3b8;display:flex;align-items:flex-start;gap:6px">
+                <span>—</span><span><strong>Approved by / at</strong> — điền khi người duyệt xác nhận</span>
+              </div>
+              <div style="font-size:11px;color:#94a3b8;display:flex;align-items:flex-start;gap:6px">
+                <span>—</span><span><strong>Mã PO</strong> — tự sinh khi convert sang Purchase Order</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success state (ẩn ban đầu) -->
+          <div id="successBox" style="display:none;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:16px;text-align:center">
+            <div style="font-size:24px;margin-bottom:6px">✅</div>
+            <div style="font-size:14px;font-weight:700;color:#065f3d">PR đã được submit!</div>
+            <div style="font-size:12px;color:#047857;margin-top:4px">PR-2026-043 đang chờ duyệt</div>
+            <div style="font-size:11px;color:#059669;margin-top:6px">Người duyệt sẽ nhận thông báo ngay</div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button class="btn" style="flex:1;font-size:12px;justify-content:center">Xem PR</button>
+              <button class="btn btn-primary" style="flex:1;font-size:12px;justify-content:center">+ Tạo PR mới</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc8">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Main Menu</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1"/></svg>Suppliers</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:12px">
+        <button class="btn" style="padding:6px 12px">← Danh sách</button>
+        <div>
+          <h1 style="display:flex;align-items:center;gap:10px">PO-2026-028 <span class="badge b-info" style="font-size:12px">◑ Nhận 1 phần</span></h1>
+          <p>Từ PR-2026-038, PR-2026-039 · Vải ABC Trading · Lần giao 1/2</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">↓ Xuất PDF</button>
+        <button class="btn">✉ Gửi NCC</button>
+        <button class="btn btn-primary">+ Tạo GRN</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="grid-2-equal" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>Thông tin đơn hàng</h3></div>
+          <div class="card-body">
+            <div class="info-grid-2">
+              <div class="info-item"><label>Mã PO</label><span class="td-link">PO-2026-028</span></div>
+              <div class="info-item"><label>Ngày đặt hàng</label><span>12/05/2026</span></div>
+              <div class="info-item"><label>Nhà cung cấp</label><span class="td-link">Vải ABC Trading Co.</span></div>
+              <div class="info-item"><label>Giao hàng dự kiến</label><span>17/05/2026</span></div>
+              <div class="info-item"><label>Hợp đồng áp dụng</label><span class="td-link">CON-2026-003</span></div>
+              <div class="info-item"><label>Điều khoản thanh toán</label><span>NET30</span></div>
+              <div class="info-item"><label>Tiền tệ</label><span>VND</span></div>
+              <div class="info-item"><label>NCC xác nhận lúc</label><span>12/05 · 14:22</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Tiến độ thực hiện</h3></div>
+          <div class="timeline">
+            <div class="t-step done"><div class="t-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="t-label">Draft</div><div class="t-date">12/05</div></div>
+            <div class="t-step done"><div class="t-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="t-label">Sent</div><div class="t-date">12/05</div></div>
+            <div class="t-step done"><div class="t-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="t-label">Confirmed</div><div class="t-date">12/05</div></div>
+            <div class="t-step"><div class="t-dot current"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg></div><div class="t-label">Receiving</div><div class="t-date" style="color:#f59e0b">GRN #2 chờ</div></div>
+            <div class="t-step"><div class="t-dot pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="t-label">Completed</div><div class="t-date t-label">—</div></div>
+          </div>
+          <div class="card-body" style="padding-top:0">
+            <div class="info-grid-2">
+              <div class="info-item"><label>Tiến độ nhận hàng</label><div class="progress-wrap" style="margin-top:4px"><div class="progress-bar"><div class="progress-fill" style="width:54%"></div></div><span class="progress-label">200 / 370m</span></div></div>
+              <div class="info-item"><label>Từ yêu cầu mua hàng</label><span class="td-link">PR-2026-038, PR-2026-039</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Chi tiết mặt hàng</h3><p>3 dòng hàng hóa · Đã nhận 1 phần</p></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:32px">#</th><th>Tên hàng</th><th>Đặc tả</th><th style="width:70px">SL đặt</th><th style="width:70px">Đã nhận</th><th style="width:70px">Còn lại</th><th style="width:100px">Đơn giá</th><th style="width:120px">Thành tiền</th><th style="width:90px">Trạng thái</th></tr></thead>
+            <tbody>
+              <tr><td class="td-muted">1</td><td>Vải Cotton Trắng</td><td class="td-muted" style="font-size:12px">Khổ 150cm, 100% cotton</td><td>200m</td><td style="color:#059669;font-weight:600">200m</td><td style="color:#059669">0m ✓</td><td>120,000đ/m</td><td style="font-weight:600">24,000,000đ</td><td><span class="badge b-success" style="font-size:10px">✓ Đủ</span></td></tr>
+              <tr><td class="td-muted">2</td><td>Vải Cotton Xanh Navy</td><td class="td-muted" style="font-size:12px">Khổ 150cm, nhuộm navy</td><td>120m</td><td style="color:#059669;font-weight:600">0m</td><td style="color:#dc2626;font-weight:600">120m</td><td>135,000đ/m</td><td style="font-weight:600">16,200,000đ</td><td><span class="badge b-warning" style="font-size:10px">⏳ Chờ GRN#2</span></td></tr>
+              <tr><td class="td-muted">3</td><td>Vải Cotton Đỏ Đô</td><td class="td-muted" style="font-size:12px">Khổ 150cm, nhuộm đỏ</td><td>50m</td><td style="color:#f59e0b;font-weight:600">46m</td><td style="color:#dc2626;font-weight:600">4m</td><td>140,000đ/m</td><td style="font-weight:600">7,000,000đ</td><td><span class="badge b-orange" style="font-size:10px">◑ Thiếu 4m</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="totals">
+          <div class="total-item"><label>Tạm tính</label><span>47,200,000đ</span></div>
+          <div class="total-item"><label>Thuế VAT (10%)</label><span>4,720,000đ</span></div>
+          <div class="total-item"><label>Chiết khấu</label><span style="color:#059669">- 2,000,000đ</span></div>
+          <div class="total-item grand"><label>Tổng cộng</label><span>49,920,000đ</span></div>
+        </div>
+      </div>
+
+      <!-- GRN History card -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header">
+          <div><h3>📦 Lịch sử nhận hàng (GRN)</h3><p>Các phiếu nhập kho liên kết với PO-2026-028</p></div>
+          <button class="btn btn-primary" style="font-size:12px">+ Tạo GRN Lần 2</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Mã GRN</th><th style="width:60px">Lần</th><th>Ngày nhận</th><th>Người nhận</th><th>SL nhận về</th><th>SL chấp nhận</th><th>SL từ chối</th><th>QC</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-link">GRN-2026-014</td>
+                <td style="text-align:center"><span class="badge b-info" style="font-size:10px">#1</span></td>
+                <td>13/05/2026</td>
+                <td>Minh Khoa</td>
+                <td>248m</td>
+                <td style="color:#059669;font-weight:600">246m</td>
+                <td style="color:#dc2626">2m</td>
+                <td><span class="badge b-success" style="font-size:10px">✓ Passed</span></td>
+                <td><span class="badge b-success" style="font-size:10px">✓ Confirmed</span></td>
+                <td><button class="btn" style="padding:4px 10px;font-size:11px">👁 Xem</button></td>
+              </tr>
+              <tr style="background:#fffbeb">
+                <td class="td-link" style="color:#d97706">GRN-2026-021</td>
+                <td style="text-align:center"><span class="badge b-warning" style="font-size:10px">#2</span></td>
+                <td style="color:#d97706">Dự kiến 18/05</td>
+                <td class="td-muted">—</td>
+                <td class="td-muted">124m (còn lại)</td>
+                <td class="td-muted">—</td>
+                <td class="td-muted">—</td>
+                <td class="td-muted">—</td>
+                <td><span class="badge b-warning" style="font-size:10px">⏳ Chờ hàng</span></td>
+                <td><button class="btn btn-primary" style="padding:4px 10px;font-size:11px">Nhận hàng</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Tổng hợp tiến độ -->
+        <div style="padding:14px 20px;border-top:1px solid #f1f5f9;display:flex;gap:32px;background:#f8fafc">
+          <div><span style="font-size:11px;color:#64748b;display:block">Tổng đặt</span><span style="font-size:16px;font-weight:700;color:#0f1729">370m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">Đã nhận (accepted)</span><span style="font-size:16px;font-weight:700;color:#059669">246m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">Còn phải nhận</span><span style="font-size:16px;font-weight:700;color:#dc2626">124m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">Bị từ chối / Return</span><span style="font-size:16px;font-weight:700;color:#f59e0b">2m</span></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end">
+            <div style="width:200px">
+              <div style="font-size:11px;color:#64748b;margin-bottom:4px">Tiến độ nhận: 66%</div>
+              <div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:66%;background:#059669"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc9">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Main Menu</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1"/></svg>Suppliers</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:12px">
+        <button class="btn" style="padding:6px 12px">← Danh sách</button>
+        <div><h1 style="display:flex;align-items:center;gap:10px">GRN-2026-014 <span class="badge b-info" style="font-size:12px">#1 / 2 lần</span> <span class="badge b-warning" style="font-size:12px">Draft</span></h1><p>Liên kết PO-2026-028 · Vải ABC Trading · Lần giao 1 — còn GRN#2 sau</p></div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">✕ Hủy</button>
+        <button class="btn btn-primary" style="background:#059669;border-color:#059669">✓ Xác nhận nhập kho</button>
+      </div>
+    </div>
+
+    <!-- Sub tabs -->
+    <div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:0 28px;display:flex;gap:0">
+      <div style="padding:12px 20px;font-size:13px;font-weight:500;color:#2563eb;border-bottom:2px solid #2563eb;cursor:pointer">Phiếu nhập kho (GRN)</div>
+      <div style="padding:12px 20px;font-size:13px;color:#64748b;border-bottom:2px solid transparent;cursor:pointer">3-Way Matching</div>
+      <div style="padding:12px 20px;font-size:13px;color:#64748b;border-bottom:2px solid transparent;cursor:pointer">Lịch sử trả hàng</div>
+      <div style="padding:12px 20px;font-size:13px;color:#d97706;border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:6px">⏳ Backorder <span style="background:#fef3c7;color:#d97706;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:600">GRN#2 chờ</span></div>
+    </div>
+
+    <div class="content">
+      <div class="grid-2-equal" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>Thông tin nhận hàng</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group"><label>Liên kết PO</label><input value="PO-2026-028" readonly /></div>
+              <div class="form-group"><label>Nhà cung cấp</label><input value="Vải ABC Trading" readonly /></div>
+              <div class="form-group"><label>Ngày nhận hàng</label><input value="13/05/2026" /></div>
+              <div class="form-group"><label>Người nhận</label><input value="Minh Khoa" /></div>
+              <div class="form-group"><label>Đơn vị vận chuyển</label><input value="Giao Hàng Nhanh" /></div>
+              <div class="form-group"><label>Mã vận đơn</label><input value="GHN-20260513-7821" /></div>
+            </div>
+            <div class="form-group" style="margin-top:8px"><label>Ghi chú</label><input value="Hàng giao đúng hẹn, đóng gói tốt" /></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Kiểm tra chất lượng (QC)</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tiêu chí</th><th style="width:80px">Kết quả</th><th>Ghi chú</th></tr></thead>
+              <tbody>
+                <tr><td style="font-size:12px">Màu sắc đúng mẫu</td><td><span class="badge b-success" style="font-size:10px">Đạt</span></td><td class="td-muted" style="font-size:11px">Khớp 100% với mẫu</td></tr>
+                <tr><td style="font-size:12px">Khổ vải đủ rộng</td><td><span class="badge b-success" style="font-size:10px">Đạt</span></td><td class="td-muted" style="font-size:11px">150cm ±0.5cm</td></tr>
+                <tr><td style="font-size:12px">Độ co rút</td><td><span class="badge b-success" style="font-size:10px">Đạt</span></td><td class="td-muted" style="font-size:11px">&lt;3%, đạt tiêu chuẩn</td></tr>
+                <tr><td style="font-size:12px">Kiểm lỗi dệt/nhuộm</td><td><span class="badge b-warning" style="font-size:10px">1 lỗi nhỏ</span></td><td class="td-muted" style="font-size:11px">2m cuối lô phai màu nhẹ</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div><h3>Chi tiết hàng nhận & kiểm đếm — Lần 1</h3><p>Nhận một phần · Vải Navy và phần Vải Đỏ sẽ giao lần 2</p></div>
+          <span class="badge b-warning">◑ Partial — còn 124m</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tên hàng</th><th style="width:65px">SL đặt PO</th><th style="width:80px">Thực nhận</th><th style="width:80px">Chấp nhận</th><th style="width:70px">Từ chối</th><th style="width:70px">Còn lại</th><th style="width:90px">Số lô</th><th style="width:80px">Vị trí kho</th><th>QC note</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Vải Cotton Trắng</td><td>200m</td>
+                <td><input class="qty-input" type="number" value="200" /></td>
+                <td><input class="qty-input" type="number" value="200" /></td>
+                <td><input class="qty-input" type="number" value="0" /></td>
+                <td style="color:#059669;font-weight:600;font-size:12px">0m ✓</td>
+                <td class="td-muted" style="font-size:11px">LOT-05132</td><td class="td-muted" style="font-size:11px">A2-04</td>
+                <td class="qc-pass" style="font-size:11px">✓ Đạt toàn bộ</td>
+              </tr>
+              <tr style="background:#f8fafc">
+                <td style="color:#94a3b8">Vải Cotton Xanh Navy</td><td style="color:#94a3b8">120m</td>
+                <td><input class="qty-input" type="number" value="0" style="border-color:#e2e8f0;color:#94a3b8" /></td>
+                <td><input class="qty-input" type="number" value="0" style="border-color:#e2e8f0;color:#94a3b8" /></td>
+                <td><input class="qty-input" type="number" value="0" style="border-color:#e2e8f0;color:#94a3b8" /></td>
+                <td style="color:#dc2626;font-weight:600;font-size:12px">120m</td>
+                <td class="td-muted" style="font-size:11px">—</td><td class="td-muted" style="font-size:11px">—</td>
+                <td style="font-size:11px;color:#d97706">⏳ Chưa giao — sẽ nhận GRN#2</td>
+              </tr>
+              <tr>
+                <td>Vải Cotton Đỏ Đô</td><td>50m</td>
+                <td><input class="qty-input" type="number" value="48" /></td>
+                <td><input class="qty-input" type="number" value="46" /></td>
+                <td><input class="qty-input reject" type="number" value="2" /></td>
+                <td style="color:#dc2626;font-weight:600;font-size:12px">4m</td>
+                <td class="td-muted" style="font-size:11px">LOT-05134</td><td class="td-muted" style="font-size:11px">A2-06</td>
+                <td class="qc-warn" style="font-size:11px">⚠ 2m phai màu → Return · 4m NCC giao bù GRN#2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Backorder notice -->
+        <div style="margin:12px 16px;padding:12px 16px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:18px">⏳</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#92400e">Backorder tự động: GRN-2026-021 sẽ được tạo</div>
+            <div style="font-size:11px;color:#b45309;margin-top:2px">Còn 120m Vải Navy + 4m Vải Đỏ (124m tổng) chưa nhận. Hệ thống tự tạo GRN#2 liên kết PO-2026-028 sau khi xác nhận GRN này. NCC dự kiến giao lần 2 ngày 18/05/2026.</div>
+          </div>
+          <button class="btn" style="margin-left:auto;white-space:nowrap;font-size:11px;padding:5px 12px">Xem GRN#2 →</button>
+        </div>
+      </div>
+
+      <!-- 3-Way Matching -->
+      <div class="card">
+        <div class="card-header">
+          <div><h3>3-Way Matching — PO-2026-028</h3><p>Đối chiếu 3 chiều: Đơn hàng ↔ Nhập kho ↔ Hóa đơn NCC</p></div>
+          <span class="badge b-success">✓ Matched</span>
+        </div>
+        <div class="match-grid">
+          <div class="match-col">
+            <div class="match-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+            <div class="match-row"><label>Số lượng đặt</label><span>370m</span></div>
+            <div class="match-row"><label>Đơn giá TB</label><span>126,486đ</span></div>
+            <div class="match-row"><label>Tổng PO</label><span style="color:#2563eb;font-weight:600">47,200,000đ</span></div>
+          </div>
+          <div class="match-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div class="match-col">
+            <div class="match-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>GRN Thực nhận</div>
+            <div class="match-row"><label>Qty nhận về</label><span>368m</span></div>
+            <div class="match-row"><label>Qty chấp nhận</label><span style="color:#059669;font-weight:600">366m</span></div>
+            <div class="match-row"><label>Qty từ chối</label><span style="color:#dc2626">2m (→ Return)</span></div>
+          </div>
+          <div class="match-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div class="match-col">
+            <div class="match-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Hóa đơn NCC</div>
+            <div class="match-row"><label>Qty xuất HĐ</label><span>366m</span></div>
+            <div class="match-row"><label>Đơn giá HĐ</label><span>126,486đ</span></div>
+            <div class="match-row"><label>Tổng HĐ</label><span style="color:#059669;font-weight:600">46,293,876đ</span></div>
+          </div>
+          <div class="match-result">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div>
+              <h4>3-Way Match thành công — Sẵn sàng thanh toán</h4>
+              <p>Qty GRN = Qty HĐ (366m) · Giá khớp với PO · 2m bị từ chối đã tạo Return · Hạn thanh toán: 12/06/2026 (NET30)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="sc10">
+<div class="erp-shell">
+  <aside class="sidebar">
+    <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12s1-3 4-3 4 3 4 3"/></svg>Cocandy ERP</div>
+    <div class="sb-section-label">Main Menu</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M14 8h1"/></svg>Suppliers</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Purchase Request</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Purchase Order</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Goods Receipt</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Inventory</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Invoice &amp; Payment</div>
+    <div class="sb-footer"><div class="sb-avatar">TN</div><div class="sb-user-info">Trọng Nguyễn<small>Administrator</small></div></div>
+  </aside>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:12px">
+        <button class="btn" style="padding:6px 12px">← Danh sách</button>
+        <div>
+          <h1 style="display:flex;align-items:center;gap:10px">
+            GRN-2026-021
+            <span class="badge b-warning" style="font-size:12px">#2 / 2 lần</span>
+            <span class="badge b-muted" style="font-size:12px">● Chờ hàng</span>
+          </h1>
+          <p>Backorder từ GRN-2026-014 · PO-2026-028 · Vải ABC Trading · Dự kiến 18/05/2026</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn">↗ Xem GRN#1</button>
+        <button class="btn">↗ Xem PO</button>
+        <button class="btn btn-primary" style="background:#059669;border-color:#059669">✓ Xác nhận nhập kho</button>
+      </div>
+    </div>
+
+    <!-- Sub tabs -->
+    <div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:0 28px;display:flex;gap:0">
+      <div style="padding:12px 20px;font-size:13px;font-weight:500;color:#2563eb;border-bottom:2px solid #2563eb;cursor:pointer">Phiếu nhập kho (GRN#2)</div>
+      <div style="padding:12px 20px;font-size:13px;color:#64748b;border-bottom:2px solid transparent;cursor:pointer">Lịch sử GRN cùng PO</div>
+    </div>
+
+    <div class="content">
+
+      <!-- Context banner -->
+      <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" style="width:20px;height:20px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#1e40af">Đây là GRN lần 2 — Backorder tự động từ GRN-2026-014</div>
+          <div style="font-size:11px;color:#3b82f6;margin-top:2px">GRN#1 (13/05) đã nhận: 200m Trắng + 46m Đỏ = 246m. Còn lại: <strong>120m Navy + 4m Đỏ bù = 124m</strong> đã được điền sẵn bên dưới.</div>
+        </div>
+        <div style="text-align:right;white-space:nowrap">
+          <div style="font-size:18px;font-weight:700;color:#2563eb">124m</div>
+          <div style="font-size:10px;color:#3b82f6">còn phải nhận</div>
+        </div>
+      </div>
+
+      <div class="grid-2-equal" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>Thông tin nhận hàng — Lần 2</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group"><label>Liên kết PO</label><input value="PO-2026-028" readonly /></div>
+              <div class="form-group"><label>Backorder từ GRN</label><input value="GRN-2026-014" readonly style="color:#2563eb" /></div>
+              <div class="form-group"><label>Ngày nhận hàng</label><input value="18/05/2026" /></div>
+              <div class="form-group"><label>Người nhận</label><input value="Minh Khoa" /></div>
+              <div class="form-group"><label>Đơn vị vận chuyển</label><input value="Giao Hàng Nhanh" /></div>
+              <div class="form-group"><label>Mã vận đơn</label><input value="" placeholder="Nhập khi hàng về..." /></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress tổng PO -->
+        <div class="card">
+          <div class="card-header"><h3>Tiến độ toàn bộ PO-2026-028</h3></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:12px;color:#64748b">Vải Cotton Trắng</span>
+                <span style="font-size:12px;font-weight:600;color:#059669">200 / 200m ✓</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#059669"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:12px;color:#64748b">Vải Cotton Xanh Navy</span>
+                <span style="font-size:12px;font-weight:600;color:#dc2626">0 / 120m</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#dc2626"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:12px;color:#64748b">Vải Cotton Đỏ Đô</span>
+                <span style="font-size:12px;font-weight:600;color:#f59e0b">46 / 50m (còn 4m bù)</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:92%;background:#f59e0b"></div></div>
+            </div>
+            <div style="padding-top:8px;border-top:1px solid #f1f5f9">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:600;color:#0f1729">Tổng tiến độ</span>
+                <span style="font-size:12px;font-weight:700;color:#2563eb">246 / 370m (66%)</span>
+              </div>
+              <div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:66%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bảng hàng GRN lần 2 -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div><h3>Chi tiết hàng nhận — Lần 2 (Backorder)</h3><p>Các dòng được điền sẵn từ số lượng còn thiếu · Cập nhật khi hàng về thực tế</p></div>
+          <span class="badge b-warning">124m còn lại</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tên hàng</th><th style="width:70px">Còn thiếu</th><th style="width:80px">Thực nhận</th><th style="width:80px">Chấp nhận</th><th style="width:70px">Từ chối</th><th style="width:90px">Số lô</th><th style="width:80px">Vị trí kho</th><th>QC note</th></tr></thead>
+            <tbody>
+              <tr style="background:#f0fdf4">
+                <td style="display:flex;align-items:center;gap:8px">
+                  <span style="width:8px;height:8px;background:#059669;border-radius:50%;display:inline-block"></span>
+                  Vải Cotton Trắng
+                </td>
+                <td style="color:#059669;font-weight:600">0m ✓</td>
+                <td><input class="qty-input" type="number" value="0" style="border-color:#6ee7b7;color:#059669" disabled /></td>
+                <td><input class="qty-input" type="number" value="0" style="border-color:#6ee7b7;color:#059669" disabled /></td>
+                <td><input class="qty-input" type="number" value="0" disabled /></td>
+                <td class="td-muted" style="font-size:11px">—</td>
+                <td class="td-muted" style="font-size:11px">—</td>
+                <td class="qc-pass" style="font-size:11px">✓ Đã nhận đủ ở GRN#1</td>
+              </tr>
+              <tr>
+                <td style="display:flex;align-items:center;gap:8px">
+                  <span style="width:8px;height:8px;background:#dc2626;border-radius:50%;display:inline-block"></span>
+                  Vải Cotton Xanh Navy
+                </td>
+                <td style="color:#dc2626;font-weight:600">120m</td>
+                <td><input class="qty-input" type="number" value="120" /></td>
+                <td><input class="qty-input" type="number" value="120" /></td>
+                <td><input class="qty-input" type="number" value="0" /></td>
+                <td class="td-muted" style="font-size:11px">LOT-05188</td>
+                <td class="td-muted" style="font-size:11px">A2-05</td>
+                <td class="qc-pass" style="font-size:11px">✓ Đạt — chờ xác nhận</td>
+              </tr>
+              <tr>
+                <td style="display:flex;align-items:center;gap:8px">
+                  <span style="width:8px;height:8px;background:#f59e0b;border-radius:50%;display:inline-block"></span>
+                  Vải Cotton Đỏ Đô (bù 2m lỗi + 2m thiếu)
+                </td>
+                <td style="color:#f59e0b;font-weight:600">4m</td>
+                <td><input class="qty-input" type="number" value="4" /></td>
+                <td><input class="qty-input" type="number" value="4" /></td>
+                <td><input class="qty-input" type="number" value="0" /></td>
+                <td class="td-muted" style="font-size:11px">LOT-05189</td>
+                <td class="td-muted" style="font-size:11px">A2-06</td>
+                <td class="qc-warn" style="font-size:11px">Kiểm tra màu kỹ — lô trước phai</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Completion notice -->
+        <div style="margin:12px 16px;padding:12px 16px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:18px">🎯</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#065f3d">Sau khi xác nhận GRN này → PO-2026-028 sẽ COMPLETED</div>
+            <div style="font-size:11px;color:#047857;margin-top:2px">Tổng nhận: 246m (GRN#1) + 124m (GRN#2) = <strong>370m = SL đặt PO</strong>. Tồn kho tự động cộng thêm 124m sau khi validate.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lịch sử 2 GRN -->
+      <div class="card">
+        <div class="card-header">
+          <div><h3>📋 Tổng hợp lịch sử nhận hàng — PO-2026-028</h3><p>2 lần giao hàng</p></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>GRN</th><th>Lần</th><th>Ngày</th><th>SL nhận</th><th>SL chấp nhận</th><th>SL từ chối</th><th>Return</th><th>Tồn kho cộng</th><th>PO status sau</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-link">GRN-2026-014</td>
+                <td><span class="badge b-info" style="font-size:10px">#1</span></td>
+                <td>13/05/2026</td>
+                <td>248m</td>
+                <td style="color:#059669;font-weight:600">246m</td>
+                <td style="color:#dc2626">2m</td>
+                <td><span class="badge b-warning" style="font-size:10px">RET-001 (2m)</span></td>
+                <td style="color:#059669;font-weight:600">+246m</td>
+                <td><span class="badge b-info">◑ Partially Received</span></td>
+              </tr>
+              <tr style="background:#f0fdf4">
+                <td class="td-link" style="color:#059669">GRN-2026-021</td>
+                <td><span class="badge b-warning" style="font-size:10px">#2</span></td>
+                <td style="color:#d97706">18/05 (dự kiến)</td>
+                <td>124m</td>
+                <td style="color:#94a3b8">—</td>
+                <td style="color:#94a3b8">—</td>
+                <td style="color:#94a3b8">—</td>
+                <td style="color:#059669;font-weight:600">+124m</td>
+                <td><span class="badge b-success">✓ COMPLETED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Tổng kết -->
+        <div style="padding:14px 20px;border-top:1px solid #f1f5f9;background:#f8fafc;display:flex;gap:32px;flex-wrap:wrap">
+          <div><span style="font-size:11px;color:#64748b;display:block">PO ordered</span><span style="font-size:18px;font-weight:700;color:#0f1729">370m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">GRN#1 accepted</span><span style="font-size:18px;font-weight:700;color:#059669">246m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">GRN#2 expected</span><span style="font-size:18px;font-weight:700;color:#d97706">124m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">Returned to NCC</span><span style="font-size:18px;font-weight:700;color:#dc2626">2m</span></div>
+          <div><span style="font-size:11px;color:#64748b;display:block">Total kho sau cả 2 GRN</span><span style="font-size:18px;font-weight:700;color:#2563eb">370m</span></div>
+        </div>
+
+        <!-- Invoice note -->
+        <div style="margin:0 16px 16px;padding:12px 16px;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px">
+          <div style="font-size:12px;font-weight:600;color:#1e40af;margin-bottom:4px">💳 Hóa đơn & Thanh toán theo luồng này</div>
+          <div style="font-size:11px;color:#3b82f6;display:flex;flex-direction:column;gap:3px">
+            <span>• <strong>Kiểu HĐ theo GRN:</strong> Invoice#1 (246m) sau GRN#1 → Invoice#2 (124m) sau GRN#2 → 2 lần thanh toán</span>
+            <span>• <strong>Kiểu HĐ gộp:</strong> 1 Invoice (370m) chờ sau GRN#2 hoàn tất → 1 lần thanh toán</span>
+            <span>• <strong>Ràng buộc:</strong> Invoice.quantity_billed ≤ tổng GRN.quantity_accepted tại thời điểm xuất HĐ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function go(i) {
+  document.querySelectorAll('.screen').forEach((s,j) => s.classList.toggle('active', i===j));
+  document.querySelectorAll('.stab').forEach((t,j) => t.classList.toggle('active', i===j));
+  window.scrollTo(0,0);
+}
+
+/* ── PR FORM ── */
+let rowIndex=1, selectedPri='';
+function setPri(btn,val,cls){selectedPri=val;document.querySelectorAll('.pri-btn').forEach(b=>b.className='pri-btn');btn.classList.add(cls);validate();}
+function updateUnit(sel,idx){const opt=sel.options[sel.selectedIndex];const el=document.getElementById('unit-'+idx);if(el)el.value=opt.dataset.unit||'';validate();}
+function calcPRTotal(){let t=0;document.querySelectorAll('[id^="qty-"]').forEach(q=>{const i=q.id.split('-')[1];const p=parseFloat(document.getElementById('price-'+i)?.value)||0;t+=(parseFloat(q.value)||0)*p;});const fmt=t>0?t.toLocaleString('vi-VN')+' ₫':'0 ₫';['estTotal','sideTotal'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=fmt;});updateApprovalRoute(t);}
+function updateApprovalRoute(t){const el=document.getElementById('approvalRoute');if(!el)return;if(t===0){el.innerHTML='<div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px dashed #e2e8f0;font-size:12px;color:#94a3b8">Nhập giá ước tính để xem cấp duyệt</div>';return;}let a,c,b,ic;if(t<5e6){a='Quản lý Kho/Bộ phận';c='#065f3d';b='#ecfdf5';ic='✓';}else if(t<=5e7){a='Trưởng phòng';c='#92400e';b='#fffbeb';ic='⚡';}else{a='Giám đốc';c='#991b1b';b='#fef2f2';ic='🔴';}el.innerHTML=`<div style="padding:10px 12px;background:${b};border-radius:8px"><div style="font-size:10px;color:#64748b">Người duyệt</div><div style="font-size:14px;font-weight:700;color:${c}">${ic} ${a}</div></div>`;}
+function countValidRows(){let v=0,t=0;document.querySelectorAll('[id^="qty-"]').forEach(q=>{const i=q.id.split('-')[1];const r=document.getElementById('row-'+i);if(!r)return;if(r.querySelector('select')?.value){t++;if((parseFloat(q.value)||0)>0)v++;}});return{valid:v,total:t};}
+function validate(){const dept=document.getElementById('dept')?.value;const date=document.getElementById('neededDate')?.value;const{valid,total}=countValidRows();const ok={dept:!!dept,date:!!date,pri:!!selectedPri,items:total>0,qtys:valid===total&&total>0};[['vDept',ok.dept,'Bộ phận: '+dept,'Chưa chọn bộ phận'],['vDate',ok.date,'Cần hàng: '+date,'Chưa chọn ngày'],['vPri',ok.pri,'Ưu tiên: '+selectedPri,'Chưa chọn ưu tiên'],['vItems',ok.items&&ok.qtys,total+' dòng hợp lệ','Chưa có dòng hàng']].forEach(([id,pass,y,n])=>{const el=document.getElementById(id);if(el){el.textContent=pass?'✓ '+y:'✗ '+n;el.className='vcheck '+(pass?'pass':'fail');}});const all=ok.dept&&ok.date&&ok.pri&&ok.items&&ok.qtys;const bar=document.getElementById('validationBar');if(bar)bar.className='validation-bar'+(all?' ok':'');[['chk1',ok.dept,'Chọn bộ phận'],['chk2',ok.date,'Điền ngày cần hàng'],['chk3',ok.pri,'Chọn ưu tiên'],['chk4',ok.items,'Thêm dòng hàng'],['chk5',ok.qtys,'SL > 0']].forEach(([id,pass,lbl])=>{const el=document.getElementById(id);if(el)el.innerHTML=pass?`<span style="color:#059669">✓</span><span style="color:#059669;font-weight:500">${lbl}</span>`:`<span style="color:#e2e8f0">○</span><span style="color:#94a3b8">${lbl}</span>`;});const ic=document.getElementById('itemCount');if(ic)ic.textContent=total+' dòng';const btn=document.getElementById('submitBtn');if(btn){btn.style.opacity=all?'1':'.5';btn.style.cursor=all?'pointer':'not-allowed';}return all;}
+function addRow(){rowIndex++;const idx=rowIndex;const c=document.getElementById('itemRows');if(!c)return;const d=document.createElement('div');d.className='item-row';d.id='row-'+idx;d.innerHTML=`<div class="item-num">${idx}</div><div><select onchange="updateUnit(this,${idx});validate()"><option value="">-- Chọn --</option><option value="Vải Cotton Trắng" data-unit="mét">Vải Cotton Trắng</option><option value="Vải Cotton Xanh Navy" data-unit="mét">Vải Cotton Xanh Navy</option><option value="Khóa Kéo 20cm" data-unit="cái">Khóa Kéo 20cm</option><option value="Chỉ May Lụa" data-unit="cuộn">Chỉ May Lụa</option><option value="Mex Lót Mỏng" data-unit="mét">Mex Lót Mỏng</option></select></div><div><input placeholder="Đặc tả..." id="spec-${idx}"/></div><div><input type="number" min="1" placeholder="0" id="qty-${idx}" onchange="calcPRTotal();validate()"/></div><div><input placeholder="mét" id="unit-${idx}"/></div><div><div class="input-with-badge"><input type="number" min="0" placeholder="0" id="price-${idx}" onchange="calcPRTotal()"/><span class="input-badge">VND</span></div></div><div><select id="sup-${idx}"><option value="">--</option><option>Vải ABC Trading</option><option>Phụ Liệu XYZ</option></select></div><button class="del-btn" onclick="removeRow(${idx})">×</button>`;c.appendChild(d);validate();}
+function removeRow(idx){const r=document.getElementById('row-'+idx);if(r)r.remove();calcPRTotal();validate();}
+function handleSubmit(){if(!validate())return;const btn=document.getElementById('submitBtn');if(btn){btn.textContent='✓ Đã submit';btn.style.background='#059669';btn.style.borderColor='#059669';}const sb=document.getElementById('successBox');if(sb){sb.style.display='block';sb.scrollIntoView({behavior:'smooth',block:'nearest'});}}
+
+/* ── SUPPLIER EVAL ── */
+function setScore(container,scoreId,e){const star=e.target.closest('[data-v]');if(!star)return;const val=parseInt(star.dataset.v);container.querySelectorAll('.star-big').forEach((s,i)=>{s.classList.toggle('filled',i<val);s.classList.toggle('empty',i>=val);});const el=document.getElementById(scoreId);if(el){el.textContent=val;const colors={1:'#dc2626',2:'#f59e0b',3:'#f59e0b',4:'#059669',5:'#059669'};el.style.color=colors[val];}calcEvalTotal();}
+function calcEvalTotal(){const s1=parseInt(document.getElementById('q1score')?.textContent||5);const s2=parseInt(document.getElementById('q2score')?.textContent||4);const s3=parseInt(document.getElementById('q3score')?.textContent||5);const s4=parseInt(document.getElementById('q4score')?.textContent||5);const total=(s1*.35+s2*.30+s3*.20+s4*.15).toFixed(2);const el=document.getElementById('totalScore');if(el){el.textContent=total;el.style.color=total>=4?'#059669':total>=3?'#f59e0b':'#dc2626';}if(document.getElementById('d1')){document.getElementById('d1').textContent=s1+'.0 → '+(s1*.35).toFixed(2);document.getElementById('d2').textContent=s2+'.0 → '+(s2*.30).toFixed(2);document.getElementById('d3').textContent=s3+'.0 → '+(s3*.20).toFixed(2);document.getElementById('d4').textContent=s4+'.0 → '+(s4*.15).toFixed(2);}}
+</script>
+</body>
+</html>
