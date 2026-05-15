@@ -61,7 +61,7 @@ export function InvoiceDetailModal({ open, onOpenChange, data }: InvoiceDetailMo
           </div>
         </div>
 
-        {/* Items Section - Linked GRNs */}
+        {/* Linked GRNs Section */}
         <div>
           <h4 className="font-semibold text-sm mb-3">Phiếu nhập kho liên kết ({data.grnCodes?.length || 0})</h4>
           <div className="border rounded overflow-hidden">
@@ -85,61 +85,6 @@ export function InvoiceDetailModal({ open, onOpenChange, data }: InvoiceDetailMo
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
-
-        {/* Items Section - Invoice Details */}
-        <div>
-          <h4 className="font-semibold text-sm mb-3">Chi tiết hàng hóa ({data.items?.length || 0} dòng)</h4>
-          <div className="border rounded overflow-hidden">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="bg-slate-100 border-b">
-                  <th className="px-3 py-2 text-left font-semibold">#</th>
-                  <th className="px-3 py-2 text-left font-semibold">Tên sản phẩm</th>
-                  <th className="px-3 py-2 text-center font-semibold">SL</th>
-                  <th className="px-3 py-2 text-left font-semibold">Đơn vị</th>
-                  <th className="px-3 py-2 text-right font-semibold">Đơn giá</th>
-                  <th className="px-3 py-2 text-right font-semibold">Thành tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.items?.map((item, idx) => (
-                  <tr key={item.id} className="border-b hover:bg-slate-50">
-                    <td className="px-3 py-2 text-slate-600">{idx + 1}</td>
-                    <td className="px-3 py-2 font-medium text-slate-800">{item.productName}</td>
-                    <td className="px-3 py-2 text-center">{item.quantity}</td>
-                    <td className="px-3 py-2 text-slate-600">{item.unit}</td>
-                    <td className="px-3 py-2 text-right text-slate-600">
-                      {item.unitPrice.toLocaleString('vi-VN')} ₫
-                    </td>
-                    <td className="px-3 py-2 text-right font-semibold text-slate-800">
-                      {item.totalAmount.toLocaleString('vi-VN')} ₫
-                    </td>
-                  </tr>
-                )) || (
-                  <tr>
-                    <td colSpan={6} className="px-3 py-2 text-slate-500 text-center">Không có hàng hóa</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Summary Section */}
-        <div className="grid grid-cols-3 gap-4 p-4 bg-slate-50 rounded border">
-          <div>
-            <div className="text-xs font-medium text-slate-600 mb-1">Tạm tính</div>
-            <div className="font-medium text-slate-800">{(data.subtotal || 0).toLocaleString('vi-VN')} ₫</div>
-          </div>
-          <div>
-            <div className="text-xs font-medium text-slate-600 mb-1">Thuế VAT</div>
-            <div className="font-medium text-slate-800">{(data.vat || 0).toLocaleString('vi-VN')} ₫</div>
-          </div>
-          <div>
-            <div className="text-xs font-medium text-slate-600 mb-1">Chiết khấu</div>
-            <div className="font-medium text-green-700">{(data.discount || 0).toLocaleString('vi-VN')} ₫</div>
           </div>
         </div>
 
