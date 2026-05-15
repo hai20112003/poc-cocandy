@@ -4,6 +4,7 @@ export interface IGRNItem {
   productName: string
   expectedQty: number
   receivedQty: number
+  quantityReceived?: number
   acceptedQty: number
   rejectedQty: number
   unit: string
@@ -18,15 +19,24 @@ export interface IGRN {
   id: string
   code: string
   poId: string
+  poCode?: string
   prId?: string
   supplierId: string
   supplierName: string
   status: 'Draft' | 'Submitted' | 'Received' | 'QC In Progress' | 'Completed' | 'Rejected'
+  qcStatus?: 'Pending' | 'Pass' | 'Fail'
   isPartial: boolean
   items: IGRNItem[]
   receivedDate: Date
   createdAt: Date
   updatedAt: Date
+  receivedBy?: string
+  warehouseLocation?: string
+  qcStartedAt?: Date
+  qcCompletedAt?: Date
+  qcInspector?: string
+  notes?: string
+  returns?: IReturn[]
 }
 
 export interface IReturn {

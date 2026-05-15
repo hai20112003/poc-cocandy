@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Eye, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Eye, Pencil, Trash2, FileText } from 'lucide-react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { PageLayout } from '@/layouts/PageLayout'
 import { PageHeader } from '@/components/shared/PageHeader'
@@ -125,7 +125,11 @@ export function PurchaseRequestsPage() {
     {
       accessorKey: 'status',
       header: 'Trạng thái',
-      cell: ({ getValue }) => <StatusBadge status={getValue<string>()} />,
+      cell: ({ getValue }) => {
+        const status = getValue<string>()
+        const variant = status === 'Approved' ? 'success' : status === 'Rejected' ? 'danger' : 'info'
+        return <StatusBadge variant={variant}>{status}</StatusBadge>
+      },
     },
     {
       accessorKey: 'createdBy',
@@ -171,8 +175,8 @@ export function PurchaseRequestsPage() {
     <PageLayout>
       <PageHeader
         title="Danh sách yêu cầu mua hàng"
-        description="Quản lý các yêu cầu mua hàng từ các bộ phận"
-        action={
+        subtitle="Quản lý các yêu cầu mua hàng từ các bộ phận"
+        actions={
           <Button onClick={openAdd}>
             <Plus className="w-4 h-4 mr-2" /> Tạo mới
           </Button>
@@ -193,6 +197,7 @@ export function PurchaseRequestsPage() {
 
       {filtered.length === 0 ? (
         <EmptyState
+          icon={FileText}
           title="Không có yêu cầu mua hàng"
           description="Hãy tạo yêu cầu mua hàng đầu tiên"
           action={<Button onClick={openAdd}>Tạo mới</Button>}

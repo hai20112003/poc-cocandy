@@ -7,6 +7,9 @@ export interface IPRItem {
   unitPrice: number
   total: number
   notes: string
+  specification?: string
+  estimatedPrice?: number
+  suggestedSupplier?: string
 }
 
 export interface IPR {
@@ -28,6 +31,8 @@ export interface IPR {
   createdAt: Date
   updatedAt: Date
   convertedToPOId?: string
+  requester?: string
+  notes?: string
 }
 
 // Type aliases for backward compatibility

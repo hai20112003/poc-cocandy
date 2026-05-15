@@ -34,6 +34,10 @@ export interface IPO {
   cancellationReason?: string
 }
 
+// Type aliases for backward compatibility
+export type IPurchaseOrder = IPO
+export type IPurchaseOrderItem = IPOItem
+
 export interface PurchaseOrdersState {
   items: IPO[]
   selected: IPO | null

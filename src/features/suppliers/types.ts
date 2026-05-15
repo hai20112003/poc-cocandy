@@ -37,6 +37,8 @@ export interface ISupplier {
   products: IProduct[]
   website?: string
   minOrderValue?: number
+  taxCode?: string
+  contactPerson?: string
   createdAt: Date
   updatedAt: Date
 }
