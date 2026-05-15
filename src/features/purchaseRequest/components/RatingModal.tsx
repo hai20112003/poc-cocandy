@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Star } from 'lucide-react'
 
 export interface RatingFormData {
@@ -46,11 +46,21 @@ export function RatingModal({
     onClose()
   }
 
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose()
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isOpen, handleClose])
+
   const displayRating = hoveredRating || rating
   const isValid = rating > 0
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
@@ -59,6 +69,7 @@ export function RatingModal({
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition"
             disabled={isLoading}
+            aria-label="Đóng"
           >
             <X size={20} />
           </button>
@@ -82,6 +93,7 @@ export function RatingModal({
                     onMouseLeave={() => setHoveredRating(0)}
                     className="transition-transform hover:scale-110"
                     disabled={isLoading}
+                    aria-label={`Đánh giá ${star} sao`}
                   >
                     <Star
                       size={28}
@@ -114,8 +126,9 @@ export function RatingModal({
               rows={4}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition focus:border-blue-500 resize-none"
               disabled={isLoading}
+              aria-describedby="comment-counter"
             />
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-gray-500 mt-1" id="comment-counter">
               {comment.length}/500 ký tự
             </div>
           </div>
