@@ -42,7 +42,8 @@
       "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")",
       "Bash(rtk lint *)",
       "Bash(timeout 15 npm run dev)",
-      "Bash(curl -s http://localhost:5174)"
+      "Bash(curl -s http://localhost:5174)",
+      "Bash(pkill -f \"node\\\\|npm\")"
     ]
   }
 }
