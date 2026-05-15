@@ -4,17 +4,27 @@ import { ChevronLeft, Plus, AlertCircle } from 'lucide-react'
 import { useProcurementStore } from '@/store/procurementStore'
 import { IPurchaseRequest, IPurchaseRequestItem } from '../types'
 
-const PRODUCTS = [
-  'Vải Cotton Trắng',
-  'Vải Cotton Xanh Navy',
-  'Vải Cotton Đỏ Đô',
-  'Vải Lụa Kem',
-  'Khóa Kéo 20cm',
-  'Nút Áo 4 Lỗ',
-  'Chỉ May Lụa',
-  'Mex Lót Mỏng',
-  'Túi Nilon 10x20',
-]
+const PRODUCTS_BY_CATEGORY = {
+  'Nguyên phụ liệu': [
+    { name: 'Vải Cotton Trắng', unit: 'mét' },
+    { name: 'Vải Cotton Xanh Navy', unit: 'mét' },
+    { name: 'Vải Cotton Đỏ Đô', unit: 'mét' },
+    { name: 'Vải Lụa Kem', unit: 'mét' },
+    { name: 'Khóa Kéo 20cm', unit: 'cái' },
+    { name: 'Nút Áo 4 Lỗ', unit: 'cái' },
+    { name: 'Chỉ May Lụa', unit: 'cuộn' },
+    { name: 'Mex Lót Mỏng', unit: 'mét' },
+    { name: 'Túi Nilon 10x20', unit: 'cái' },
+  ],
+  'Thành phẩm': [
+    { name: 'Áo Sơ Mi Cotton', unit: 'cái' },
+    { name: 'Quần Tây Nam', unit: 'cái' },
+    { name: 'Đầm Nữ Công Sở', unit: 'cái' },
+    { name: 'Áo Thun In Logo', unit: 'cái' },
+    { name: 'Quần Jeans Nam', unit: 'cái' },
+    { name: 'Áo Khoác Nữ', unit: 'cái' },
+  ],
+}
 
 const SUPPLIERS = ['Vải ABC Trading', 'Phụ Liệu XYZ', 'Vải Lụa Hạnh Phúc', 'NCC Nút Bấm 123', 'Cotton Premium']
 
@@ -47,6 +57,7 @@ export function PRForm() {
 
   const [items, setItems] = useState<IPurchaseRequestItem[]>([])
   const [newItem, setNewItem] = useState<Partial<IPurchaseRequestItem>>({
+    productCategory: '',
     productName: '',
     specification: '',
     quantity: 0,
@@ -350,19 +361,39 @@ export function PRForm() {
             {/* Add Item Form */}
             <div className="p-6 bg-gray-50 border-t border-gray-200 space-y-3">
               <div className="grid grid-cols-8 gap-2">
-                <div className="col-span-2">
+                <div className="col-span-1.5">
                   <select
-                    value={newItem.productName || ''}
-                    onChange={(e) => setNewItem({ ...newItem, productName: e.target.value })}
+                    value={newItem.productCategory || ''}
+                    onChange={(e) => setNewItem({ ...newItem, productCategory: e.target.value, productName: '', unit: '' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">-- Chọn sản phẩm --</option>
-                    {PRODUCTS.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
+                    <option value="">-- Loại --</option>
+                    <option value="Nguyên phụ liệu">Nguyên phụ liệu</option>
+                    <option value="Thành phẩm">Thành phẩm</option>
                   </select>
+                </div>
+                <div className="col-span-1.5">
+                  {!newItem.productCategory ? (
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-100 text-gray-500">
+                      Chọn loại trước
+                    </div>
+                  ) : (
+                    <select
+                      value={newItem.productName || ''}
+                      onChange={(e) => {
+                        const product = PRODUCTS_BY_CATEGORY[newItem.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm'].find(p => p.name === e.target.value)
+                        setNewItem({ ...newItem, productName: e.target.value, unit: product?.unit || '' })
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">-- Chọn sản phẩm --</option>
+                      {(newItem.productCategory ? PRODUCTS_BY_CATEGORY[newItem.productCategory as 'Nguyên phụ liệu' | 'Thành phẩm'] : []).map((p) => (
+                        <option key={p.name} value={p.name}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
                 <div className="col-span-1.5">
                   <input

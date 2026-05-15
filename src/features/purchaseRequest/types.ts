@@ -1,6 +1,7 @@
 export interface IPRItem {
   id: string
   productId: string
+  productCategory?: string
   productName: string
   quantity: number
   unit: string
