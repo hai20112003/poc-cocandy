@@ -48,7 +48,7 @@ export function SupplierList() {
           </div>
           <div className="flex gap-2">
             <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50">
-              ↓ Export
+              ↓ Xuất
             </button>
             <button onClick={() => navigate('/suppliers/add')} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
               + Thêm NCC
@@ -62,7 +62,7 @@ export function SupplierList() {
         {[
           { label: 'Đang hoạt động', value: stats.active, color: 'text-green-600' },
           { label: 'Tạm ngưng', value: stats.suspended, color: 'text-yellow-600' },
-          { label: 'Blacklisted', value: stats.blacklisted, color: 'text-red-600' },
+          { label: 'Bị chặn', value: stats.blacklisted, color: 'text-red-600' },
           { label: 'Có hợp đồng', value: stats.withContract, color: 'text-blue-600' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white p-4 rounded-lg border border-gray-200">
@@ -87,10 +87,10 @@ export function SupplierList() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
-            <option>All</option>
-            <option>Active</option>
-            <option>Suspended</option>
-            <option>Blacklisted</option>
+            <option value="All">Trạng thái: Tất cả</option>
+            <option value="Active">Hoạt động</option>
+            <option value="Suspended">Tạm ngưng</option>
+            <option value="Blacklisted">Bị chặn</option>
           </select>
           <select
             value={typeFilter}
@@ -98,9 +98,9 @@ export function SupplierList() {
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
             <option value="All">Loại: Tất cả</option>
-            <option value="Manufacturer">Manufacturer</option>
-            <option value="Trader">Trader</option>
-            <option value="Individual">Individual</option>
+            <option value="Manufacturer">Nhà sản xuất</option>
+            <option value="Trader">Thương nhân</option>
+            <option value="Individual">Cá nhân</option>
           </select>
         </div>
       </div>
@@ -133,7 +133,7 @@ export function SupplierList() {
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-                        {supplier.type}
+                        {supplier.type === 'Manufacturer' ? 'Nhà sản xuất' : supplier.type === 'Trader' ? 'Thương nhân' : 'Cá nhân'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm">{supplier.leadTime} ngày</td>
@@ -157,9 +157,9 @@ export function SupplierList() {
                         supplier.status === 'Suspended' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-red-100 text-red-700'
                       }`}>
-                        {supplier.status === 'Active' ? '● Active' :
-                         supplier.status === 'Suspended' ? '○ Inactive' :
-                         '✕ Blacklisted'}
+                        {supplier.status === 'Active' ? '● Hoạt động' :
+                         supplier.status === 'Suspended' ? '○ Tạm ngưng' :
+                         '✕ Bị chặn'}
                       </span>
                     </td>
                   </tr>
